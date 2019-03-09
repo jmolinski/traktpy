@@ -1,0 +1,12 @@
+dist: trusty
+sudo: false
+language: python
+python:
+  - 3.6
+install:
+  - travis_retry pip install -r travis-requirements.txt
+  - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then travis_retry pip install pyOpenSSL>=16.2.0; fi
+script:
+  - tox
+after_success:
+  - coveralls
