@@ -14,3 +14,4 @@ pytest-runner
 httmock
 PyHamcrest
 flake8
+pytest-cov
