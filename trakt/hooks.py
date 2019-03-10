@@ -1,7 +1,8 @@
 import os
+from typing import Any
 
 
-def write_version(command):
+def write_version(command: Any) -> None:
     version = command.egg_version
 
     version_path = os.path.join(os.path.dirname(__file__), 'version.py')

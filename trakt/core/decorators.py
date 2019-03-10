@@ -4,7 +4,7 @@ from trakt.core.exceptions import NotAuthenticated
 
 
 def auth_required(f: Callable[..., Any]) -> Callable[..., Any]:
-    def wrapper(self, *args: Any, **kwargs: Any):
+    def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
         if not self.authenticated:
             raise NotAuthenticated
 

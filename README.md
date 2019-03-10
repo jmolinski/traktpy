@@ -3,3 +3,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/jmolinski/traktpy/badge.svg?branch=master)](https://coveralls.io/github/jmolinski/traktpy?branch=master)
 
 Python wrapper for Trakt REST api
+
+---
+### TODO
+- oauth
+- resource models
+- http fetcher

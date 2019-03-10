@@ -1,14 +1,23 @@
 from typing import Any
 
+from trakt.config import Config, DefaultConfig
+
 
 class TraktApi:
     authenticated: bool
+    client_id: str
+    client_secret: str
+    config: Config
 
-    def __init__(self) -> None:
+    def __init__(self, client_id: str, client_secret: str, **config: str) -> None:
         self.authenticated = False
+        self.client_id = client_id
+        self.client_secret = client_secret
+
+        self.config = DefaultConfig(client_id=client_id, client_secret=client_secret, **config)
 
     def login(self) -> None:
         pass
 
-    def run(self, path: str, *args: Any, **kwargs: Any) -> Any:
+    def request(self, path: str, *args: Any, **kwargs: Any) -> Any:
         pass
