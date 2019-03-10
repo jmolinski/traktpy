@@ -9,4 +9,5 @@ def auth_required(f: Callable[..., Any]) -> Callable[..., Any]:
             raise NotAuthenticated
 
         return f(self, *args, **kwargs)
+
     return wrapper

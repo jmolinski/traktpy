@@ -10,3 +10,4 @@ pytest-cov
 pytest-runner
 requests
 tox
+black

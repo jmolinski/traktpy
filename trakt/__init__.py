@@ -11,7 +11,7 @@ class Trakt:
     _config: Dict[str, str]
 
     def __init__(self, client_id: str, client_secret: str) -> None:
-        self._config = {'client_id': client_id, 'client_secret': client_secret}
+        self._config = {"client_id": client_id, "client_secret": client_secret}
 
     def __getattr__(self, name: str) -> Any:
         if not self._instance:
@@ -20,9 +20,7 @@ class Trakt:
         return getattr(self._instance, name)
 
 
-__all__ = (
-    'Trakt',
-)
+__all__ = ("Trakt",)
 
 
 logging.getLogger(__name__).addHandler(NullHandler())

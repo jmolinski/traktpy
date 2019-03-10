@@ -12,9 +12,7 @@ class Config:
         self._config.update(config)
 
 
-DEFAULT_CONFIG: Dict[str, str] = {
-    'base_url': 'https://api.trakt.tv',
-}
+DEFAULT_CONFIG: Dict[str, str] = {"base_url": "https://api.trakt.tv"}
 
 
 class DefaultConfig(Config):

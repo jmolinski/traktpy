@@ -14,7 +14,9 @@ class TraktApi:
         self.client_id = client_id
         self.client_secret = client_secret
 
-        self.config = DefaultConfig(client_id=client_id, client_secret=client_secret, **config)
+        self.config = DefaultConfig(
+            client_id=client_id, client_secret=client_secret, **config
+        )
 
     def login(self) -> None:
         pass

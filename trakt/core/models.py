@@ -9,7 +9,7 @@ class _AbstractFromJson:
     pass
 
 
-T = TypeVar('T', bound=_AbstractFromJson)
+T = TypeVar("T", bound=_AbstractFromJson)
 MediaForeignIDType = Type[Union[int, str, None]]
 
 
@@ -125,3 +125,49 @@ class MovieDetails(Movie):
     available_translations: List[str]
     genres: List[str]
     certification: str
+
+
+@dataclass
+class MovieAlias(AbstractBaseModel):
+    title: str
+    country: str
+
+
+@dataclass
+class MovieRelease(AbstractBaseModel):
+    country: str
+    certification: str
+    release_date: date
+    release_type: str
+    note: Optional[str]
+
+
+@dataclass
+class MovieTranslation(AbstractBaseModel):
+    title: str
+    overview: str
+    tagline: str
+    language: str
+
+
+@dataclass
+class Person(AbstractBaseModel):
+    name: str
+    ids: Dict[str, MediaForeignIDType]
+
+
+@dataclass
+class Rating(AbstractBaseModel):
+    rating: float
+    votes: int
+    distribution: Dict[str, int]
+
+
+@dataclass
+class MovieStats(AbstractBaseModel):
+    watchers: int
+    plays: int
+    collectors: int
+    comments: int
+    lists: int
+    votes: int
