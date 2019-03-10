@@ -3,6 +3,7 @@ from logging import NullHandler
 from typing import Any, Dict, Optional
 
 from trakt.api import TraktApi
+from trakt.core.abstract_models import AbstractBaseModel
 from trakt.version import __version__  # NOQA
 
 
@@ -16,6 +17,7 @@ class Trakt:
     def __getattr__(self, name: str) -> Any:
         if not self._instance:
             self._instance = TraktApi(**self._config)
+            AbstractBaseModel.set_client(self._instance)
 
         return getattr(self._instance, name)
 

@@ -1,9 +1,10 @@
 from typing import Any
 
 from trakt.config import Config, DefaultConfig
+from trakt.core.abstract_api import AbstractApi
 
 
-class TraktApi:
+class TraktApi(AbstractApi):
     authenticated: bool
     client_id: str
     client_secret: str
@@ -22,4 +23,7 @@ class TraktApi:
         pass
 
     def request(self, path: str, *args: Any, **kwargs: Any) -> Any:
+        pass
+
+    def noop(self) -> None:
         pass

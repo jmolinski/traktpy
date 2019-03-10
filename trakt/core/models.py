@@ -1,23 +1,10 @@
 from dataclasses import dataclass
-from datetime import date, datetime
-from typing import Any, Dict, List, Optional, Type, TypeVar, Union, cast
+from datetime import datetime
+from typing import Dict, List, Optional, Type, Union
 
-import jsons
+from trakt.core.abstract_models import AbstractBaseModel
 
-
-class _AbstractFromJson:
-    pass
-
-
-T = TypeVar("T", bound=_AbstractFromJson)
 MediaForeignIDType = Type[Union[int, str, None]]
-
-
-class AbstractBaseModel(_AbstractFromJson):
-    @classmethod
-    def from_json(cls: Type[T], data: Dict[str, Any]) -> T:
-        obj = jsons.load(data, cls)
-        return cast(T, obj)
 
 
 @dataclass
@@ -112,7 +99,7 @@ class Movie(AbstractBaseModel):
 class MovieDetails(Movie):
     tagline: str
     overview: str
-    released: date
+    released: datetime
     runtime: int
     country: str
     updated_at: datetime
@@ -137,7 +124,7 @@ class MovieAlias(AbstractBaseModel):
 class MovieRelease(AbstractBaseModel):
     country: str
     certification: str
-    release_date: date
+    release_date: datetime
     release_type: str
     note: Optional[str]
 
