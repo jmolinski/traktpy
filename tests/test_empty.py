@@ -3,6 +3,7 @@ from typing import List
 
 import jsons
 import pytest
+from tests.client import config as secrets
 from trakt import Trakt
 from trakt.core.models import Country
 
@@ -22,3 +23,10 @@ def test_data_deserialization():
     cts: List[Country] = jsons.load(data, List[Country])
 
     assert cts[0].client == cts[1].client
+
+
+def test_client():
+    client = Trakt(**secrets)
+    client.noop()
+
+    # print(client._instance.config._config)

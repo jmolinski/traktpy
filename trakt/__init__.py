@@ -3,7 +3,7 @@ from logging import NullHandler
 from typing import Any, Dict, Optional
 
 from trakt.api import TraktApi
-from trakt.core.abstract_models import AbstractBaseModel
+from trakt.core.abstract.abstract_models import AbstractBaseModel
 from trakt.version import __version__  # NOQA
 
 
