@@ -2,7 +2,6 @@
 from dataclasses import dataclass
 from typing import List
 
-import jsons
 import pytest
 from trakt.core import json_parser
 

@@ -27,6 +27,5 @@ def test_data_deserialization():
 
 def test_client():
     client = Trakt(**secrets)
-    client.noop()
 
-    # print(client._instance.config._config)
+    assert "Executor(params=shows.trending)" == client.shows.trending()
