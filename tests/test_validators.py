@@ -4,15 +4,16 @@ import pytest
 from trakt.core.restpaths import AuthRequiredValidator
 
 
-def test_validators():
-    class A:
-        pass
+class A:
+    pass
 
+
+def test_auth_validator():
     client = A()
     client.authenticated = True
 
-    assert AuthRequiredValidator().validate(client=client) == True
+    assert AuthRequiredValidator().validate(client=client) is True
 
     client.authenticated = False
 
-    assert AuthRequiredValidator().validate(client=client) == False
+    assert AuthRequiredValidator().validate(client=client) is False
