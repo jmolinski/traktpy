@@ -1,7 +1,9 @@
 from typing import Any
 
 from trakt.config import Config, DefaultConfig
-from trakt.core.abstract_api import AbstractApi
+from trakt.core.abstract.abstract_api import AbstractApi
+from trakt.core.components import HttpComponent, OathComponent
+from trakt.core.executors import Executor
 
 
 class TraktApi(AbstractApi):
@@ -19,11 +21,11 @@ class TraktApi(AbstractApi):
             client_id=client_id, client_secret=client_secret, **config
         )
 
-    def login(self) -> None:
-        pass
-
-    def request(self, path: str, *args: Any, **kwargs: Any) -> Any:
-        pass
+        self.http = HttpComponent(self)
+        self.oath = OathComponent(self)
 
     def noop(self) -> None:
         pass
+
+    def __getattr__(self, item):
+        return Executor(self, item)

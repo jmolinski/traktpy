@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Dict, Type, TypeVar, cast
 
 import jsons
-from trakt.core.abstract_api import AbstractApi
+from trakt.core.abstract.abstract_api import AbstractApi
 
 
 class _AbstractFromJson:

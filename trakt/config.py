@@ -1,18 +1,22 @@
 from copy import deepcopy
-from typing import Dict
+from typing import Dict, Union
+
+InternalConfigType = Dict[str, Union[str, Dict[str, Union[str, int]]]]
 
 
 class Config:
-    _config: Dict[str, str]
+    _config: InternalConfigType
 
-    def __init__(self, config: Dict[str, str]) -> None:
+    def __init__(self, config: InternalConfigType) -> None:
         self._config = config
 
-    def update(self, config: Dict[str, str]) -> None:
+    def update(self, config: InternalConfigType) -> None:
         self._config.update(config)
 
 
-DEFAULT_CONFIG: Dict[str, str] = {"base_url": "https://api.trakt.tv"}
+DEFAULT_CONFIG: InternalConfigType = {
+    "http": {"base_url": "https://api.trakt.tv", "max_retries": 3}
+}
 
 
 class DefaultConfig(Config):
