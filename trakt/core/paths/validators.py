@@ -1,5 +1,5 @@
 class Validator:
-    def _validate(self, *args, **kwargs):
+    def _validate(self, *args, **kwargs):  # pragma: no cover
         return True
 
     def validate(self, *args, **kwargs):
@@ -36,3 +36,13 @@ class OptionalArgsValidator(Validator):
                     return False
             elif arg_name in kwargs:
                 require_previous = True
+
+
+class PerArgValidator(Validator):
+    def __init__(self, arg_name, f):
+        self.arg_name = arg_name
+        self.boolean_check = f
+
+    def _validate(self, *args, **kwargs):
+        if self.arg_name in kwargs:
+            return self.boolean_check(kwargs[self.arg_name])

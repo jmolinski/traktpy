@@ -2,7 +2,7 @@ import os
 from typing import Any
 
 
-def write_version(command: Any) -> None:
+def write_version(command: Any) -> None:  # pragma: no cover
     version = command.egg_version
 
     version_path = os.path.join(os.path.dirname(__file__), "version.py")
