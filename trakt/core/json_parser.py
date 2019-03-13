@@ -5,6 +5,8 @@ import jsons
 TYPE_TYPE = int.__class__
 ITERABLES = [list, dict]
 
+# TODO wildcards {str: str}
+
 
 def parse_tree(data, tree_structure):
     if not tree_structure:

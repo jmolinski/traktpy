@@ -28,4 +28,6 @@ def test_data_deserialization():
 def test_client():
     client = Trakt(**secrets)
 
-    assert "Executor(params=shows.trending)" == client.shows.trending()
+    # x = client.request("countries", type="shows")
+
+    # print(x)

@@ -2,32 +2,13 @@ from typing import Any, Dict, List
 
 from trakt.core.abstract import AbstractApi
 from trakt.core.exceptions import ClientError
+from trakt.core.paths.validators import (
+    OptionalArgsValidator,
+    RequiredArgsValidator,
+    Validator,
+)
 
-
-class Validator:
-    def _validate(self, *args, **kwargs):
-        return True
-
-    def validate(self, *args, **kwargs):
-        return self._validate(*args, **kwargs) is not False
-
-
-class AuthRequiredValidator(Validator):
-    def _validate(self, client, *args, **kwargs):
-        if not client.authenticated:
-            return False
-
-
-class RequiredArgsValidator(Validator):
-    def _validate(self, *args, path=None, **kwargs):
-        for p in path.req_args:
-            arg_name = p[1:]
-            if arg_name not in kwargs or kwargs[arg_name] in (None, [], {}):
-                return False
-
-
-class OptionalArgsValidator(Validator):
-    ...
+DEFAULT_VALIDATORS = [RequiredArgsValidator(), OptionalArgsValidator()]
 
 
 class Path:
@@ -39,6 +20,8 @@ class Path:
     validators: List[Validator]
     aliases: List[str]
 
+    _output_structure: Any
+
     __bound_client: AbstractApi
     __bound_args: List[Any]
     __bound_kwargs: Dict[str, Any]
@@ -47,20 +30,14 @@ class Path:
         self, path, output_structure, methods="GET", validators=None, qargs=None
     ):
         self.path = path
-        self.output_structure = output_structure
+        self._output_structure = output_structure
 
         if isinstance(methods, str):
             methods = [methods]
 
         self.methods = methods
 
-        if not validators:
-            validators = list()
-
-        self.validators = [
-            RequiredArgsValidator(),
-            OptionalArgsValidator(),
-        ] + validators
+        self.validators = DEFAULT_VALIDATORS + (validators or [])
 
         parts = path.split("/")
         default_alias = [p for p in parts if p[0] not in "?!"]
@@ -72,7 +49,7 @@ class Path:
         self.aliases = [default_alias]
         self.args = args
 
-        self.qargs = qargs if qargs else []
+        self.qargs = qargs or []
 
         self.__bound_client = None
 
@@ -120,29 +97,10 @@ class Path:
     def is_bound(self):
         return self.__bound_client is not None
 
+    @property
+    def response_structure(self):
+        return self._output_structure
 
-REQ_AUTH = [AuthRequiredValidator()]
-
-"""
-OAUTH = [("oath/device/code", "GET"), ("oath/device/token", "POST")]
-
-cal_validators = []
-CALENDARS = [
-    ("calendars/my/shows/?start_date/?days", "GET", cal_validators + REQ_AUTH),
-    ("calendars/my/shows/new/?start_date/?days", "GET", cal_validators + REQ_AUTH),
-    (
-        "calendars/my/shows/premieres/?start_date/?days",
-        "GET",
-        cal_validators + REQ_AUTH,
-    ),
-    ("calendars/my/movies/?start_date/?days", "GET", cal_validators + REQ_AUTH),
-    ("calendars/my/dvd/?start_date/?days", "GET", cal_validators + REQ_AUTH),
-    ("calendars/all/shows/?start_date/?days", "GET", cal_validators),
-    ("calendars/all/shows/new/?start_date/?days", "GET", cal_validators),
-    ("calendars/all/shows/premieres/?start_date/?days", "GET", cal_validators),
-    ("calendars/all/movies/?start_date/?days", "GET", cal_validators),
-    ("calendars/all/dvd/?start_date/?days", "GET", cal_validators),
-]
-
-PATHS = OAUTH + CALENDARS
-"""
+    @property
+    def method(self):
+        return self.methods[0]

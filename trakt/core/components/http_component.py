@@ -1,18 +1,37 @@
-from typing import Any, Dict, cast
+import urllib.parse
+from typing import Any, Dict
 
 import requests
 from trakt.core.abstract import AbstractComponent
 
 
-class HttpComponent(AbstractComponent):
+class DefaultHttpComponent(AbstractComponent):
     name = "http"
 
     def request(
-        self, method, path, headers=None, data=None, *args, **kwargs
+        self, path, *, method="GET", query_args=None, data=None, **kwargs
     ) -> Dict[str, Any]:
-        url = self.resolve_path(path)
-        response = requests.get(url)
+
+        url = urllib.parse.urljoin(self.client.config["http"]["base_url"], path)
+
+        query_args = query_args or {}
+        data = data or {}
+
+        response = requests.request(
+            method, url, params=query_args, data=data, headers=self.get_headers()
+        )
         return response.json()
 
-    def resolve_path(self, *args):
-        return ""
+    def get_headers(self):
+        headers = {
+            "Content-type": "application/json",
+            "trakt-api-key": self.client.client_id,
+            "trakt-api-version": 2,
+        }
+
+        if self.client.authenticated:
+            headers["Authorization"] = self.client.oauth.token
+
+        headers = {k: str(v) for k, v in headers.items()}
+
+        return headers

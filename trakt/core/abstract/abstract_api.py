@@ -1,2 +1,0 @@
-class AbstractApi:
-    pass
