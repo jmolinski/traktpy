@@ -3,9 +3,9 @@
 from trakt.core.paths import Path
 from trakt.core.paths.validators import (
     AuthRequiredValidator,
-    RequiredArgsValidator,
     OptionalArgsValidator,
     PerArgValidator,
+    RequiredArgsValidator
 )
 
 

@@ -2,11 +2,7 @@ from typing import Any, Dict, List
 
 from trakt.core.abstract import AbstractApi
 from trakt.core.exceptions import ClientError
-from trakt.core.paths.validators import (
-    Validator,
-    RequiredArgsValidator,
-    OptionalArgsValidator,
-)
+from trakt.core.paths.validators import OptionalArgsValidator, RequiredArgsValidator, Validator
 
 DEFAULT_VALIDATORS = [RequiredArgsValidator(), OptionalArgsValidator()]
 

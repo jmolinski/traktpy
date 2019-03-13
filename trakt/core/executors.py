@@ -2,6 +2,7 @@ from typing import List, Union
 
 from trakt.core import json_parser
 from trakt.core.abstract import AbstractApi
+from trakt.core.exceptions import ClientError
 from trakt.core.paths.path import Path
 
 
@@ -23,7 +24,7 @@ class Executor:
 
         return self
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         return f'Executor(params={".".join(self.params)})'
 
     def __call__(self, *args, **kwargs):
@@ -39,12 +40,12 @@ class Executor:
         matching_paths = self.find_matching_path()
 
         if len(matching_paths) != 1:
-            raise Exception("Ambiguous call: more than 1 path matches")
+            raise ClientError("Ambiguous call: matching paths # has to be 1")
 
         path = matching_paths[0]
 
         if not path.is_valid(self.client, *args, **kwargs):
-            raise Exception("Invalid call!")
+            raise ClientError("Invalid call!")
 
         api_path, query_args = path.get_path_and_qargs()
         response = self.client.http.request(

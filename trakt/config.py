@@ -10,9 +10,6 @@ class Config:
     def __init__(self, config: InternalConfigType) -> None:
         self._config = config
 
-    def update(self, config: InternalConfigType) -> None:
-        self._config.update(config)
-
     def __getitem__(self, name):
         return self._config[name]
 
