@@ -152,3 +152,7 @@ CALENDARS = [
 
 PATHS = OAUTH + CALENDARS
 """
+
+COUNTRIES = [Path("countries/!type", [{"name": str, "code": str}])]
+
+PATHS = COUNTRIES

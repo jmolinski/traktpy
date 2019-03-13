@@ -13,6 +13,9 @@ class Config:
     def update(self, config: InternalConfigType) -> None:
         self._config.update(config)
 
+    def __getitem__(self, name):
+        return self._config[name]
+
 
 DEFAULT_CONFIG: InternalConfigType = {
     "http": {"base_url": "https://api.trakt.tv", "max_retries": 3}

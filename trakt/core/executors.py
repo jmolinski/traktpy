@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from trakt.core import json_parser
 from trakt.core.abstract import AbstractApi
@@ -10,8 +10,11 @@ class Executor:
     client: AbstractApi
     paths: List[Path]
 
-    def __init__(self, client: AbstractApi, module: str) -> None:
-        self.params = [module]
+    def __init__(self, client: AbstractApi, params: Union[List[str], str]) -> None:
+        if isinstance(params, str):
+            params = [params]
+
+        self.params = params
         self.client = client
         self.paths = []
 
@@ -40,7 +43,7 @@ class Executor:
 
         path = matching_paths[0]
 
-        if not path.is_valid(*args, **kwargs):
+        if not path.is_valid(self.client, *args, **kwargs):
             raise Exception("Invalid call!")
 
         api_path, query_args = path.get_path_and_qargs()

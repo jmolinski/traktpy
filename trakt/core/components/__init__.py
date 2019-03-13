@@ -1,2 +1,2 @@
-from trakt.core.components.http_component import HttpComponent
-from trakt.core.components.oath import OathComponent
+from trakt.core.components.http_component import DefaultHttpComponent
+from trakt.core.components.oauth import DefaultOauthComponent
