@@ -5,7 +5,7 @@ from trakt.core.paths.validators import (
     AuthRequiredValidator,
     OptionalArgsValidator,
     PerArgValidator,
-    RequiredArgsValidator
+    RequiredArgsValidator,
 )
 
 
