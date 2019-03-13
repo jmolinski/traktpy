@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional, Type, Union
 
-from trakt.core.abstract.abstract_models import AbstractBaseModel
+from trakt.core.abstract import AbstractBaseModel
 
 MediaForeignIDType = Type[Union[int, str, None]]
 

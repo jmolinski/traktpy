@@ -1,7 +1,7 @@
 from typing import Any
 
 from trakt.config import Config, DefaultConfig
-from trakt.core.abstract.abstract_api import AbstractApi
+from trakt.core.abstract import AbstractApi
 from trakt.core.components import HttpComponent, OathComponent
 from trakt.core.executors import Executor
 
