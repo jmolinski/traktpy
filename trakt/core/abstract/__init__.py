@@ -3,10 +3,15 @@ from __future__ import annotations
 from typing import Any, Dict, Type, TypeVar, cast
 
 import jsons
+from trakt.config import Config
 
 
 class AbstractApi:
-    pass
+    authenticated: bool
+    client_id: str
+    client_secret: str
+    config: Config
+    http: "AbstractComponent"
 
 
 class AbstractComponent:

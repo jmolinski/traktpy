@@ -39,6 +39,8 @@ class Path:
     validators: List[Validator]
     aliases: List[str]
 
+    _output_structure: Any
+
     __bound_client: AbstractApi
     __bound_args: List[Any]
     __bound_kwargs: Dict[str, Any]
@@ -47,20 +49,16 @@ class Path:
         self, path, output_structure, methods="GET", validators=None, qargs=None
     ):
         self.path = path
-        self.output_structure = output_structure
+        self._output_structure = output_structure
 
         if isinstance(methods, str):
             methods = [methods]
 
         self.methods = methods
 
-        if not validators:
-            validators = list()
-
-        self.validators = [
-            RequiredArgsValidator(),
-            OptionalArgsValidator(),
-        ] + validators
+        self.validators = [RequiredArgsValidator(), OptionalArgsValidator()] + (
+            validators or []
+        )
 
         parts = path.split("/")
         default_alias = [p for p in parts if p[0] not in "?!"]
@@ -72,7 +70,7 @@ class Path:
         self.aliases = [default_alias]
         self.args = args
 
-        self.qargs = qargs if qargs else []
+        self.qargs = qargs or []
 
         self.__bound_client = None
 
@@ -119,6 +117,14 @@ class Path:
 
     def is_bound(self):
         return self.__bound_client is not None
+
+    @property
+    def response_structure(self):
+        return self._output_structure
+
+    @property
+    def method(self):
+        return self.methods[0]
 
 
 REQ_AUTH = [AuthRequiredValidator()]

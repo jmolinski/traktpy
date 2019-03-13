@@ -7,11 +7,6 @@ from trakt.core.executors import Executor
 
 
 class TraktApi(AbstractApi):
-    authenticated: bool
-    client_id: str
-    client_secret: str
-    config: Config
-
     def __init__(self, client_id: str, client_secret: str, **config: str) -> None:
         self.authenticated = False
         self.client_id = client_id
