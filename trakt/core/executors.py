@@ -2,7 +2,7 @@ from typing import List, Union
 
 from trakt.core import json_parser
 from trakt.core.abstract import AbstractApi
-from trakt.core.restpaths import Path
+from trakt.core.paths.path import Path
 
 
 class Executor:

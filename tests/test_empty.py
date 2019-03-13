@@ -28,6 +28,6 @@ def test_data_deserialization():
 def test_client():
     client = Trakt(**secrets)
 
-    x = client.request("countries", type="shows")
+    # x = client.request("countries", type="shows")
 
     # print(x)

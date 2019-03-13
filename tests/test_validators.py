@@ -1,7 +1,6 @@
 # flake8: noqa: F403, F405
 
-import pytest
-from trakt.core.restpaths import AuthRequiredValidator
+from trakt.core.paths.path import AuthRequiredValidator
 
 
 class A:

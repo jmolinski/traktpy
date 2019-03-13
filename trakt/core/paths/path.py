@@ -2,32 +2,13 @@ from typing import Any, Dict, List
 
 from trakt.core.abstract import AbstractApi
 from trakt.core.exceptions import ClientError
+from trakt.core.paths.validators import (
+    Validator,
+    RequiredArgsValidator,
+    OptionalArgsValidator,
+)
 
-
-class Validator:
-    def _validate(self, *args, **kwargs):
-        return True
-
-    def validate(self, *args, **kwargs):
-        return self._validate(*args, **kwargs) is not False
-
-
-class AuthRequiredValidator(Validator):
-    def _validate(self, client, *args, **kwargs):
-        if not client.authenticated:
-            return False
-
-
-class RequiredArgsValidator(Validator):
-    def _validate(self, *args, path=None, **kwargs):
-        for p in path.req_args:
-            arg_name = p[1:]
-            if arg_name not in kwargs or kwargs[arg_name] in (None, [], {}):
-                return False
-
-
-class OptionalArgsValidator(Validator):
-    ...
+DEFAULT_VALIDATORS = [RequiredArgsValidator(), OptionalArgsValidator()]
 
 
 class Path:
@@ -56,9 +37,7 @@ class Path:
 
         self.methods = methods
 
-        self.validators = [RequiredArgsValidator(), OptionalArgsValidator()] + (
-            validators or []
-        )
+        self.validators = DEFAULT_VALIDATORS + (validators or [])
 
         parts = path.split("/")
         default_alias = [p for p in parts if p[0] not in "?!"]
@@ -125,34 +104,3 @@ class Path:
     @property
     def method(self):
         return self.methods[0]
-
-
-REQ_AUTH = [AuthRequiredValidator()]
-
-"""
-OAUTH = [("oath/device/code", "GET"), ("oath/device/token", "POST")]
-
-cal_validators = []
-CALENDARS = [
-    ("calendars/my/shows/?start_date/?days", "GET", cal_validators + REQ_AUTH),
-    ("calendars/my/shows/new/?start_date/?days", "GET", cal_validators + REQ_AUTH),
-    (
-        "calendars/my/shows/premieres/?start_date/?days",
-        "GET",
-        cal_validators + REQ_AUTH,
-    ),
-    ("calendars/my/movies/?start_date/?days", "GET", cal_validators + REQ_AUTH),
-    ("calendars/my/dvd/?start_date/?days", "GET", cal_validators + REQ_AUTH),
-    ("calendars/all/shows/?start_date/?days", "GET", cal_validators),
-    ("calendars/all/shows/new/?start_date/?days", "GET", cal_validators),
-    ("calendars/all/shows/premieres/?start_date/?days", "GET", cal_validators),
-    ("calendars/all/movies/?start_date/?days", "GET", cal_validators),
-    ("calendars/all/dvd/?start_date/?days", "GET", cal_validators),
-]
-
-PATHS = OAUTH + CALENDARS
-"""
-
-COUNTRIES = [Path("countries/!type", [{"name": str, "code": str}])]
-
-PATHS = COUNTRIES

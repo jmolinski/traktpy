@@ -2,7 +2,7 @@ from trakt.config import DefaultConfig
 from trakt.core.abstract import AbstractApi
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 from trakt.core.executors import Executor
-from trakt.core.restpaths import PATHS
+from trakt.core.paths import PATHS
 
 
 class TraktApi(AbstractApi):
