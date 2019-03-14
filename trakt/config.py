@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 InternalConfigType = Dict[str, Union[str, Dict[str, Union[str, int]]]]
 
@@ -10,7 +10,7 @@ class Config:
     def __init__(self, config: InternalConfigType) -> None:
         self._config = config
 
-    def __getitem__(self, name):
+    def __getitem__(self, name: str) -> Union[Dict[str, Any], str]:
         return self._config[name]
 
 

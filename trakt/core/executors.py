@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Any, List, Union
 
 from trakt.core import json_parser
 from trakt.core.abstract import AbstractApi
@@ -27,16 +27,16 @@ class Executor:
     def __repr__(self) -> str:  # pragma: no cover
         return f'Executor(params={".".join(self.params)})'
 
-    def __call__(self, *args, **kwargs):
-        return self.run(*args, **kwargs)
+    def __call__(self, **kwargs: Any) -> Any:
+        return self.run(**kwargs)
 
-    def install(self, paths):
+    def install(self, paths: Union[Path, List[Path]]) -> None:
         if isinstance(paths, list):
             self.paths.extend(paths)
         else:
             self.paths.append(paths)
 
-    def run(self, *args, **kwargs):
+    def run(self, **kwargs: Any) -> Any:
         matching_paths = self.find_matching_path()
 
         if len(matching_paths) != 1:
@@ -44,7 +44,7 @@ class Executor:
 
         path = matching_paths[0]
 
-        if not path.is_valid(self.client, *args, **kwargs):
+        if not path.is_valid(self.client, **kwargs):
             raise ClientError("Invalid call!")
 
         api_path, query_args = path.get_path_and_qargs()
@@ -54,5 +54,5 @@ class Executor:
 
         return json_parser.parse_tree(response, path.response_structure)
 
-    def find_matching_path(self):
+    def find_matching_path(self) -> List[Path]:
         return [p for p in self.paths if p.does_match(self.params)]

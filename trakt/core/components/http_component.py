@@ -9,8 +9,14 @@ class DefaultHttpComponent(AbstractComponent):
     name = "http"
 
     def request(
-        self, path, *, method="GET", query_args=None, data=None, **kwargs
-    ) -> Dict[str, Any]:
+        self,
+        path: str,
+        *,
+        method: str = "GET",
+        query_args: Dict[str, Any] = None,
+        data: Any = None,
+        **kwargs: Any
+    ) -> Any:
 
         url = urllib.parse.urljoin(self.client.config["http"]["base_url"], path)
 
@@ -22,7 +28,7 @@ class DefaultHttpComponent(AbstractComponent):
         )
         return response.json()
 
-    def get_headers(self):
+    def get_headers(self) -> Dict[str, str]:
         headers = {
             "Content-type": "application/json",
             "trakt-api-key": self.client.client_id,
@@ -32,6 +38,6 @@ class DefaultHttpComponent(AbstractComponent):
         if self.client.authenticated:
             headers["Authorization"] = self.client.oauth.token
 
-        headers = {k: str(v) for k, v in headers.items()}
+        str_headers = {k: str(v) for k, v in headers.items()}
 
-        return headers
+        return str_headers

@@ -1,5 +1,7 @@
+from typing import Any, List, Union
+
 from trakt.config import DefaultConfig
-from trakt.core.abstract import AbstractApi
+from trakt.core.abstract import AbstractApi, AbstractComponent
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 from trakt.core.executors import Executor
 from trakt.core.paths import PATHS
@@ -10,8 +12,8 @@ class TraktApi(AbstractApi):
         self,
         client_id: str,
         client_secret: str,
-        http_component=None,
-        oauth_component=None,
+        http_component: Any = None,
+        oauth_component: Any = None,
         **config: str
     ) -> None:
         self.authenticated = False
@@ -28,13 +30,13 @@ class TraktApi(AbstractApi):
     def noop(self) -> None:
         pass
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str) -> Executor:
         e = Executor(self, item)
         e.install(PATHS)
 
         return e
 
-    def request(self, params, *args, **kwargs):
+    def request(self, params: Union[str, List[str]], *args: Any, **kwargs: Any) -> Any:
         if isinstance(params, str):
             params = params.split(".")
 

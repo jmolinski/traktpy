@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Any
 
 import jsons
 
@@ -8,7 +9,7 @@ ITERABLES = [list, dict]
 # TODO wildcards {str: str}
 
 
-def parse_tree(data, tree_structure):
+def parse_tree(data: Any, tree_structure: Any) -> Any:
     if not tree_structure:
         return deepcopy(tree_structure)
 

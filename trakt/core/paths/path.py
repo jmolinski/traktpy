@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple, Union
 
 from trakt.core.abstract import AbstractApi
 from trakt.core.exceptions import ClientError
@@ -18,23 +18,22 @@ class Path:
     opt_args: List[str]
     methods: List[str]
     validators: List[Validator]
-    aliases: List[str]
+    aliases: List[List[str]]
 
     _output_structure: Any
 
     __bound_client: AbstractApi
-    __bound_args: List[Any]
     __bound_kwargs: Dict[str, Any]
 
     def __init__(
         self,
-        path,
-        output_structure,
-        methods="GET",
-        validators=None,
-        qargs=None,
-        aliases=None,
-    ):
+        path: str,
+        output_structure: Any,
+        methods: Union[str, List[str]] = "GET",
+        validators: List[Validator] = None,
+        qargs: Dict[str, str] = None,
+        aliases: List[str] = None,
+    ) -> None:
         self.path = path
         self._output_structure = output_structure
 
@@ -53,31 +52,30 @@ class Path:
 
         self.params = parts
         aliases = aliases or []
-        aliases = [a.split(".") for a in aliases]
-        self.aliases = [default_alias] + aliases
+        split_aliases = [a.split(".") for a in aliases]
+        self.aliases = [default_alias] + split_aliases
         self.args = args
 
         self.qargs = qargs or []
 
         self.__bound_client = None
 
-    def does_match(self, params):
+    def does_match(self, params: List[str]) -> bool:
         return any(alias == params for alias in self.aliases)
 
-    def is_valid(self, client, *args, **kwargs):
+    def is_valid(self, client: AbstractApi, **kwargs: Any) -> bool:
         validation_result = all(
-            v.validate(self, client=client, path=self, *args, **kwargs)
+            v.validate(self, client=client, path=self, **kwargs)
             for v in self.validators
         )
 
         if validation_result:
             self.__bound_client = client
-            self.__bound_args = args
             self.__bound_kwargs = kwargs
 
         return validation_result
 
-    def _get_param_value(self, param):
+    def _get_param_value(self, param: str) -> Any:
         if param not in self.args:
             return param
 
@@ -89,7 +87,7 @@ class Path:
         if param in self.opt_args:
             return self.__bound_kwargs.get(arg_name)
 
-    def get_path_and_qargs(self):
+    def get_path_and_qargs(self) -> Tuple[str, Dict[str, Any]]:
         if not self.is_bound():
             raise ClientError("call .is_valid first!")
 
@@ -102,13 +100,13 @@ class Path:
 
         return "/".join(parts), qargs
 
-    def is_bound(self):
+    def is_bound(self) -> bool:
         return self.__bound_client is not None
 
     @property
-    def response_structure(self):
+    def response_structure(self) -> Any:
         return self._output_structure
 
     @property
-    def method(self):
+    def method(self) -> str:
         return self.methods[0]
