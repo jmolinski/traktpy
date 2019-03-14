@@ -15,7 +15,6 @@ Todo:
 - http component retries etc
 - filters
 - help [client.x.y.help should return possible paths starting with x.y]
-- json_parser wildcards (`{str:str}`)
 - define all paths & user friendly aliases
 - docs
 - pypi release

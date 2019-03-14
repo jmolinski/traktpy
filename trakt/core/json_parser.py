@@ -1,37 +1,61 @@
-from copy import deepcopy
-from typing import Any
+from typing import Any, Dict, List
 
 import jsons
 
 TYPE_TYPE = int.__class__
-ITERABLES = [list, dict]
-
-# TODO wildcards {str: str}
+ITERABLES = {list, dict}
 
 
 def parse_tree(data: Any, tree_structure: Any) -> Any:
-    if not tree_structure:
-        return deepcopy(tree_structure)
-
     level_type = tree_structure.__class__
 
     if level_type not in ITERABLES:
         return jsons.load(data, tree_structure)
 
-    result = level_type()
-
     if level_type == list:
-        subtree = tree_structure[0]
-        for e in data:
-            parsed = parse_tree(e, subtree)
-            result.append(parsed)
+        return _parse_list(data, single_item_type=tree_structure[0])
 
     if level_type == dict:
-        for k, v in data.items():
-            if k not in tree_structure:
-                continue
+        return _parse_dict(data, tree_structure)
 
+
+def _is_arbitrary_value(x: Any) -> bool:
+    return x.__class__ not in (ITERABLES | {type})
+
+
+def _parse_list(data: List[Any], single_item_type: Any) -> List[Any]:
+    if single_item_type is Any:
+        return data
+
+    return [parse_tree(e, single_item_type) for e in data]
+
+
+def _parse_dict(data: Dict[Any, Any], tree_structure: Dict[Any, Any]) -> Dict[Any, Any]:
+    wildcards = {  # eg {str: str} / {str: Any}
+        k: v for k, v in tree_structure.items() if isinstance(k, type)
+    }
+
+    defaults = {  # eg {value: value}
+        k: v
+        for k, v in tree_structure.items()
+        if (k not in wildcards) and _is_arbitrary_value(v)
+    }
+
+    result = dict()
+    for k, v in data.items():
+        if k in tree_structure:
+            # v may be a default value -> use its type as subtree type
             subtree = tree_structure[k]
+            subtree = subtree.__class__ if _is_arbitrary_value(subtree) else subtree
+
             result[k] = parse_tree(v, subtree)
+        elif k.__class__ in wildcards:
+            wildcard = wildcards[k.__class__]
+            result[k] = v if wildcard is Any else parse_tree(v, wildcard)
+
+    # set defaults if any keys are missing
+    for k, v in defaults.items():
+        if k not in result:
+            result[k] = v
 
     return result

@@ -1,6 +1,6 @@
 # flake8: noqa: F403, F405
 from dataclasses import dataclass
-from typing import List
+from typing import Any
 
 import pytest
 from trakt.core import json_parser
@@ -73,3 +73,28 @@ def test_mixed_structure():
     assert "info" in item and item["info"] == "m-2"
     assert "obj" in item and item["obj"].__class__ == MockClassDateData
     assert item["obj"].data.__class__ == MockClassName
+
+
+def test_defaults():
+    data = {"a": "b"}
+    tree_struct = {"a": "c", "d": "e"}
+
+    parsed = json_parser.parse_tree(data, tree_struct)
+
+    assert parsed["a"] == "b"
+    assert parsed["d"] == "e"
+    assert json_parser.parse_tree(data, {}) == {}
+
+
+def test_wildcards():
+    data = {"a": 100, "c": "d", "e": "f", True: "g", 0.5: "y", 0.7: 10}
+    tree_struct = {"a": int, str: str, float: Any}
+
+    parsed = json_parser.parse_tree(data, tree_struct)
+
+    assert parsed["a"] == 100
+    assert parsed["c"] == "d"
+    assert parsed["e"] == "f"
+    assert True not in parsed
+    assert parsed[0.5] == "y"
+    assert parsed[0.7] == 10
