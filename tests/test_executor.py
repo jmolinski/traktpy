@@ -19,6 +19,7 @@ def test_executor():
 
     assert client.request("countries", type="shows") == http.response
     assert client.countries(type="shows") == http.response
+    assert client.get_countries(type="shows") == http.response
 
     with pytest.raises(ClientError):
         client.count(type="shows")

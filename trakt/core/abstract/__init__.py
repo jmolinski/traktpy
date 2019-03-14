@@ -22,20 +22,8 @@ class AbstractComponent:
         self.client = client
 
 
-class _AbstractFromJson:
-    pass
-
-
-T = TypeVar("T", bound=_AbstractFromJson)
-
-
-class AbstractBaseModel(_AbstractFromJson):
+class AbstractBaseModel:
     _client = AbstractApi()
-
-    @classmethod
-    def from_json(cls: Type[T], data: Dict[str, Any]) -> T:
-        obj = jsons.load(data, cls)
-        return cast(T, obj)
 
     @classmethod
     def set_client(cls, client: AbstractApi) -> None:
