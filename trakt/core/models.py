@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List as ListType, Optional, Type, Union
+from typing import Dict
+from typing import List as ListType
+from typing import Optional, Type, Union
 
 from trakt.core.abstract import AbstractBaseModel
 

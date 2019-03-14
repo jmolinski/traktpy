@@ -1,5 +1,5 @@
-from trakt.core.paths.path import Path
 from trakt.core.models import *
+from trakt.core.paths.path import Path
 from trakt.core.paths.validators import PerArgValidator
 
 """

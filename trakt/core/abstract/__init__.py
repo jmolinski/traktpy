@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Type, TypeVar, cast
-
-import jsons
 from trakt.config import Config
 
 
