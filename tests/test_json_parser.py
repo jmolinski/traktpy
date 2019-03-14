@@ -1,6 +1,6 @@
 # flake8: noqa: F403, F405
 from dataclasses import dataclass
-from typing import List
+from typing import Any
 
 import pytest
 from trakt.core import json_parser
@@ -87,8 +87,8 @@ def test_defaults():
 
 
 def test_wildcards():
-    data = {"a": 100, "c": "d", "e": "f", True: "g"}
-    tree_struct = {"a": int, str: str}
+    data = {"a": 100, "c": "d", "e": "f", True: "g", 0.5: "y", 0.7: 10}
+    tree_struct = {"a": int, str: str, float: Any}
 
     parsed = json_parser.parse_tree(data, tree_struct)
 
@@ -96,3 +96,5 @@ def test_wildcards():
     assert parsed["c"] == "d"
     assert parsed["e"] == "f"
     assert True not in parsed
+    assert parsed[0.5] == "y"
+    assert parsed[0.7] == 10

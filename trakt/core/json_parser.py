@@ -24,11 +24,14 @@ def _is_arbitrary_value(x: Any) -> bool:
 
 
 def _parse_list(data: List[Any], single_item_type: Any) -> List[Any]:
+    if single_item_type is Any:
+        return data
+
     return [parse_tree(e, single_item_type) for e in data]
 
 
 def _parse_dict(data: Dict[Any, Any], tree_structure: Dict[Any, Any]) -> Dict[Any, Any]:
-    wildcards = {  # eg {str: str} / {str: value}
+    wildcards = {  # eg {str: str} / {str: Any}
         k: v for k, v in tree_structure.items() if isinstance(k, type)
     }
 
@@ -41,17 +44,16 @@ def _parse_dict(data: Dict[Any, Any], tree_structure: Dict[Any, Any]) -> Dict[An
     result = dict()
     for k, v in data.items():
         if k in tree_structure:
-            # "normal" way
-
-            # v may be default -> use its type as subtree
+            # v may be a default value -> use its type as subtree type
             subtree = tree_structure[k]
             subtree = subtree.__class__ if _is_arbitrary_value(subtree) else subtree
 
             result[k] = parse_tree(v, subtree)
-        elif k.__class__ in wildcards:  # wildcard
-            result[k] = parse_tree(v, wildcards[k.__class__])
+        elif k.__class__ in wildcards:
+            wildcard = wildcards[k.__class__]
+            result[k] = v if wildcard is Any else parse_tree(v, wildcard)
 
-    # set defaults if any is missing
+    # set defaults if any keys are missing
     for k, v in defaults.items():
         if k not in result:
             result[k] = v
