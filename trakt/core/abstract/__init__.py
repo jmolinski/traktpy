@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from trakt.config import Config
 
 
@@ -29,3 +31,14 @@ class AbstractBaseModel:
     @property
     def client(self) -> AbstractApi:
         return self._client
+
+
+class AbstractSuiteInterface:
+    def __init__(self, client: AbstractApi) -> None:
+        raise NotImplementedError
+
+    def find_match(self, name: str) -> None:
+        raise NotImplementedError
+
+    def run(self, command: str, **kwargs: Any):
+        raise NotImplementedError

@@ -1,3 +1,8 @@
+from typing import Any, Dict, cast
+
+from trakt.core.abstract import AbstractApi, AbstractSuiteInterface
+
+# from trakt.core.executors import Executor
 from trakt.core.models import *
 from trakt.core.paths.path import Path
 from trakt.core.paths.validators import PerArgValidator
@@ -26,13 +31,35 @@ CALENDARS = [
 PATHS = OAUTH + CALENDARS
 """
 
-COUNTRIES = [
-    Path(
-        "countries/!type",
-        [{"name": str, "code": str}],
-        aliases=["get_countries"],
-        validators=[PerArgValidator("type", lambda t: t in {"shows", "movies"})],
-    )
-]
 
-PATHS = COUNTRIES
+PATHS = []
+
+
+class SuiteInterface(AbstractSuiteInterface):
+    paths: Dict[str, Path]
+    client: AbstractApi
+
+    def __init__(self, client: AbstractApi) -> None:
+        self.client = client
+        self.paths = {}
+
+    def find_match(self, name: str) -> None:
+        return self.paths.get(name)
+
+    def run(self, command: str, **kwargs: Any) -> Any:
+        return Executor(self.client).run(path=self.paths[command], **kwargs)
+
+
+class CountriesInterface(SuiteInterface):
+    paths = {
+        "get_countries": Path(
+            "countries/!type",
+            [{"name": str, "code": str}],
+            aliases=["get_countries"],
+            validators=[PerArgValidator("type", lambda t: t in {"shows", "movies"})],
+        )
+    }
+
+    def get_countries(self, *, type: str, **kwargs: Any) -> Dict[str, str]:
+        ret = self.run("get_countries", type=type, **kwargs)
+        return cast(ret, Dict[str, str])
