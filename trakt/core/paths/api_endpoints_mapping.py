@@ -1,4 +1,6 @@
 from trakt.core.paths.path import Path
+from trakt.core.models import *
+from trakt.core.paths.validators import PerArgValidator
 
 """
 OAUTH = [("oath/device/code", "GET"), ("oath/device/token", "POST")]
@@ -24,6 +26,13 @@ CALENDARS = [
 PATHS = OAUTH + CALENDARS
 """
 
-COUNTRIES = [Path("countries/!type", [{"name": str, "code": str}])]
+COUNTRIES = [
+    Path(
+        "countries/!type",
+        [{"name": str, "code": str}],
+        aliases=["get_countries"],
+        validators=[PerArgValidator("type", lambda t: t in {"shows", "movies"})],
+    )
+]
 
 PATHS = COUNTRIES

@@ -27,7 +27,13 @@ class Path:
     __bound_kwargs: Dict[str, Any]
 
     def __init__(
-        self, path, output_structure, methods="GET", validators=None, qargs=None
+        self,
+        path,
+        output_structure,
+        methods="GET",
+        validators=None,
+        qargs=None,
+        aliases=None,
     ):
         self.path = path
         self._output_structure = output_structure
@@ -46,7 +52,9 @@ class Path:
         self.opt_args = [p for p in args if p[0] == "?"]
 
         self.params = parts
-        self.aliases = [default_alias]
+        aliases = aliases or []
+        aliases = [a.split(".") for a in aliases]
+        self.aliases = [default_alias] + aliases
         self.args = args
 
         self.qargs = qargs or []

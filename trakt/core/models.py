@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Type, Union
+from typing import Dict, List as ListType, Optional, Type, Union
 
 from trakt.core.abstract import AbstractBaseModel
 
@@ -46,25 +46,7 @@ class Comment(AbstractBaseModel):
 
 
 @dataclass
-class Country(AbstractBaseModel):
-    name: str
-    code: str
-
-
-@dataclass
-class Genre(AbstractBaseModel):
-    name: str
-    slug: str
-
-
-@dataclass
-class Language(AbstractBaseModel):
-    name: str
-    code: str
-
-
-@dataclass
-class MediaList(AbstractBaseModel):
+class List(AbstractBaseModel):
     name: str
     description: str
     privacy: str
@@ -109,8 +91,8 @@ class MovieDetails(Movie):
     votes: int
     comment_count: int
     language: str
-    available_translations: List[str]
-    genres: List[str]
+    available_translations: ListType[str]
+    genres: ListType[str]
     certification: str
 
 
