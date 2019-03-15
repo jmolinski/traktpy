@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, List, Optional, Union
 from trakt.core import json_parser
 from trakt.core.exceptions import ClientError
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.abstract import AbstractApi
     from trakt.core.paths.suite_interface import SuiteInterface
     from trakt.core.paths.path import Path

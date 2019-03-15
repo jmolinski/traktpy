@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, List, Type, Union
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.abstract import AbstractApi
     from trakt.core.executors import Executor
     from trakt.core.paths.path import Path

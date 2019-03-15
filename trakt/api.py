@@ -8,7 +8,7 @@ from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 from trakt.core.executors import Executor
 from trakt.core.paths import CountriesInterface, Path
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.paths.suite_interface import SuiteInterface
 
 

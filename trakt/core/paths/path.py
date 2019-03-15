@@ -9,7 +9,7 @@ from trakt.core.paths.validators import (
     Validator,
 )
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.abstract import AbstractApi
 
 DEFAULT_VALIDATORS = [RequiredArgsValidator(), OptionalArgsValidator()]
