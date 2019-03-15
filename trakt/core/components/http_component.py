@@ -23,6 +23,8 @@ class DefaultHttpComponent(AbstractComponent):
         query_args = query_args or {}
         data = data or {}
 
+        # TODO STATUS CODES
+
         response = requests.request(
             method, url, params=query_args, data=data, headers=self.get_headers()
         )

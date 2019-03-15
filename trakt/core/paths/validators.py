@@ -1,34 +1,28 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from trakt.core.abstract import AbstractApi
+from trakt.core.exceptions import NotAuthenticated, ArgumentError
 
 
 class Validator:
-    def _validate(
-        self, *args: Any, **kwargs: Any
-    ) -> Optional[bool]:  # pragma: no cover
-        return True
-
-    def validate(self, *args: Any, **kwargs: Any) -> bool:
-        return self._validate(*args, **kwargs) is not False
+    def validate(self, *args: Any, **kwargs: Any) -> None:
+        return None
 
 
 class AuthRequiredValidator(Validator):
-    def _validate(
-        self, client: AbstractApi, *args: Any, **kwargs: Any
-    ) -> Optional[bool]:
+    def validate(self, client: AbstractApi, *args: Any, **kwargs: Any) -> None:
         if not client.authenticated:
-            return False
+            raise NotAuthenticated
 
 
 class RequiredArgsValidator(Validator):
-    def _validate(self, *args: Any, path: Any, **kwargs: Any) -> Optional[bool]:
+    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
         for p in path.req_args:
             arg_name = p[1:]
             if arg_name not in kwargs or kwargs[arg_name] in (None, [], {}):
-                return False
+                raise ArgumentError(f"missing required {arg_name} argument")
 
 
 class OptionalArgsValidator(Validator):
@@ -37,14 +31,14 @@ class OptionalArgsValidator(Validator):
     if c is provided then b must be provided
     """
 
-    def _validate(self, *args: Any, path: Any, **kwargs: Any) -> Optional[bool]:
+    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
         require_previous = False
 
         for p in path.opt_args[::-1]:
             arg_name = p[1:]
             if require_previous:
                 if arg_name not in kwargs or kwargs[arg_name] in (None, [], {}):
-                    return False
+                    raise ArgumentError(f"missing {arg_name} argument")
             elif arg_name in kwargs:
                 require_previous = True
 
@@ -54,6 +48,9 @@ class PerArgValidator(Validator):
         self.arg_name = arg_name
         self.boolean_check = f
 
-    def _validate(self, *args: Any, **kwargs: Any) -> Optional[bool]:
+    def validate(self, *args: Any, **kwargs: Any) -> None:
         if self.arg_name in kwargs:
-            return self.boolean_check(kwargs[self.arg_name])
+            if not self.boolean_check(kwargs[self.arg_name]):
+                raise ArgumentError(
+                    f"invalid {self.arg_name}={kwargs[self.arg_name]} argument value"
+                )

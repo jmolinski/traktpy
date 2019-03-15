@@ -11,3 +11,7 @@ class ClientError(Exception):
 
 class NotAuthenticated(ClientError):
     ...
+
+
+class ArgumentError(ClientError):
+    ...
