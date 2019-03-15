@@ -18,11 +18,9 @@ def test_executor():
     client = Trakt("", "", inject={"http_component": http})
 
     assert client.request("countries", type="shows") == http.response
-    assert client.countries(type="shows") == http.response
+    assert client.request("get_countries", type="shows") == http.response
+    assert client.request("countries.get_countries", type="shows") == http.response
     assert client.get_countries(type="shows") == http.response
 
     with pytest.raises(ClientError):
         client.count(type="shows")
-
-    with pytest.raises(ClientError):
-        client.countries()

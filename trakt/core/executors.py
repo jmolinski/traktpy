@@ -1,16 +1,21 @@
-from typing import Any, List, Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 
 from trakt.core import json_parser
-from trakt.core.abstract import AbstractApi, AbstractSuiteInterface
 from trakt.core.exceptions import ClientError
-from trakt.core.paths.path import Path
+
+if TYPE_CHECKING:
+    from trakt.core.abstract import AbstractApi
+    from trakt.core.paths.suite_interface import SuiteInterface
+    from trakt.core.paths.path import Path
 
 
 class Executor:
     params: List[str]
     client: AbstractApi
     paths: List[Path]
-    path_suites: List[AbstractSuiteInterface]
+    path_suites: List[SuiteInterface]
 
     def __init__(
         self, client: AbstractApi, params: Union[List[str], str, None] = None
@@ -23,7 +28,7 @@ class Executor:
         self.paths = []
         self.path_suites = []
 
-    def __getattr__(self, param: str) -> "Executor":
+    def __getattr__(self, param: str) -> Executor:
         self.params.append(param)
 
         return self
@@ -34,15 +39,8 @@ class Executor:
     def __call__(self, **kwargs: Any) -> Any:
         return self.run(**kwargs)
 
-    def install(self, paths: Union[AbstractSuiteInterface, Path, List[Path]]) -> None:
-        # TODO only add suites & handle aliasing
-        for p in paths:
-            if isinstance(p, list):
-                self.paths.extend(p)
-            elif isinstance(p, Path):
-                self.paths.append(p)
-            else:  # AbstractSuiteInterface
-                self.path_suites.append(p)
+    def install(self, suites: List[SuiteInterface]) -> None:
+        self.path_suites.extend(suites)
 
     def run(self, *, path: Optional[Path] = None, **kwargs: Any) -> Any:
         if not path:
@@ -64,6 +62,4 @@ class Executor:
         return json_parser.parse_tree(response, path.response_structure)
 
     def find_matching_path(self) -> List[Path]:
-        # TODO search in suites
-
-        xxxxx = [p for p in self.paths if p.does_match(self.params)]
+        return [p for s in self.path_suites for p in s.find_matching(self.params)]

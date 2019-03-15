@@ -1,12 +1,16 @@
-from typing import Any, Dict, List, Tuple, Union
+from __future__ import annotations
 
-from trakt.core.abstract import AbstractApi
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+
 from trakt.core.exceptions import ClientError
 from trakt.core.paths.validators import (
     OptionalArgsValidator,
     RequiredArgsValidator,
     Validator,
 )
+
+if TYPE_CHECKING:
+    from trakt.core.abstract import AbstractApi
 
 DEFAULT_VALIDATORS = [RequiredArgsValidator(), OptionalArgsValidator()]
 
@@ -18,11 +22,11 @@ class Path:
     opt_args: List[str]
     methods: List[str]
     validators: List[Validator]
-    aliases: List[List[str]]
+    aliases: List[str]
 
     _output_structure: Any
 
-    __bound_client: AbstractApi
+    __bound_client: Optional[AbstractApi]
     __bound_kwargs: Dict[str, Any]
 
     def __init__(
@@ -45,23 +49,21 @@ class Path:
         self.validators = DEFAULT_VALIDATORS + (validators or [])
 
         parts = path.split("/")
-        default_alias = [p for p in parts if p[0] not in "?!"]
+        default_alias = ".".join([p for p in parts if p[0] not in "?!"])
         args = [p for p in parts if p[0] in "?!"]
         self.req_args = [p for p in args if p[0] == "!"]
         self.opt_args = [p for p in args if p[0] == "?"]
 
         self.params = parts
-        aliases = aliases or []
-        split_aliases = [a.split(".") for a in aliases]
-        self.aliases = [default_alias] + split_aliases
+        self.aliases = [default_alias] + (aliases or [])
         self.args = args
 
         self.qargs = qargs or []
 
         self.__bound_client = None
 
-    def does_match(self, params: List[str]) -> bool:
-        return any(alias == params for alias in self.aliases)
+    def does_match(self, name: str) -> bool:
+        return name in self.aliases
 
     def is_valid(self, client: AbstractApi, **kwargs: Any) -> bool:
         validation_result = all(

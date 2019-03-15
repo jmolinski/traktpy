@@ -10,7 +10,8 @@ class AbstractApi:
     client_id: str
     client_secret: str
     config: Config
-    http: "AbstractComponent"
+    http: AbstractComponent
+    oauth: AbstractComponent
 
 
 class AbstractComponent:
