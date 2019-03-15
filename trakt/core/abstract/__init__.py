@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from trakt.config import Config
 
 
@@ -8,7 +10,8 @@ class AbstractApi:
     client_id: str
     client_secret: str
     config: Config
-    http: "AbstractComponent"
+    http: AbstractComponent
+    oauth: AbstractComponent
 
 
 class AbstractComponent:

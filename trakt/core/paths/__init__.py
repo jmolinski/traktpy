@@ -1,1 +1,1 @@
-from trakt.core.paths.api_endpoints_mapping import PATHS, Path
+from trakt.core.paths.api_endpoints_mapping import CountriesInterface, Path  # NOQA

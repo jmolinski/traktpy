@@ -4,6 +4,14 @@ from trakt import Trakt
 from trakt.core.paths.path import Path
 
 
+def test_aliases():
+    p = Path("a/b/c", {}, aliases=["", "xyz"])
+
+    assert p.does_match("xyz")
+    assert p.does_match("")
+    assert not p.does_match("a")
+
+
 def test_optional_args():
     client = Trakt("", "")
 
@@ -12,7 +20,7 @@ def test_optional_args():
     assert p.methods == ["GET"]
     assert p.args == ["?start_date", "?days"]
 
-    default_alias = ["calendars", "all", "shows", "new"]
+    default_alias = "calendars.all.shows.new"
 
     assert p.aliases == [default_alias]
     assert p.does_match(default_alias)
@@ -33,7 +41,7 @@ def test_required_args():
     assert p.methods == ["GET"]
     assert p.args == ["!b", "?d"]
 
-    default_alias = ["aaa", "ccc"]
+    default_alias = "aaa.ccc"
 
     assert p.aliases == [default_alias]
     assert p.does_match(default_alias)
