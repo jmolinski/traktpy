@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from trakt.core.abstract import AbstractApi
-from trakt.core.exceptions import NotAuthenticated, ArgumentError
+from trakt.core.exceptions import ArgumentError, NotAuthenticated
 
 
 class Validator:
@@ -18,7 +18,7 @@ class AuthRequiredValidator(Validator):
 
 
 class RequiredArgsValidator(Validator):
-    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
+    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:  # type: ignore
         for p in path.req_args:
             arg_name = p[1:]
             if arg_name not in kwargs or kwargs[arg_name] in (None, [], {}):
@@ -31,7 +31,7 @@ class OptionalArgsValidator(Validator):
     if c is provided then b must be provided
     """
 
-    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
+    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:  # type: ignore
         require_previous = False
 
         for p in path.opt_args[::-1]:

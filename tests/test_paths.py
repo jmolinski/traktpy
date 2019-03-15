@@ -1,7 +1,8 @@
 # flake8: noqa: F403, F405
-
+import pytest
 from trakt import Trakt
 from trakt.core.paths.path import Path
+from trakt.core.exceptions import ClientError
 
 
 def test_aliases():
@@ -46,8 +47,11 @@ def test_required_args():
     assert p.aliases == [default_alias]
     assert p.does_match(default_alias)
 
-    assert not p.is_valid(client)
-    assert not p.is_valid(client)  # intentional, assert didn't bind any values
+    with pytest.raises(ClientError):
+        p.is_valid(client)
+
+    with pytest.raises(ClientError):  # intentional, assert didn't bind any values
+        p.is_valid(client)
 
     assert p.is_valid(client, b=10)
     assert p.get_path_and_qargs() == ("aaa/10/ccc", {})
