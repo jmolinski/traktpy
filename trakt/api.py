@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
 
 from trakt.core.abstract import AbstractApi, AbstractBaseModel
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
@@ -21,6 +21,7 @@ class TraktApi(AbstractApi):
         http_component: Optional[Type[DefaultHttpComponent]] = None,
         oauth_component: Optional[Type[DefaultOauthComponent]] = None,
         countries_interface: Optional[Type[CountriesInterface]] = None,
+        authorization_keys: Optional[Dict[str, Any]] = None,
         **config: str
     ) -> None:
         AbstractBaseModel.set_client(self)
@@ -35,6 +36,12 @@ class TraktApi(AbstractApi):
 
         self.http = (http_component or DefaultHttpComponent)(self)
         self.oauth = (oauth_component or DefaultOauthComponent)(self)
+
+        if authorization_keys:
+            self.config["authorization"] = authorization_keys
+            self.authenticated = True
+            self.oauth.token = authorization_keys["access_token"]
+            self.access_token = authorization_keys["access_token"]
 
         self.countries = (countries_interface or CountriesInterface)(self, Executor)
 

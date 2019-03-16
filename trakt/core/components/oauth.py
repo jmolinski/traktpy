@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import time
 from typing import NamedTuple
 
 from trakt.core.abstract import AbstractComponent
 from trakt.core.decorators import auth_required
+from trakt.core.exceptions import ClientError
 
 
 class TokenResponse(NamedTuple):
@@ -117,7 +119,20 @@ class DefaultOauthComponent(AbstractComponent):
             "client_secret": self.client.client_secret,
         }
 
-        ret = self.client.http.request("oauth/device/token", method="POST", data=data)
+        elapsed_time: float = 0
+        while True:
+            ret, status_code = self.client.http.request(
+                "oauth/device/token", method="POST", data=data, return_code=True
+            )
+            if status_code == 200:
+                break
+
+            elapsed_time += code.interval + 0.3
+
+            if elapsed_time > code.expires_in:
+                raise ClientError("Code expired; start the verification process again")
+
+            time.sleep(code.interval + 0.3)
 
         token = TokenResponse(**ret)
 
