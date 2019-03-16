@@ -20,6 +20,7 @@ from trakt.core.exceptions import (
 
 class DefaultHttpComponent(AbstractComponent):
     name = "http"
+    _requests = requests
 
     def request(
         self,
@@ -36,7 +37,7 @@ class DefaultHttpComponent(AbstractComponent):
         query_args = query_args or {}
         data = data or {}
 
-        response = requests.request(
+        response = self._requests.request(
             method, url, params=query_args, data=data, headers=self.get_headers()
         )
 

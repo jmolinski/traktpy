@@ -7,7 +7,7 @@ from trakt.core.exceptions import ArgumentError, NotAuthenticated
 
 
 class Validator:
-    def validate(self, *args: Any, **kwargs: Any) -> None:
+    def validate(self, *args: Any, **kwargs: Any) -> None:  # pragma: no cover
         return None
 
 
