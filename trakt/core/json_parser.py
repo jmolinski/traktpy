@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
-from trakt.core.exceptions import TraktResponseError
+
 import jsons  # type: ignore
+from trakt.core.exceptions import TraktResponseError
 
 TYPE_TYPE = int.__class__
 ITERABLES = {list, dict}

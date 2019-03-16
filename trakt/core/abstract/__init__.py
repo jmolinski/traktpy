@@ -15,6 +15,7 @@ class AbstractApi:
     config: Config
     http: DefaultHttpComponent
     oauth: DefaultOauthComponent
+    access_token: str
 
 
 class AbstractComponent:

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
 
-from trakt.core.config import DefaultConfig
 from trakt.core.abstract import AbstractApi, AbstractBaseModel
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
+from trakt.core.config import DefaultConfig
 from trakt.core.executors import Executor
 from trakt.core.paths import CountriesInterface
 

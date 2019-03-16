@@ -51,5 +51,6 @@ class DefaultOauthComponent(AbstractComponent):
 
         self.client.authenticated = True
         self.client.access_token = token.access_token
+        self.token = token.access_token
 
         return token

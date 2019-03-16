@@ -1,5 +1,7 @@
 import json
 
+from trakt.core.components.http_component import DefaultHttpComponent
+
 try:
     with open(".secrets") as f:
         config = json.loads(f.read())
@@ -17,8 +19,19 @@ class MockResponse:
 
 
 class MockRequests:
-    def __init__(self, json_response, code):
+    def __init__(self, json_response, code=200):
         self.response = MockResponse(json_response, code)
 
     def request(self, *args, **kwargs):
         return self.response
+
+
+def get_mock_http_component(response=None, code=200):
+    response = response or {}
+
+    def wrapper(client):
+        return DefaultHttpComponent(
+            client, requests_dependency=MockRequests(json_response=response, code=code)
+        )
+
+    return wrapper
