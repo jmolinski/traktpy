@@ -3,6 +3,19 @@ from typing import Any, Dict
 
 import requests
 from trakt.core.abstract import AbstractComponent
+from trakt.core.exceptions import (
+    BadRequest,
+    Conflict,
+    Forbidden,
+    MethodNotFound,
+    NotFound,
+    PreconditionFailed,
+    RateLimitExceeded,
+    ServerError,
+    ServiceUnavailable,
+    Unauthorized,
+    UnprocessableEntity,
+)
 
 
 class DefaultHttpComponent(AbstractComponent):
@@ -15,7 +28,7 @@ class DefaultHttpComponent(AbstractComponent):
         method: str = "GET",
         query_args: Dict[str, Any] = None,
         data: Any = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Any:
 
         url = urllib.parse.urljoin(self.client.config["http"]["base_url"], path)
@@ -23,11 +36,12 @@ class DefaultHttpComponent(AbstractComponent):
         query_args = query_args or {}
         data = data or {}
 
-        # TODO STATUS CODES
-
         response = requests.request(
             method, url, params=query_args, data=data, headers=self.get_headers()
         )
+
+        self.handle_code(response.status_code)
+
         return response.json()
 
     def get_headers(self) -> Dict[str, str]:
@@ -43,3 +57,25 @@ class DefaultHttpComponent(AbstractComponent):
         str_headers = {k: str(v) for k, v in headers.items()}
 
         return str_headers
+
+    def handle_code(self, code: int) -> None:
+        m = {
+            400: BadRequest,
+            401: Unauthorized,
+            403: Forbidden,
+            404: NotFound,
+            405: MethodNotFound,
+            409: Conflict,
+            412: PreconditionFailed,
+            422: UnprocessableEntity,
+            429: RateLimitExceeded,
+            500: ServerError,
+            503: ServiceUnavailable,
+            504: ServiceUnavailable,
+            520: ServiceUnavailable,
+            521: ServiceUnavailable,
+            522: ServiceUnavailable,
+        }
+
+        if code in m:
+            raise m[code](code)

@@ -1,4 +1,6 @@
-from typing import List, Optional
+from __future__ import annotations
+
+from typing import Any, List, Optional
 
 
 class ClientError(Exception):
@@ -22,3 +24,57 @@ class NotAuthenticated(ClientError):
 
 class ArgumentError(ClientError):
     message = "Argument error"
+
+
+class RequestRelatedError(ClientError):
+    status_code: int
+
+    def __init__(self, code: int = None, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+
+        if code:
+            self.status_code = code
+
+
+class BadRequest(RequestRelatedError):
+    status_code = 400
+
+
+class Unauthorized(RequestRelatedError):
+    status_code = 401
+
+
+class Forbidden(RequestRelatedError):
+    status_code = 403
+
+
+class NotFound(RequestRelatedError):
+    status_code = 404
+
+
+class MethodNotFound(RequestRelatedError):
+    status_code = 405
+
+
+class Conflict(RequestRelatedError):
+    status_code = 409
+
+
+class PreconditionFailed(RequestRelatedError):
+    status_code = 412
+
+
+class UnprocessableEntity(RequestRelatedError):
+    status_code = 422
+
+
+class RateLimitExceeded(RequestRelatedError):
+    status_code = 429
+
+
+class ServerError(RequestRelatedError):
+    status_code = 500
+
+
+class ServiceUnavailable(RequestRelatedError):
+    status_code = 503

@@ -1,8 +1,8 @@
 # flake8: noqa: F403, F405
 import pytest
 from trakt import Trakt
-from trakt.core.paths.path import Path
 from trakt.core.exceptions import ClientError
+from trakt.core.paths.path import Path
 
 
 def test_aliases():
