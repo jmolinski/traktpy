@@ -1,8 +1,8 @@
 # flake8: noqa: F403, F405
 
 from trakt import Trakt
-from trakt.core.paths.path import Path
 from trakt.core.components.http_component import DefaultHttpComponent
+from trakt.core.paths.path import Path
 
 
 def test_oauth():

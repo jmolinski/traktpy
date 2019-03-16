@@ -96,4 +96,3 @@ class DefaultHttpComponent(AbstractComponent):
         url_parts[4] = urllib.parse.urlencode(query_args or {})
 
         return urllib.parse.urlunparse(url_parts)
-

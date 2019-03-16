@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from trakt.config import Config
+from trakt.core.config import Config
 
 if TYPE_CHECKING:
     from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent

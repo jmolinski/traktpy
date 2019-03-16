@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Optional, cast, NamedTuple
+
+from typing import NamedTuple
 
 from trakt.core.abstract import AbstractComponent
 
@@ -18,8 +19,6 @@ class DefaultOauthComponent(AbstractComponent):
     token = ""
 
     def get_redirect_url(self, *, redirect_uri: str = "", state: str = "") -> str:
-        x = "https://api.trakt.tv/oauth/authorize?response_type=code&client_id=%20&redirect_uri=%20&state=%20"
-
         if not redirect_uri:
             redirect_uri = self.client.config["oauth"]["default_redirect_uri"]
 
