@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
 
-from trakt.config import DefaultConfig
-from trakt.core.abstract import AbstractApi
+from trakt.core.abstract import AbstractApi, AbstractBaseModel
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
+from trakt.core.config import DefaultConfig
 from trakt.core.executors import Executor
 from trakt.core.paths import CountriesInterface
 
@@ -17,11 +17,15 @@ class TraktApi(AbstractApi):
         self,
         client_id: str,
         client_secret: str,
+        *,
         http_component: Optional[Type[DefaultHttpComponent]] = None,
         oauth_component: Optional[Type[DefaultOauthComponent]] = None,
-        countries_interface: Any = None,
+        countries_interface: Optional[Type[CountriesInterface]] = None,
+        authorization_keys: Optional[Dict[str, Any]] = None,
         **config: str
     ) -> None:
+        AbstractBaseModel.set_client(self)
+
         self.authenticated = False
         self.client_id = client_id
         self.client_secret = client_secret
@@ -33,10 +37,13 @@ class TraktApi(AbstractApi):
         self.http = (http_component or DefaultHttpComponent)(self)
         self.oauth = (oauth_component or DefaultOauthComponent)(self)
 
-        self.countries = (countries_interface or CountriesInterface)(self, Executor)
+        if authorization_keys:
+            self.config["authorization"] = authorization_keys
+            self.authenticated = True
+            self.oauth.token = authorization_keys["access_token"]
+            self.access_token = authorization_keys["access_token"]
 
-    def noop(self) -> None:
-        pass
+        self.countries = (countries_interface or CountriesInterface)(self, Executor)
 
     def __getattr__(self, item: str) -> Executor:
         e = Executor(self, item)

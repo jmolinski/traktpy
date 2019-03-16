@@ -13,6 +13,7 @@ from trakt.core.exceptions import (
     NotFound,
     PreconditionFailed,
     RateLimitExceeded,
+    RequestRelatedError,
     ServerError,
     ServiceUnavailable,
     Unauthorized,
@@ -36,6 +37,7 @@ class DefaultHttpComponent(AbstractComponent):
         method: str = "GET",
         query_args: Dict[str, str] = None,
         data: Any = None,
+        return_code: bool = False,
         **kwargs: Any,
     ) -> Any:
 
@@ -49,6 +51,9 @@ class DefaultHttpComponent(AbstractComponent):
         )
 
         self.handle_code(response.status_code)
+
+        if return_code:
+            return response.json(), response.status_code
 
         return response.json()
 
@@ -88,6 +93,9 @@ class DefaultHttpComponent(AbstractComponent):
         if code in m:
             raise m[code](code)
 
+        if code // 100 in {4, 5}:
+            raise RequestRelatedError(code=code)
+
     def get_url(self, path: str, query_args: Dict[str, str] = None) -> str:
         query_args = query_args or {}
 
@@ -96,4 +104,3 @@ class DefaultHttpComponent(AbstractComponent):
         url_parts[4] = urllib.parse.urlencode(query_args or {})
 
         return urllib.parse.urlunparse(url_parts)
-

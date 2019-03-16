@@ -7,18 +7,20 @@ from trakt.core.exceptions import ArgumentError, NotAuthenticated
 
 
 class Validator:
-    def validate(self, *args: Any, **kwargs: Any) -> None:  # pragma: no cover
+    def validate(
+        self, *args: Any, client: AbstractApi, path: Any, **kwargs: Any
+    ) -> None:  # pragma: no cover
         return None
 
 
 class AuthRequiredValidator(Validator):
-    def validate(self, client: AbstractApi, *args: Any, **kwargs: Any) -> None:
+    def validate(self, *args: Any, client: AbstractApi, **kwargs: Any) -> None:
         if not client.authenticated:
             raise NotAuthenticated
 
 
 class RequiredArgsValidator(Validator):
-    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:  # type: ignore
+    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
         for p in path.req_args:
             arg_name = p[1:]
             if arg_name not in kwargs or kwargs[arg_name] in (None, [], {}):
@@ -31,7 +33,7 @@ class OptionalArgsValidator(Validator):
     if c is provided then b must be provided
     """
 
-    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:  # type: ignore
+    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
         require_previous = False
 
         for p in path.opt_args[::-1]:

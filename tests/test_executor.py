@@ -1,26 +1,24 @@
 # flake8: noqa: F403, F405
 
 import pytest
+from tests.client import MockRequests
 from trakt import Trakt
 from trakt.core.components import DefaultHttpComponent
 from trakt.core.exceptions import ClientError
 
 
-class MockHttpComponent(DefaultHttpComponent):
-    def request(self, *args, **kwargs):
-        return self.response
-
-
 def test_executor():
-    http = MockHttpComponent
-    http.response = [{"name": "Australia", "code": "au"}]
+    response = [{"name": "Australia", "code": "au"}]
+    http = lambda client: DefaultHttpComponent(
+        client, requests_dependency=MockRequests(code=200, json_response=response)
+    )
 
-    client = Trakt("", "", inject={"http_component": http})
+    client = Trakt("", "", http_component=http)
 
-    assert client.request("countries", type="shows") == http.response
-    assert client.request("get_countries", type="shows") == http.response
-    assert client.request("countries.get_countries", type="shows") == http.response
-    assert client.get_countries(type="shows") == http.response
+    assert client.request("countries", type="shows") == response
+    assert client.request("get_countries", type="shows") == response
+    assert client.request("countries.get_countries", type="shows") == response
+    assert client.get_countries(type="shows") == response
 
     with pytest.raises(ClientError):
         client.count(type="shows")

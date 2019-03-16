@@ -78,3 +78,7 @@ class ServerError(RequestRelatedError):
 
 class ServiceUnavailable(RequestRelatedError):
     status_code = 503
+
+
+class TraktResponseError(ClientError):
+    message = "Response parsing error. Check response json structure."

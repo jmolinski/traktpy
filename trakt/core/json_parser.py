@@ -1,12 +1,20 @@
 from typing import Any, Dict, List
 
 import jsons  # type: ignore
+from trakt.core.exceptions import TraktResponseError
 
 TYPE_TYPE = int.__class__
 ITERABLES = {list, dict}
 
 
 def parse_tree(data: Any, tree_structure: Any) -> Any:
+    try:
+        return _parse_tree(data, tree_structure)
+    except Exception as e:
+        raise TraktResponseError(errors=[e])
+
+
+def _parse_tree(data: Any, tree_structure: Any) -> Any:
     level_type = tree_structure.__class__
 
     if level_type not in ITERABLES:
@@ -27,7 +35,7 @@ def _parse_list(data: List[Any], single_item_type: Any) -> List[Any]:
     if single_item_type is Any:
         return data
 
-    return [parse_tree(e, single_item_type) for e in data]
+    return [_parse_tree(e, single_item_type) for e in data]
 
 
 def _parse_dict(data: Dict[Any, Any], tree_structure: Dict[Any, Any]) -> Dict[Any, Any]:
@@ -48,10 +56,10 @@ def _parse_dict(data: Dict[Any, Any], tree_structure: Dict[Any, Any]) -> Dict[An
             subtree = tree_structure[k]
             subtree = subtree.__class__ if _is_arbitrary_value(subtree) else subtree
 
-            result[k] = parse_tree(v, subtree)
+            result[k] = _parse_tree(v, subtree)
         elif k.__class__ in wildcards:
             wildcard = wildcards[k.__class__]
-            result[k] = v if wildcard is Any else parse_tree(v, wildcard)
+            result[k] = v if wildcard is Any else _parse_tree(v, wildcard)
 
     # set defaults if any keys are missing
     for k, v in defaults.items():
