@@ -1,8 +1,56 @@
+from __future__ import annotations
+from typing import Optional, cast, NamedTuple
+
 from trakt.core.abstract import AbstractComponent
+
+
+class TokenResponse(NamedTuple):
+    access_token: str
+    refresh_token: str
+    token_type: str
+    expires_in: int
+    scope: str
+    created_at: int
 
 
 class DefaultOauthComponent(AbstractComponent):
     name = "oauth"
     token = ""
 
-    url = "https://api.trakt.tv/oauth/authorize?response_type=response_type&client_id=client_id&redirect_uri=redirect_uri&state=state"
+    def get_redirect_url(self, *, redirect_uri: str = "", state: str = "") -> str:
+        x = "https://api.trakt.tv/oauth/authorize?response_type=code&client_id=%20&redirect_uri=%20&state=%20"
+
+        if not redirect_uri:
+            redirect_uri = self.client.config["oauth"]["default_redirect_uri"]
+
+        quargs = {
+            "response_type": "code",
+            "client_id": self.client.client_id,
+            "redirect_uri": redirect_uri,
+        }
+
+        if state:
+            quargs["state"] = state
+
+        return self.client.http.get_url("oauth/authorize", query_args=quargs)
+
+    def get_token(self, *, code: str, redirect_uri: str = "") -> TokenResponse:
+        if not redirect_uri:
+            redirect_uri = self.client.config["oauth"]["default_redirect_uri"]
+
+        data = {
+            "code": code,
+            "client_id": self.client.client_id,
+            "client_secret": self.client.client_secret,
+            "redirect_uri": redirect_uri,
+            "grant_type": "authorization_code",
+        }
+
+        ret = self.client.http.request("oauth/token", method="POST", data=data)
+
+        token = TokenResponse(**ret)
+
+        self.client.authenticated = True
+        self.client.access_token = token.access_token
+
+        return token
