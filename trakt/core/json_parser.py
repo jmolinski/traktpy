@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-import jsons
+import jsons  # type: ignore
 
 TYPE_TYPE = int.__class__
 ITERABLES = {list, dict}
