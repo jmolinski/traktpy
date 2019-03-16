@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import NamedTuple
 
 from trakt.core.abstract import AbstractComponent
+from trakt.core.decorators import auth_required
 
 
 class TokenResponse(NamedTuple):
@@ -12,6 +13,14 @@ class TokenResponse(NamedTuple):
     expires_in: int
     scope: str
     created_at: int
+
+
+class CodeResponse(NamedTuple):
+    device_code: str
+    user_code: str
+    verification_url: str
+    expires_in: int
+    interval: int
 
 
 class DefaultOauthComponent(AbstractComponent):
@@ -46,6 +55,69 @@ class DefaultOauthComponent(AbstractComponent):
         }
 
         ret = self.client.http.request("oauth/token", method="POST", data=data)
+
+        token = TokenResponse(**ret)
+
+        self.client.authenticated = True
+        self.client.access_token = token.access_token
+        self.token = token.access_token
+
+        return token
+
+    @auth_required
+    def refresh_token(
+        self, *, refresh_token: str, redirect_uri: str = ""
+    ) -> TokenResponse:
+        if not redirect_uri:
+            redirect_uri = self.client.config["oauth"]["default_redirect_uri"]
+
+        data = {
+            "refresh_token": refresh_token,
+            "client_id": self.client.client_id,
+            "client_secret": self.client.client_secret,
+            "redirect_uri": redirect_uri,
+            "grant_type": "refresh_token",
+        }
+
+        ret = self.client.http.request("oauth/token", method="POST", data=data)
+
+        token = TokenResponse(**ret)
+
+        self.client.authenticated = True
+        self.client.access_token = token.access_token
+        self.token = token.access_token
+
+        return token
+
+    @auth_required
+    def revoke_token(self) -> None:
+        data = {
+            "token": self.token,
+            "client_id": self.client.client_id,
+            "client_secret": self.client.client_secret,
+        }
+
+        self.client.http.request("oauth/revoke", method="POST", data=data)
+
+        self.client.authenticated = False
+        self.client.access_token = ""
+        self.token = ""
+
+    def get_verification_code(self) -> CodeResponse:
+        data = {"client_id": self.client.client_id}
+
+        ret = self.client.http.request("oauth/device/code", method="POST", data=data)
+
+        return CodeResponse(**ret)
+
+    def wait_for_verification(self, *, code: CodeResponse) -> TokenResponse:
+        data = {
+            "code": code.device_code,
+            "client_id": self.client.client_id,
+            "client_secret": self.client.client_secret,
+        }
+
+        ret = self.client.http.request("oauth/device/token", method="POST", data=data)
 
         token = TokenResponse(**ret)
 

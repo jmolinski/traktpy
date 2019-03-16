@@ -31,3 +31,4 @@ def test_get_token():
 
     assert token_resp.access_token == OAUTH_GET_TOKEN["access_token"]
     assert client.access_token == OAUTH_GET_TOKEN["access_token"]
+    assert client.authenticated

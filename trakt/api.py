@@ -38,9 +38,6 @@ class TraktApi(AbstractApi):
 
         self.countries = (countries_interface or CountriesInterface)(self, Executor)
 
-    def noop(self) -> None:
-        pass
-
     def __getattr__(self, item: str) -> Executor:
         e = Executor(self, item)
         e.install(self.get_executor_paths())

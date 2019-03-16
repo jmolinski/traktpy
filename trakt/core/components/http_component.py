@@ -17,6 +17,7 @@ from trakt.core.exceptions import (
     ServiceUnavailable,
     Unauthorized,
     UnprocessableEntity,
+    RequestRelatedError,
 )
 
 
@@ -87,6 +88,9 @@ class DefaultHttpComponent(AbstractComponent):
 
         if code in m:
             raise m[code](code)
+
+        if code // 100 in {4, 5}:
+            raise RequestRelatedError(code=code)
 
     def get_url(self, path: str, query_args: Dict[str, str] = None) -> str:
         query_args = query_args or {}
