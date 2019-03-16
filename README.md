@@ -18,4 +18,3 @@ Todo:
 - define all paths & user friendly aliases
 - docs
 - pypi release
-- validators should raise

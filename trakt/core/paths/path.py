@@ -66,16 +66,13 @@ class Path:
         return name in self.aliases
 
     def is_valid(self, client: AbstractApi, **kwargs: Any) -> bool:
-        validation_result = all(
-            v.validate(self, client=client, path=self, **kwargs)
-            for v in self.validators
-        )
+        for v in self.validators:
+            v.validate(self, client=client, path=self, **kwargs)  # may raise
 
-        if validation_result:
-            self.__bound_client = client
-            self.__bound_kwargs = kwargs
+        self.__bound_client = client
+        self.__bound_kwargs = kwargs
 
-        return validation_result
+        return True
 
     def _get_param_value(self, param: str) -> Any:
         if param not in self.args:
