@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from trakt.config import Config
+
+if TYPE_CHECKING:
+    from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 
 
 class AbstractApi:
@@ -8,8 +13,8 @@ class AbstractApi:
     client_id: str
     client_secret: str
     config: Config
-    http: AbstractComponent
-    oauth: AbstractComponent
+    http: DefaultHttpComponent
+    oauth: DefaultOauthComponent
 
 
 class AbstractComponent:

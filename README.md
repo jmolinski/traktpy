@@ -14,7 +14,6 @@ Todo:
 - error handling
 - http component retries etc
 - filters
-- help [client.x.y.help should return possible paths starting with x.y]
 - define all paths & user friendly aliases
 - docs
 - pypi release

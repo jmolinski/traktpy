@@ -9,7 +9,7 @@ from trakt.version import __version__  # NOQA
 
 class Trakt:
     _instance: Optional[TraktApi] = None
-    _config: Dict[str, str]
+    _config: Dict[str, Any]
     _injected: Dict[str, Any]
 
     def __init__(

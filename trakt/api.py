@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
 
 from trakt.config import DefaultConfig
 from trakt.core.abstract import AbstractApi
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 from trakt.core.executors import Executor
-from trakt.core.paths import CountriesInterface, Path
+from trakt.core.paths import CountriesInterface
 
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.paths.suite_interface import SuiteInterface
@@ -17,8 +17,8 @@ class TraktApi(AbstractApi):
         self,
         client_id: str,
         client_secret: str,
-        http_component: Any = None,
-        oauth_component: Any = None,
+        http_component: Optional[Type[DefaultHttpComponent]] = None,
+        oauth_component: Optional[Type[DefaultOauthComponent]] = None,
         countries_interface: Any = None,
         **config: str
     ) -> None:
