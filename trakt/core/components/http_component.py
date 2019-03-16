@@ -2,7 +2,7 @@ import urllib.parse
 from typing import Any, Dict
 
 import requests
-from trakt.core.abstract import AbstractComponent
+from trakt.core.abstract import AbstractApi, AbstractComponent
 from trakt.core.exceptions import (
     BadRequest,
     Conflict,
@@ -21,6 +21,11 @@ from trakt.core.exceptions import (
 class DefaultHttpComponent(AbstractComponent):
     name = "http"
     _requests = requests
+
+    def __init__(self, client: AbstractApi, requests_dependency: Any = None) -> None:
+        super().__init__(client)
+
+        self._requests = requests_dependency if requests_dependency else requests
 
     def request(
         self,

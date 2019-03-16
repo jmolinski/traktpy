@@ -23,16 +23,12 @@ class MockRequests:
         return self.response
 
 
-class MockHttpComponent(DefaultHttpComponent):
-    def __init__(self, client, response, code):
-        super().__init__(client)
-        self._requests = MockRequests(response, code)
-
-
 def test_bad_request_exception():
     client = Trakt("", "")
 
-    http = MockHttpComponent(client, {}, code=400)
+    http = DefaultHttpComponent(
+        client, requests_dependency=MockRequests(json_response={}, code=400)
+    )
 
     with pytest.raises(BadRequest):
         http.request("...")
