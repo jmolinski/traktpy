@@ -27,13 +27,16 @@ class ArgumentError(ClientError):
 
 
 class RequestRelatedError(ClientError):
-    status_code: int
+    status_code: Optional[int]
+    response: Any
 
-    def __init__(self, code: int = None, *args: Any, **kwargs: Any) -> None:
+    def __init__(
+        self, code: int = None, response=None, *args: Any, **kwargs: Any
+    ) -> None:
         super().__init__(*args, **kwargs)
 
-        if code:
-            self.status_code = code
+        self.status_code = code
+        self.response = response
 
 
 class BadRequest(RequestRelatedError):

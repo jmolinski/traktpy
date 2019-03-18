@@ -99,7 +99,7 @@ class DefaultOauthComponent(AbstractComponent):
             "client_secret": self.client.client_secret,
         }
 
-        self.client.http.request("oauth/revoke", method="POST", data=data)
+        self.client.http.request("oauth/revoke", method="POST", data=data, headers={})
 
         self.client.authenticated = False
         self.client.access_token = ""
@@ -108,7 +108,9 @@ class DefaultOauthComponent(AbstractComponent):
     def get_verification_code(self) -> CodeResponse:
         data = {"client_id": self.client.client_id}
 
-        ret = self.client.http.request("oauth/device/code", method="POST", data=data)
+        ret = self.client.http.request(
+            "oauth/device/code", method="POST", data=data, headers={}
+        )
 
         return CodeResponse(**ret)
 
@@ -122,7 +124,12 @@ class DefaultOauthComponent(AbstractComponent):
         elapsed_time: float = 0
         while True:
             ret, status_code = self.client.http.request(
-                "oauth/device/token", method="POST", data=data, return_code=True
+                "oauth/device/token",
+                method="POST",
+                data=data,
+                return_code=True,
+                headers={},
+                no_raise=True,
             )
             if status_code == 200:
                 break
