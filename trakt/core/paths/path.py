@@ -37,6 +37,8 @@ class Path:
         validators: List[Validator] = None,
         qargs: Dict[str, str] = None,
         aliases: List[str] = None,
+        extended: List[str] = None,
+        allowed_filters: List[str] = None,
     ) -> None:
         self.path = path
         self._output_structure = output_structure
@@ -59,6 +61,9 @@ class Path:
         self.args = args
 
         self.qargs = qargs or []
+
+        self.extended = extended or []
+        self.filters = allowed_filters or []
 
         self.__bound_client = None
 

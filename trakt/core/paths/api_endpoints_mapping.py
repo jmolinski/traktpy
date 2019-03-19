@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import re
 from typing import Any, Dict, cast
 
-from trakt.core.models import Movie
+from trakt.core.models import Episode, Show
 from trakt.core.paths.path import Path
 from trakt.core.paths.suite_interface import SuiteInterface
 from trakt.core.paths.validators import PerArgValidator
@@ -22,4 +23,25 @@ class CountriesInterface(SuiteInterface):
 
     def get_countries(self, *, type: str, **kwargs: Any) -> Dict[str, str]:
         ret = self.run("get_countries", type=type, **kwargs)
+        return cast(Dict[str, str], ret)
+
+
+class CalendarsInterface(SuiteInterface):
+    name = "calendars"
+
+    paths = {
+        "get_season_premieres": Path(
+            "calendars/all/shows/premieres/?start_date/?days",
+            [{"first_aired": str, "episode": Episode, "show": Show}],
+            validators=[
+                PerArgValidator("days", lambda t: isinstance(t, int)),
+                PerArgValidator(
+                    "start_date", lambda t: bool(re.match(r"\d{4}-\d{2}-\d{2}", t))
+                ),
+            ],
+        )
+    }
+
+    def get_season_premieres(self, **kwargs: Any) -> Dict[str, str]:
+        ret = self.run("get_season_premieres", **kwargs)
         return cast(Dict[str, str], ret)

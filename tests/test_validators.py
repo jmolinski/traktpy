@@ -70,3 +70,11 @@ def test_per_arg_validator():
 
     with pytest.raises(ArgumentError):
         c_validator.validate(path=p, b="any", c="y")
+
+
+def test_extended_validator():
+    pass
+
+
+def test_filters_validator():
+    pass

@@ -56,3 +56,22 @@ class PerArgValidator(Validator):
                 raise ArgumentError(
                     f"invalid {self.arg_name}={kwargs[self.arg_name]} argument value"
                 )
+
+
+class ExtendedValidator(Validator):
+    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
+        if "extended" in kwargs:
+            if kwargs["extended"] not in path.extended:
+                message = f"invalid extended={kwargs['extended']} argument value; "
+
+                if path.extended:
+                    message += f"possible extended values: {path.extended}"
+                else:
+                    message += "this endpoint doesn't accept extended parameter"
+
+                raise ArgumentError(message)
+
+
+class FiltersValidator(Validator):
+    def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
+        pass
