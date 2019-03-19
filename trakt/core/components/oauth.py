@@ -59,14 +59,12 @@ class DefaultOauthComponent(AbstractComponent):
         return self.client.user
 
     @auth_required
-    def refresh_token(
-        self, *, refresh_token: str, redirect_uri: str = ""
-    ) -> TraktCredentials:
+    def refresh_token(self, *, redirect_uri: str = "") -> TraktCredentials:
         if not redirect_uri:
             redirect_uri = self.client.config["oauth"]["default_redirect_uri"]
 
         data = {
-            "refresh_token": refresh_token,
+            "refresh_token": cast(TraktCredentials, self.client.user).access_token,
             "client_id": self.client.client_id,
             "client_secret": self.client.client_secret,
             "redirect_uri": redirect_uri,

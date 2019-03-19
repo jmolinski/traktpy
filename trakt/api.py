@@ -22,6 +22,7 @@ class TraktApi(AbstractApi):
         oauth_component: Optional[Type[DefaultOauthComponent]] = None,
         countries_interface: Optional[Type[CountriesInterface]] = None,
         user: Optional[TraktCredentials] = None,
+        auto_refresh_token: bool = False,
         **config: str
     ) -> None:
         AbstractBaseModel.set_client(self)
@@ -30,7 +31,10 @@ class TraktApi(AbstractApi):
         self.client_secret = client_secret
 
         self.config = DefaultConfig(
-            client_id=client_id, client_secret=client_secret, **config
+            client_id=client_id,
+            client_secret=client_secret,
+            auto_refresh_token=auto_refresh_token,
+            **config
         )
 
         self.user = user
@@ -39,20 +43,23 @@ class TraktApi(AbstractApi):
         self.oauth = (oauth_component or DefaultOauthComponent)(self)
         self.countries = (countries_interface or CountriesInterface)(self, Executor)
 
-    def __getattr__(self, item: str) -> Executor:
-        e = Executor(self, item)
-        e.install(self.get_executor_paths())
-
-        return e
-
     def request(self, params: Union[str, List[str]], **kwargs: Any) -> Any:
         if isinstance(params, str):
             params = params.split(".")
 
         e = Executor(self, params)
-        e.install(self.get_executor_paths())
+        e.install(self._get_executor_paths())
 
         return e.run(**kwargs)
 
-    def get_executor_paths(self) -> List[SuiteInterface]:
+    def set_user(self, user: TraktCredentials) -> None:
+        self.user = user
+
+    def __getattr__(self, item: str) -> Executor:
+        e = Executor(self, item)
+        e.install(self._get_executor_paths())
+
+        return e
+
+    def _get_executor_paths(self) -> List[SuiteInterface]:
         return [self.countries]

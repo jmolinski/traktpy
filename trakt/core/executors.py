@@ -28,6 +28,9 @@ class Executor:
         self.paths = []
         self.path_suites = []
 
+        if self.client.config["auto_refresh_token"] and self.client.user:
+            self.client.oauth.refresh_token()
+
     def __getattr__(self, param: str) -> Executor:
         self.params.append(param)
 

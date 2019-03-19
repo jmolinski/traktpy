@@ -22,3 +22,6 @@ def test_executor():
 
     with pytest.raises(ClientError):
         client.count(type="shows")
+
+
+# TODO test refresh token

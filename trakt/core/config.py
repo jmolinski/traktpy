@@ -12,7 +12,7 @@ class Config:
         self._config = config
 
     def __getitem__(self, name: str) -> Any:
-        return self._config[name]
+        return self._config.get(name)
 
     def __setitem__(self, name: str, value: Any) -> None:
         self._config[name] = value
@@ -25,7 +25,7 @@ DEFAULT_CONFIG: InternalConfigType = {
 
 
 class DefaultConfig(Config):
-    def __init__(self, **custom_config: str) -> None:
+    def __init__(self, **custom_config: Any) -> None:
         config = deepcopy(DEFAULT_CONFIG)
 
         if custom_config:
