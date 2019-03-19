@@ -15,7 +15,7 @@ class Validator:
 
 class AuthRequiredValidator(Validator):
     def validate(self, *args: Any, client: AbstractApi, **kwargs: Any) -> None:
-        if not client.authenticated:
+        if not client.user:
             raise NotAuthenticated
 
 

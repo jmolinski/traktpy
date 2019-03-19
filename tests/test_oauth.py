@@ -27,8 +27,8 @@ def test_get_token():
         "123", "", http_component=get_mock_http_component(response=OAUTH_GET_TOKEN)
     )
 
-    token_resp = client.oauth.get_token(code="code", redirect_uri="uri")
+    trakt_credentials = client.oauth.get_token(code="code", redirect_uri="uri")
 
-    assert token_resp.access_token == OAUTH_GET_TOKEN["access_token"]
-    assert client.access_token == OAUTH_GET_TOKEN["access_token"]
-    assert client.authenticated
+    assert trakt_credentials.access_token == OAUTH_GET_TOKEN["access_token"]
+    assert client.user
+    assert client.user.access_token == OAUTH_GET_TOKEN["access_token"]

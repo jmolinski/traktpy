@@ -84,8 +84,8 @@ class DefaultHttpComponent(AbstractComponent):
             "trakt-api-version": 2,
         }
 
-        if self.client.authenticated:
-            headers["Authorization"] = self.client.oauth.token
+        if self.client.user:
+            headers["Authorization"] = self.client.user.access_token
 
         str_headers = {k: str(v) for k, v in headers.items()}
 

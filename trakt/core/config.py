@@ -1,4 +1,5 @@
 from copy import deepcopy
+from dataclasses import dataclass
 from typing import Any, Dict
 
 InternalConfigType = Dict[str, Any]
@@ -31,3 +32,11 @@ class DefaultConfig(Config):
             config.update(custom_config)
 
         super().__init__(config)
+
+
+@dataclass
+class TraktCredentials:
+    access_token: str
+    refresh_token: str
+    scope: str
+    expires_at: int
