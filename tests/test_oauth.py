@@ -24,7 +24,7 @@ def test_redirect_url():
 
 def test_get_token():
     client = Trakt(
-        "123", "", http_component=get_mock_http_component(response=OAUTH_GET_TOKEN)
+        "123", "", http_component=get_mock_http_component({"*": [OAUTH_GET_TOKEN, 200]})
     )
 
     trakt_credentials = client.oauth.get_token(code="code", redirect_uri="uri")

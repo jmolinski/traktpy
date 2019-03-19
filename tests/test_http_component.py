@@ -11,7 +11,7 @@ def test_bad_request_exception():
     client = Trakt("", "")
 
     http = DefaultHttpComponent(
-        client, requests_dependency=MockRequests(json_response={}, code=400)
+        client, requests_dependency=MockRequests({"*": [{}, 400]})
     )
 
     with pytest.raises(BadRequest):

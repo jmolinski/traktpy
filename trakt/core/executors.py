@@ -60,7 +60,7 @@ class Executor:
         api_path, query_args = path.get_path_and_qargs()
         response = self.client.http.request(
             api_path, method=path.method, query_args=query_args, data=kwargs.get("data")
-        )  # TODO post data handling?
+        )
 
         return json_parser.parse_tree(response, path.response_structure)
 
