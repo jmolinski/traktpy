@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
 
 from trakt.core.abstract import AbstractApi, AbstractBaseModel
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
-from trakt.core.config import DefaultConfig
+from trakt.core.config import DefaultConfig, TraktCredentials
 from trakt.core.executors import Executor
 from trakt.core.paths import CountriesInterface
 
@@ -21,44 +21,45 @@ class TraktApi(AbstractApi):
         http_component: Optional[Type[DefaultHttpComponent]] = None,
         oauth_component: Optional[Type[DefaultOauthComponent]] = None,
         countries_interface: Optional[Type[CountriesInterface]] = None,
-        authorization_keys: Optional[Dict[str, Any]] = None,
+        user: Optional[TraktCredentials] = None,
+        auto_refresh_token: bool = False,
         **config: str
     ) -> None:
         AbstractBaseModel.set_client(self)
 
-        self.authenticated = False
         self.client_id = client_id
         self.client_secret = client_secret
 
         self.config = DefaultConfig(
-            client_id=client_id, client_secret=client_secret, **config
+            client_id=client_id,
+            client_secret=client_secret,
+            auto_refresh_token=auto_refresh_token,
+            **config
         )
+
+        self.user = user
 
         self.http = (http_component or DefaultHttpComponent)(self)
         self.oauth = (oauth_component or DefaultOauthComponent)(self)
-
-        if authorization_keys:
-            self.config["authorization"] = authorization_keys
-            self.authenticated = True
-            self.oauth.token = authorization_keys["access_token"]
-            self.access_token = authorization_keys["access_token"]
-
         self.countries = (countries_interface or CountriesInterface)(self, Executor)
-
-    def __getattr__(self, item: str) -> Executor:
-        e = Executor(self, item)
-        e.install(self.get_executor_paths())
-
-        return e
 
     def request(self, params: Union[str, List[str]], **kwargs: Any) -> Any:
         if isinstance(params, str):
             params = params.split(".")
 
         e = Executor(self, params)
-        e.install(self.get_executor_paths())
+        e.install(self._get_executor_paths())
 
         return e.run(**kwargs)
 
-    def get_executor_paths(self) -> List[SuiteInterface]:
+    def set_user(self, user: TraktCredentials) -> None:
+        self.user = user
+
+    def __getattr__(self, item: str) -> Executor:
+        e = Executor(self, item)
+        e.install(self._get_executor_paths())
+
+        return e
+
+    def _get_executor_paths(self) -> List[SuiteInterface]:
         return [self.countries]

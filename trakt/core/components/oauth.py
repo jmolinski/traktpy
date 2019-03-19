@@ -1,20 +1,12 @@
 from __future__ import annotations
 
 import time
-from typing import NamedTuple
+from typing import NamedTuple, cast
 
 from trakt.core.abstract import AbstractComponent
+from trakt.core.config import TraktCredentials
 from trakt.core.decorators import auth_required
 from trakt.core.exceptions import ClientError
-
-
-class TokenResponse(NamedTuple):
-    access_token: str
-    refresh_token: str
-    token_type: str
-    expires_in: int
-    scope: str
-    created_at: int
 
 
 class CodeResponse(NamedTuple):
@@ -27,7 +19,6 @@ class CodeResponse(NamedTuple):
 
 class DefaultOauthComponent(AbstractComponent):
     name = "oauth"
-    token = ""
 
     def get_redirect_url(self, *, redirect_uri: str = "", state: str = "") -> str:
         if not redirect_uri:
@@ -44,7 +35,7 @@ class DefaultOauthComponent(AbstractComponent):
 
         return self.client.http.get_url("oauth/authorize", query_args=quargs)
 
-    def get_token(self, *, code: str, redirect_uri: str = "") -> TokenResponse:
+    def get_token(self, *, code: str, redirect_uri: str = "") -> TraktCredentials:
         if not redirect_uri:
             redirect_uri = self.client.config["oauth"]["default_redirect_uri"]
 
@@ -58,23 +49,22 @@ class DefaultOauthComponent(AbstractComponent):
 
         ret = self.client.http.request("oauth/token", method="POST", data=data)
 
-        token = TokenResponse(**ret)
+        self.client.user = TraktCredentials(
+            access_token=ret["access_token"],
+            refresh_token=ret["refresh_token"],
+            scope=ret["scope"],
+            expires_at=(int(ret["created_at"]) + int(ret["expires_in"])),
+        )
 
-        self.client.authenticated = True
-        self.client.access_token = token.access_token
-        self.token = token.access_token
-
-        return token
+        return self.client.user
 
     @auth_required
-    def refresh_token(
-        self, *, refresh_token: str, redirect_uri: str = ""
-    ) -> TokenResponse:
+    def refresh_token(self, *, redirect_uri: str = "") -> TraktCredentials:
         if not redirect_uri:
             redirect_uri = self.client.config["oauth"]["default_redirect_uri"]
 
         data = {
-            "refresh_token": refresh_token,
+            "refresh_token": cast(TraktCredentials, self.client.user).access_token,
             "client_id": self.client.client_id,
             "client_secret": self.client.client_secret,
             "redirect_uri": redirect_uri,
@@ -83,27 +73,26 @@ class DefaultOauthComponent(AbstractComponent):
 
         ret = self.client.http.request("oauth/token", method="POST", data=data)
 
-        token = TokenResponse(**ret)
+        self.client.user = TraktCredentials(
+            access_token=ret["access_token"],
+            refresh_token=ret["refresh_token"],
+            scope=ret["scope"],
+            expires_at=(int(ret["created_at"]) + int(ret["expires_in"])),
+        )
 
-        self.client.authenticated = True
-        self.client.access_token = token.access_token
-        self.token = token.access_token
-
-        return token
+        return self.client.user
 
     @auth_required
     def revoke_token(self) -> None:
         data = {
-            "token": self.token,
+            "token": cast(TraktCredentials, self.client.user).access_token,
             "client_id": self.client.client_id,
             "client_secret": self.client.client_secret,
         }
 
         self.client.http.request("oauth/revoke", method="POST", data=data, headers={})
 
-        self.client.authenticated = False
-        self.client.access_token = ""
-        self.token = ""
+        self.client.user = None
 
     def get_verification_code(self) -> CodeResponse:
         data = {"client_id": self.client.client_id}
@@ -114,7 +103,7 @@ class DefaultOauthComponent(AbstractComponent):
 
         return CodeResponse(**ret)
 
-    def wait_for_verification(self, *, code: CodeResponse) -> TokenResponse:
+    def wait_for_verification(self, *, code: CodeResponse) -> TraktCredentials:
         data = {
             "code": code.device_code,
             "client_id": self.client.client_id,
@@ -141,10 +130,11 @@ class DefaultOauthComponent(AbstractComponent):
 
             time.sleep(code.interval + 0.3)
 
-        token = TokenResponse(**ret)
+        self.client.user = TraktCredentials(
+            access_token=ret["access_token"],
+            refresh_token=ret["refresh_token"],
+            scope=ret["scope"],
+            expires_at=(int(ret["created_at"]) + int(ret["expires_in"])),
+        )
 
-        self.client.authenticated = True
-        self.client.access_token = token.access_token
-        self.token = token.access_token
-
-        return token
+        return self.client.user

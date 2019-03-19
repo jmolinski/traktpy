@@ -17,11 +17,11 @@ class A:
 
 def test_auth_validator():
     client = A()
-    client.authenticated = True
+    client.user = "not none"
 
     assert AuthRequiredValidator().validate(client=client) is None
 
-    client.authenticated = False
+    client.user = None
 
     with pytest.raises(NotAuthenticated):
         AuthRequiredValidator().validate(client=client)

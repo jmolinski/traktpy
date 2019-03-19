@@ -28,6 +28,9 @@ class Executor:
         self.paths = []
         self.path_suites = []
 
+        if self.client.config["auto_refresh_token"] and self.client.user:
+            self.client.oauth.refresh_token()
+
     def __getattr__(self, param: str) -> Executor:
         self.params.append(param)
 
@@ -57,7 +60,7 @@ class Executor:
         api_path, query_args = path.get_path_and_qargs()
         response = self.client.http.request(
             api_path, method=path.method, query_args=query_args, data=kwargs.get("data")
-        )  # TODO post data handling?
+        )
 
         return json_parser.parse_tree(response, path.response_structure)
 

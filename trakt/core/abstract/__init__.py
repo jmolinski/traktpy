@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
-from trakt.core.config import Config
+from trakt.core.config import Config, TraktCredentials
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 
 
 class AbstractApi:
-    authenticated: bool
     client_id: str
     client_secret: str
     config: Config
     http: DefaultHttpComponent
     oauth: DefaultOauthComponent
-    access_token: str
+    user: Optional[TraktCredentials]
 
 
 class AbstractComponent:
