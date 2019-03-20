@@ -4,6 +4,7 @@ from trakt.core.paths import Path
 from trakt.core.paths.validators import (
     AuthRequiredValidator,
     ExtendedValidator,
+    FiltersValidator,
     OptionalArgsValidator,
     PerArgValidator,
     RequiredArgsValidator,
@@ -87,4 +88,15 @@ def test_extended_validator():
 
 
 def test_filters_validator():
-    pass
+    p = Path("a", {}, filters=["query", "genres"])
+
+    assert FiltersValidator().validate(path=p) is None
+    assert FiltersValidator().validate(path=p, query="xyz") is None
+    assert FiltersValidator().validate(path=p, genres="xyz") is None
+    assert FiltersValidator().validate(path=p, genres=["xyz", "abc"]) is None
+
+    with pytest.raises(ArgumentError):
+        FiltersValidator().validate(path=p, languages="xyz")
+
+    with pytest.raises(ArgumentError):
+        FiltersValidator().validate(path=p, query=["abc", "xyz"])

@@ -1,9 +1,26 @@
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any, Callable, List
 
 from trakt.core.abstract import AbstractApi
 from trakt.core.exceptions import ArgumentError, NotAuthenticated
+
+SINGLE_FILTERS = {"query", "years", "runtimes", "ratings"}
+MULTI_FILTERS = {
+    "genres",
+    "languages",
+    "countries",
+    "certifications",
+    "networks",
+    "status",
+}
+MOVIE_FILTERS = {"certifications"}
+SHOWS_FILTERS = {"certifications", "networks", "status"}
+
+
+COMMON_FILTERS = SINGLE_FILTERS | {"genres", "languages", "countries"}
+
+ALL_FILTERS = SINGLE_FILTERS | MULTI_FILTERS
 
 
 class Validator:
@@ -74,4 +91,27 @@ class ExtendedValidator(Validator):
 
 class FiltersValidator(Validator):
     def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
-        pass
+        for k in kwargs:
+            if k in ALL_FILTERS:
+                self._validate_filter_arg(path.filters, k, kwargs[k])
+
+    def _validate_filter_arg(
+        self, allowed_filters: List[str], filter: str, value: Any
+    ) -> None:
+        if filter not in allowed_filters:
+            raise ArgumentError(f"this endpoint doesnt accept {filter} filter")
+
+        if filter in SINGLE_FILTERS and not isinstance(value, (int, str)):
+            raise ArgumentError(f"{filter} filter only accepts 1 value")
+
+        if filter in MULTI_FILTERS:
+            if not isinstance(value, (tuple, list, str)):
+                raise ArgumentError(
+                    f"{filter} filter invalid value (must be str or itarable of str)"
+                )
+            if isinstance(value, (list, tuple)):
+                for v in value:
+                    if not isinstance(v, str):
+                        raise ArgumentError(
+                            f"{filter} filter invalid value (must be str or itarable of str)"
+                        )

@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 from trakt.core.exceptions import ClientError
 from trakt.core.paths.validators import (
+    ALL_FILTERS,
+    MULTI_FILTERS,
     OptionalArgsValidator,
     RequiredArgsValidator,
     Validator,
@@ -23,6 +25,8 @@ class Path:
     methods: List[str]
     validators: List[Validator]
     aliases: List[str]
+    extended: List[str]
+    filters: List[str]
 
     _output_structure: Any
 
@@ -38,7 +42,7 @@ class Path:
         qargs: Dict[str, str] = None,
         aliases: List[str] = None,
         extended: List[str] = None,
-        allowed_filters: List[str] = None,
+        filters: List[str] = None,
     ) -> None:
         self.path = path
         self._output_structure = output_structure
@@ -63,7 +67,7 @@ class Path:
         self.qargs = qargs or []
 
         self.extended = extended or []
-        self.filters = allowed_filters or []
+        self.filters = filters or []
 
         self.__bound_client = None
 
@@ -101,6 +105,18 @@ class Path:
         qargs = {
             q: self.__bound_kwargs[q] for q in self.qargs if q in self.__bound_kwargs
         }
+
+        for filter in self.filters:
+            if filter in self.__bound_kwargs:
+                val = self.__bound_kwargs[filter]
+
+                if filter in MULTI_FILTERS and isinstance(filter, (tuple, list)):
+                    val = ",".join(val)
+
+            qargs[filter] = str(val)
+
+        if "extended" in self.__bound_kwargs:
+            qargs["extended"] = self.__bound_kwargs["extended"]
 
         return "/".join(parts), qargs
 
