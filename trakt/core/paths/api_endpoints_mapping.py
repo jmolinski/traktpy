@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, cast
+from typing import Any, Dict
+from typing import List as ListType
+from typing import Union, cast
 
 from trakt.core.models import Episode, Show
 from trakt.core.paths.path import Path
@@ -21,9 +23,9 @@ class CountriesInterface(SuiteInterface):
         )
     }
 
-    def get_countries(self, *, type: str, **kwargs: Any) -> Dict[str, str]:
+    def get_countries(self, *, type: str, **kwargs: Any) -> ListType[Dict[str, str]]:
         ret = self.run("get_countries", type=type, **kwargs)
-        return cast(Dict[str, str], ret)
+        return cast(ListType[Dict[str, str]], ret)
 
 
 class CalendarsInterface(SuiteInterface):
@@ -42,6 +44,8 @@ class CalendarsInterface(SuiteInterface):
         )
     }
 
-    def get_season_premieres(self, **kwargs: Any) -> Dict[str, str]:
+    def get_season_premieres(
+        self, **kwargs: Any
+    ) -> ListType[Dict[str, Union[str, Episode, Show]]]:
         ret = self.run("get_season_premieres", **kwargs)
-        return cast(Dict[str, str], ret)
+        return ret
