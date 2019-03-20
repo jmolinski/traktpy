@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Union
 
 from trakt.core.exceptions import ClientError
 from trakt.core.paths.validators import (
@@ -32,7 +32,7 @@ class Path:
     validators: List[Validator]
     aliases: List[str]
     extended: List[str]
-    filters: List[str]
+    filters: Set[str]
 
     _output_structure: Any
 
@@ -48,7 +48,7 @@ class Path:
         qargs: Dict[str, str] = None,
         aliases: List[str] = None,
         extended: List[str] = None,
-        filters: List[str] = None,
+        filters: Set[str] = None,
     ) -> None:
         self.path = path
         self._output_structure = output_structure
@@ -73,7 +73,7 @@ class Path:
         self.qargs = qargs or []
 
         self.extended = extended or []
-        self.filters = filters or []
+        self.filters = filters or set()
 
         self.__bound_client = None
 
@@ -131,7 +131,7 @@ class Path:
             if f in self.__bound_kwargs:
                 val = self.__bound_kwargs[f]
 
-                if f in MULTI_FILTERS and isinstance(f, (tuple, list)):
+                if f in MULTI_FILTERS and isinstance(val, (tuple, list)):
                     val = ",".join(val)
 
                 m[f] = str(val)
