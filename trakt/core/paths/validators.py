@@ -63,13 +63,13 @@ class OptionalArgsValidator(Validator):
 
 
 class PerArgValidator(Validator):
-    def __init__(self, arg_name: str, f: Callable[[Any], bool]) -> None:
+    def __init__(self, arg_name: str, f: Callable[[Any], Any]) -> None:
         self.arg_name = arg_name
         self.boolean_check = f
 
     def validate(self, *args: Any, **kwargs: Any) -> None:
         if self.arg_name in kwargs:
-            if not self.boolean_check(kwargs[self.arg_name]):
+            if not bool(self.boolean_check(kwargs[self.arg_name])):
                 raise ArgumentError(
                     f"invalid {self.arg_name}={kwargs[self.arg_name]} argument value"
                 )
@@ -77,8 +77,11 @@ class PerArgValidator(Validator):
 
 class ExtendedValidator(Validator):
     def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
-        if "extended" in kwargs and kwargs["extended"]:
-            if kwargs["extended"] not in path.extended:
+        if "extended" in kwargs:
+            if len(path.extended) == 1 and kwargs["extended"] is True:
+                return  # True = enabled, to be substituted later
+
+            if kwargs["extended"] and kwargs["extended"] not in path.extended:
                 message = f"invalid extended={kwargs['extended']} argument value; "
 
                 if path.extended:
@@ -105,13 +108,16 @@ class FiltersValidator(Validator):
             raise ArgumentError(f"{filter} filter only accepts 1 value")
 
         if filter in MULTI_FILTERS:
-            if not isinstance(value, (tuple, list, str)):
-                raise ArgumentError(
-                    f"{filter} filter invalid value (must be str or itarable of str)"
-                )
-            if isinstance(value, (list, tuple)):
-                for v in value:
-                    if not isinstance(v, str):
-                        raise ArgumentError(
-                            f"{filter} filter invalid value (must be str or itarable of str)"
-                        )
+            self._validate_multi_filter(filter, value)
+
+    def _validate_multi_filter(self, filter: str, value: Any):
+        if not isinstance(value, (tuple, list, str)):
+            raise ArgumentError(
+                f"{filter} filter invalid value (must be str or itarable of str)"
+            )
+        if isinstance(value, (list, tuple)):
+            for v in value:
+                if not isinstance(v, str):
+                    raise ArgumentError(
+                        f"{filter} filter invalid value (must be str or itarable of str)"
+                    )

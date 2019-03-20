@@ -4,8 +4,9 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 from trakt.core.exceptions import ClientError
 from trakt.core.paths.validators import (
-    ALL_FILTERS,
     MULTI_FILTERS,
+    ExtendedValidator,
+    FiltersValidator,
     OptionalArgsValidator,
     RequiredArgsValidator,
     Validator,
@@ -14,7 +15,12 @@ from trakt.core.paths.validators import (
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.abstract import AbstractApi
 
-DEFAULT_VALIDATORS = [RequiredArgsValidator(), OptionalArgsValidator()]
+DEFAULT_VALIDATORS = [
+    RequiredArgsValidator(),
+    OptionalArgsValidator(),
+    ExtendedValidator(),
+    FiltersValidator(),
+]
 
 
 class Path:
@@ -106,19 +112,31 @@ class Path:
             q: self.__bound_kwargs[q] for q in self.qargs if q in self.__bound_kwargs
         }
 
-        for filter in self.filters:
-            if filter in self.__bound_kwargs:
-                val = self.__bound_kwargs[filter]
+        qargs.update(self._get_parsed_filters())
 
-                if filter in MULTI_FILTERS and isinstance(filter, (tuple, list)):
-                    val = ",".join(val)
+        if "extended" in self.__bound_kwargs and self.__bound_kwargs["extended"]:
+            if self.__bound_kwargs["extended"] is True:
+                # if len(self.extended) == 1 setting extended=True
+                # sets it to the proper val (meta or full)
+                self.__bound_kwargs["extended"] = self.extended[0]
 
-            qargs[filter] = str(val)
-
-        if "extended" in self.__bound_kwargs:
             qargs["extended"] = self.__bound_kwargs["extended"]
 
         return "/".join(parts), qargs
+
+    def _get_parsed_filters(self) -> Dict[str, str]:
+        m = {}
+
+        for f in self.filters:
+            if f in self.__bound_kwargs:
+                val = self.__bound_kwargs[f]
+
+                if f in MULTI_FILTERS and isinstance(f, (tuple, list)):
+                    val = ",".join(val)
+
+                m[f] = str(val)
+
+        return m
 
     def is_bound(self) -> bool:
         return self.__bound_client is not None

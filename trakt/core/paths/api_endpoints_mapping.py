@@ -8,7 +8,7 @@ from typing import Union, cast
 from trakt.core.models import Episode, Show
 from trakt.core.paths.path import Path
 from trakt.core.paths.suite_interface import SuiteInterface
-from trakt.core.paths.validators import PerArgValidator
+from trakt.core.paths.validators import COMMON_FILTERS, SHOWS_FILTERS, PerArgValidator
 
 
 class CountriesInterface(SuiteInterface):
@@ -38,9 +38,11 @@ class CalendarsInterface(SuiteInterface):
             validators=[
                 PerArgValidator("days", lambda t: isinstance(t, int)),
                 PerArgValidator(
-                    "start_date", lambda t: bool(re.match(r"\d{4}-\d{2}-\d{2}", t))
+                    "start_date", lambda t: re.match(r"\d{4}-\d{2}-\d{2}", t)
                 ),
             ],
+            filters=COMMON_FILTERS | SHOWS_FILTERS,
+            extended=["full"],
         )
     }
 
