@@ -1,10 +1,9 @@
-# flake8: noqa: F403, F405
-
 import pytest
 from trakt.core.exceptions import ArgumentError, NotAuthenticated
 from trakt.core.paths import Path
 from trakt.core.paths.validators import (
     AuthRequiredValidator,
+    ExtendedValidator,
     OptionalArgsValidator,
     PerArgValidator,
     RequiredArgsValidator,
@@ -73,7 +72,18 @@ def test_per_arg_validator():
 
 
 def test_extended_validator():
-    pass
+    p = Path("a", {}, extended=["full", "meta"])
+
+    assert ExtendedValidator().validate(path=p, extended="full") is None
+    assert ExtendedValidator().validate(path=p, extended="meta") is None
+
+    with pytest.raises(ArgumentError):
+        ExtendedValidator().validate(path=p, extended="xyz")
+
+    p = Path("a", {})
+
+    with pytest.raises(ArgumentError):
+        ExtendedValidator().validate(path=p, extended="full")
 
 
 def test_filters_validator():

@@ -60,7 +60,7 @@ class PerArgValidator(Validator):
 
 class ExtendedValidator(Validator):
     def validate(self, *args: Any, path: Any, **kwargs: Any) -> None:
-        if "extended" in kwargs:
+        if "extended" in kwargs and kwargs["extended"]:
             if kwargs["extended"] not in path.extended:
                 message = f"invalid extended={kwargs['extended']} argument value; "
 

@@ -15,5 +15,6 @@ Todo:
 - http component retries etc
 - filters
 - define all paths & user friendly aliases
+- user profile
 - docs
 - pypi release
