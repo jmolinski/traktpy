@@ -16,5 +16,6 @@ Todo:
 - user profile
 - possibly get rid of abstracts
 - only refresh token if going to expire soon
+- pagination extras (limit exact items, per endpoint default limit?, config)
 - docs
 - pypi release

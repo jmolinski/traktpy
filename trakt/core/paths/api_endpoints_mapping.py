@@ -59,7 +59,7 @@ class ShowsInterface(SuiteInterface):
     paths = {
         "get_trending": Path(
             "shows/trending",
-            [{"first_aired": str, "episode": Episode, "show": Show}],
+            [{"watchers": int, "show": Show}],
             filters=COMMON_FILTERS | SHOWS_FILTERS,
             extended=["full"],
             pagination=True,

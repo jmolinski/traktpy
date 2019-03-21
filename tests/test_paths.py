@@ -1,7 +1,8 @@
 # flake8: noqa: F403, F405
 import pytest
+from tests.client import config as SECRETS
 from trakt import Trakt
-from trakt.core.exceptions import ArgumentError, ClientError
+from trakt.core.exceptions import ArgumentError
 from trakt.core.paths.path import Path
 
 
@@ -111,3 +112,7 @@ def test_get_quargs():
     expected = {"genres": "a,b", "query": "xyz", "extended": "metadata"}
 
     assert quargs == expected
+
+
+def test_pagination():
+    pass

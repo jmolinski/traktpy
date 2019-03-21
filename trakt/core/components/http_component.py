@@ -41,6 +41,8 @@ class DefaultHttpComponent(AbstractComponent):
         return_code: bool = False,
         headers: Optional[Dict[str, str]] = None,
         no_raise: bool = False,
+        return_pagination: bool = False,
+        only_json: bool = True,
         **kwargs: Any,
     ) -> Any:
 
@@ -63,10 +65,19 @@ class DefaultHttpComponent(AbstractComponent):
 
         json_response = self._get_json(response, no_raise=no_raise)
 
-        if return_code:
-            return json_response, response.status_code
+        only_json = only_json and not return_code and not return_pagination
 
-        return json_response
+        if only_json:
+            return json_response
+
+        res = [json_response]
+        if return_code:
+            res += [response.status_code]
+
+        if return_pagination:
+            res += [self.get_pagination_headers(response)]
+
+        return res
 
     def _get_json(self, response: Any, no_raise: bool) -> Any:
         try:
@@ -126,3 +137,13 @@ class DefaultHttpComponent(AbstractComponent):
         url_parts[4] = urllib.parse.urlencode(query_args or {})
 
         return urllib.parse.urlunparse(url_parts)
+
+    def get_pagination_headers(self, response: Any) -> Dict[str, str]:
+        headers = response.headers
+
+        return {
+            "item_count": headers.get("X-Pagination-Item-Count"),
+            "limit": headers.get("X-Pagination-Limit"),
+            "page": headers.get("X-Pagination-Page"),
+            "page_count": headers.get("X-Pagination-Page-Count"),
+        }

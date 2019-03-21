@@ -2,6 +2,7 @@
 
 import pytest
 from tests.client import MockRequests
+from tests.test_data.countries import COUNTRIES
 from tests.test_data.oauth import OAUTH_GET_TOKEN
 from trakt import Trakt, TraktCredentials
 from trakt.core.components import DefaultHttpComponent
@@ -29,7 +30,7 @@ def test_refresh_token():
     http = lambda client: DefaultHttpComponent(
         client,
         requests_dependency=MockRequests(
-            {"countries/shows": [[], 200], "oauth/token": [OAUTH_GET_TOKEN, 200]}
+            {"countries/shows": [COUNTRIES, 200], "oauth/token": [OAUTH_GET_TOKEN, 200]}
         ),
     )
 
