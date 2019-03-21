@@ -71,7 +71,7 @@ class DefaultHttpComponent(AbstractComponent):
     def _get_json(self, response: Any, no_raise: bool) -> Any:
         try:
             return response.json()
-        except:  # NOQA
+        except BaseException:  # pragma: no cover
             if no_raise:
                 return {}
             else:

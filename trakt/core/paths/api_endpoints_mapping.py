@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Dict
+from typing import Any, Dict, Iterable
 from typing import List as ListType
 from typing import Union, cast
 
@@ -50,4 +50,22 @@ class CalendarsInterface(SuiteInterface):
         self, **kwargs: Any
     ) -> ListType[Dict[str, Union[str, Episode, Show]]]:
         ret = self.run("get_season_premieres", **kwargs)
+        return ret
+
+
+class ShowsInterface(SuiteInterface):
+    name = "shows"
+
+    paths = {
+        "get_trending": Path(
+            "shows/trending",
+            [{"first_aired": str, "episode": Episode, "show": Show}],
+            filters=COMMON_FILTERS | SHOWS_FILTERS,
+            extended=["full"],
+            pagination=True,
+        )
+    }
+
+    def get_trending(self, **kwargs: Any) -> Iterable[Any]:
+        ret = self.run("get_trending", **kwargs)
         return ret

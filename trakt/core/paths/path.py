@@ -33,6 +33,7 @@ class Path:
     aliases: List[str]
     extended: List[str]
     filters: Set[str]
+    pagination: bool
 
     _output_structure: Any
 
@@ -49,6 +50,7 @@ class Path:
         aliases: List[str] = None,
         extended: List[str] = None,
         filters: Set[str] = None,
+        pagination: bool = False,
     ) -> None:
         self.path = path
         self._output_structure = output_structure
@@ -57,23 +59,22 @@ class Path:
             methods = [methods]
 
         self.methods = methods
-
         self.validators = DEFAULT_VALIDATORS + (validators or [])
 
-        parts = path.split("/")
-        default_alias = ".".join([p for p in parts if p[0] not in "?!"])
-        args = [p for p in parts if p[0] in "?!"]
-        self.req_args = [p for p in args if p[0] == "!"]
-        self.opt_args = [p for p in args if p[0] == "?"]
+        self.params = path.split("/")
+        self.args = [p for p in self.params if p[0] in "?!"]
+        self.req_args = [p for p in self.args if p[0] == "!"]
+        self.opt_args = [p for p in self.args if p[0] == "?"]
 
-        self.params = parts
+        default_alias = ".".join([p for p in self.params if p[0] not in "?!"])
         self.aliases = [default_alias] + (aliases or [])
-        self.args = args
 
         self.qargs = qargs or []
 
         self.extended = extended or []
         self.filters = filters or set()
+
+        self.pagination = pagination
 
         self.__bound_client = None
 

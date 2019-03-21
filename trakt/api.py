@@ -6,7 +6,7 @@ from trakt.core.abstract import AbstractApi, AbstractBaseModel
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 from trakt.core.config import DefaultConfig, TraktCredentials
 from trakt.core.executors import Executor
-from trakt.core.paths import CalendarsInterface, CountriesInterface
+from trakt.core.paths import CalendarsInterface, CountriesInterface, ShowsInterface
 
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.paths.suite_interface import SuiteInterface
@@ -22,6 +22,7 @@ class TraktApi(AbstractApi):
         oauth_component: Optional[Type[DefaultOauthComponent]] = None,
         countries_interface: Optional[Type[CountriesInterface]] = None,
         calendars_interface: Optional[Type[CalendarsInterface]] = None,
+        shows_interface: Optional[Type[ShowsInterface]] = None,
         user: Optional[TraktCredentials] = None,
         auto_refresh_token: bool = False,
         **config: str
@@ -44,6 +45,7 @@ class TraktApi(AbstractApi):
         self.oauth = (oauth_component or DefaultOauthComponent)(self)
         self.countries = (countries_interface or CountriesInterface)(self, Executor)
         self.calendars = (calendars_interface or CalendarsInterface)(self, Executor)
+        self.shows = (shows_interface or ShowsInterface)(self, Executor)
 
     def request(self, params: Union[str, List[str]], **kwargs: Any) -> Any:
         if isinstance(params, str):
@@ -64,4 +66,4 @@ class TraktApi(AbstractApi):
         return e
 
     def _get_executor_paths(self) -> List[SuiteInterface]:
-        return [self.countries, self.calendars]
+        return [self.countries, self.calendars, self.shows]

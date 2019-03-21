@@ -33,7 +33,6 @@ class Executor:
 
     def __getattr__(self, param: str) -> Executor:
         self.params.append(param)
-
         return self
 
     def __repr__(self) -> str:  # pragma: no cover
