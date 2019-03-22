@@ -12,7 +12,7 @@ from trakt.core.exceptions import ClientError
 def test_executor():
     response = [{"name": "Australia", "code": "au"}]
     http = lambda client: DefaultHttpComponent(
-        client, requests_dependency=MockRequests({"*": [response, 200]})
+        client, requests_dependency=MockRequests({".*": [response, 200]})
     )
 
     client = Trakt("", "", http_component=http)

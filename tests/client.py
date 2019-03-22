@@ -1,4 +1,5 @@
 import json
+import re
 from collections import defaultdict
 from typing import Any, Dict, Tuple
 
@@ -6,9 +7,9 @@ from trakt.core.components.http_component import DefaultHttpComponent
 
 try:
     with open(".secrets") as f:
-        config = json.loads(f.read())
+        SECRETS = json.loads(f.read())
 except:  # NOQA
-    config = {"client_secret": "", "client_id": ""}
+    SECRETS = {"client_secret": "", "client_id": ""}
 
 
 class MockResponse:
@@ -26,12 +27,8 @@ class MockRequests:
         self.req_map = defaultdict(list)
         self.fixed_response = False
 
-        if "*" in map_of_responses:
-            self.response = MockResponse(*map_of_responses["*"])
-            self.fixed_response = True
-        else:
-            for path, (json_response, code) in map_of_responses.items():
-                self.m[path] = MockResponse(json_response, code)
+        for path, (json_response, code) in map_of_responses.items():
+            self.m[".*" + path + ".*"] = MockResponse(json_response, code)
 
     def request(self, method, path, *args, **kwargs):
         p = path.split(".tv/" if ".tv" in path else ".com/")[1]
@@ -41,15 +38,19 @@ class MockRequests:
             {**kwargs, "method": method, "path": path, "resource": p}
         )
 
-        if self.fixed_response:
-            return self.response
+        return self.m[self.find_path(path)]
 
-        return self.m[p]
+    def find_path(self, v):
+        paths = set(self.m.keys())
+        matching_paths = [p for p in paths if re.match(p, v)]
+
+        if matching_paths:
+            return matching_paths[0]
+
+        raise Exception("couldnt find matching endpoint")
 
 
 def get_mock_http_component(map_of_responses: Dict[str, Tuple[Any, int]]):
-    # '*' key in map is wildcard
-
     def wrapper(client):
         return DefaultHttpComponent(
             client, requests_dependency=MockRequests(map_of_responses)
