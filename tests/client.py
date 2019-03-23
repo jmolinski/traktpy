@@ -1,7 +1,8 @@
 import json
 import re
 from collections import defaultdict
-from typing import Any, Dict, Tuple
+from math import ceil
+from typing import Any, Dict, List, Optional, Tuple
 
 from trakt.core.components.http_component import DefaultHttpComponent
 
@@ -13,22 +14,27 @@ except:  # NOQA
 
 
 class MockResponse:
-    def __init__(self, json_response, code):
+    def __init__(self, json_response, code, headers):
         self.status_code = code
         self.json_response = json_response
+        self.headers = headers
 
     def json(self):
         return self.json_response
 
+    def set_headers(self, headers):
+        self.headers.update(headers)
+
 
 class MockRequests:
-    def __init__(self, map_of_responses):
+    def __init__(self, map_of_responses, paginated=None):
         self.m = {}
         self.req_map = defaultdict(list)
-        self.fixed_response = False
+        self.paginated_endpoints = paginated or set()
 
-        for path, (json_response, code) in map_of_responses.items():
-            self.m[".*" + path + ".*"] = MockResponse(json_response, code)
+        for path, (json_response, code, *rest) in map_of_responses.items():
+            headers = {} if not rest else rest[0]
+            self.m[".*" + path + ".*"] = MockResponse(json_response, code, headers)
 
     def request(self, method, path, *args, **kwargs):
         p = path.split(".tv/" if ".tv" in path else ".com/")[1]
@@ -38,7 +44,12 @@ class MockRequests:
             {**kwargs, "method": method, "path": path, "resource": p}
         )
 
-        return self.m[self.find_path(path)]
+        endpoint_identifier = self.find_path(path)
+
+        if endpoint_identifier in self.paginated_endpoints:
+            return self.return_page(endpoint_identifier, **kwargs)
+
+        return self.m[endpoint_identifier]
 
     def find_path(self, v):
         paths = set(self.m.keys())
@@ -49,11 +60,34 @@ class MockRequests:
 
         raise Exception("couldnt find matching endpoint")
 
+    def return_page(self, endpoint_identifier, params=None, **kwargs):
+        response = self.m[endpoint_identifier]
 
-def get_mock_http_component(map_of_responses: Dict[str, Tuple[Any, int]]):
+        page = int(params["page"])
+        limit = int(params["limit"])
+
+        headers = {
+            "X-Pagination-Item-Count": str(len(response.json())),
+            "X-Pagination-Limit": str(limit),
+            "X-Pagination-Page": str(page),
+            "X-Pagination-Page-Count": str(ceil(len(response.json()) / limit)),
+        }
+
+        offset = (page - 1) * limit
+        response.json_response = response.json_response[offset : offset + limit]
+        response.set_headers(headers)
+
+        return response
+
+
+def get_mock_http_component(
+    map_of_responses: Dict[str, Tuple[Any, int]], paginated: Optional[List[str]] = None
+):
+    paginated = paginated or []
+
     def wrapper(client):
         return DefaultHttpComponent(
-            client, requests_dependency=MockRequests(map_of_responses)
+            client, requests_dependency=MockRequests(map_of_responses, paginated)
         )
 
     return wrapper

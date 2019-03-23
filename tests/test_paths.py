@@ -111,7 +111,3 @@ def test_get_quargs():
     expected = {"genres": "a,b", "query": "xyz", "extended": "metadata"}
 
     assert quargs == expected
-
-
-def test_pagination():
-    pass
