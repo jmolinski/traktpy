@@ -54,13 +54,9 @@ class MockRequests:
                 )
 
     def make_infinite_response_generator(self, json_response, code, headers):
-        jr = deepcopy(json_response)
-        c = deepcopy(code)
-        h = deepcopy(headers)
-
         def response_generator():
             while True:
-                yield MockResponse(jr, c, h)
+                yield MockResponse(json_response, code, headers)
 
         return response_generator()
 
