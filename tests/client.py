@@ -1,8 +1,10 @@
 import json
 import re
+import types
 from collections import defaultdict
+from copy import deepcopy
 from math import ceil
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Generator, Iterable, List, Optional
 
 from trakt.core.components.http_component import DefaultHttpComponent
 
@@ -14,11 +16,11 @@ except:  # NOQA
 
 
 class MockResponse:
-    def __init__(self, json_response, code, headers):
+    def __init__(self, json_response=None, code=200, headers=None):
         self.status_code = code
-        self.json_response = json_response
-        self.original_json = json_response
-        self.headers = headers
+        self.json_response = json_response or {}
+        self.original_json = json_response or {}
+        self.headers = headers or {}
 
     def json(self):
         return self.json_response
@@ -29,13 +31,38 @@ class MockResponse:
 
 class MockRequests:
     def __init__(self, map_of_responses, paginated=None):
-        self.m = {}
+        self.m: Dict[str, Generator[MockResponse, None, None]] = {}
         self.req_map = defaultdict(list)
         self.paginated_endpoints = paginated or set()
 
-        for path, (json_response, code, *rest) in map_of_responses.items():
-            headers = {} if not rest else rest[0]
-            self.m[".*" + path + ".*"] = MockResponse(json_response, code, headers)
+        for path, v in map_of_responses.items():
+            regexified_path = ".*" + path + ".*"
+
+            if isinstance(v, list):
+                (json_response, code, *rest) = v
+                headers = {} if not rest else rest[0]
+
+                self.m[regexified_path] = self.make_infinite_response_generator(
+                    json_response, code, headers
+                )
+
+            elif isinstance(v, types.GeneratorType):
+                self.m[regexified_path] = v
+            else:
+                raise Exception(
+                    "invalid response arg; must be [json, code, ?headers] or a generator of such"
+                )
+
+    def make_infinite_response_generator(self, json_response, code, headers):
+        jr = deepcopy(json_response)
+        c = deepcopy(code)
+        h = deepcopy(headers)
+
+        def response_generator():
+            while True:
+                yield MockResponse(jr, c, h)
+
+        return response_generator()
 
     def request(self, method, path, *args, **kwargs):
         p = path.split(".tv/" if ".tv" in path else ".com/")[1]
@@ -46,24 +73,23 @@ class MockRequests:
         )
 
         endpoint_identifier = self.find_path(path)
+        response = next(self.m[endpoint_identifier])
 
         if endpoint_identifier[2:-2] in self.paginated_endpoints:
-            return self.return_page(endpoint_identifier, **kwargs)
+            return self.return_page(response, **kwargs)
 
-        return self.m[endpoint_identifier]
+        return response
 
     def find_path(self, v):
         paths = set(self.m.keys())
         matching_paths = [p for p in paths if re.match(p, v)]
 
-        if matching_paths:
+        if len(matching_paths) == 1:
             return matching_paths[0]
 
-        raise Exception("couldnt find matching endpoint")
+        raise Exception(f"found {len(matching_paths)} matching endpoints")
 
-    def return_page(self, endpoint_identifier, params=None, **kwargs):
-        response = self.m[endpoint_identifier]
-
+    def return_page(self, response, params=None, **kwargs):
         page = int(params["page"])
         limit = int(params["limit"])
 
@@ -82,7 +108,7 @@ class MockRequests:
 
 
 def get_mock_http_component(
-    map_of_responses: Dict[str, Tuple[Any, int]], paginated: Optional[List[str]] = None
+    map_of_responses: Dict[str, Iterable[Any]], paginated: Optional[List[str]] = None
 ):
     paginated = paginated or []
 
