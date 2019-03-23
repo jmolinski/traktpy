@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from typing import TYPE_CHECKING, Any, List, Optional, Union
 
 from trakt.core import json_parser
@@ -29,7 +30,10 @@ class Executor:
         self.path_suites = []
 
         if self.client.config["auto_refresh_token"] and self.client.user:
-            self.client.oauth.refresh_token()
+            expires_in = self.client.user.expires_at - int(time.time())
+
+            if expires_in < self.client.config["oauth"]["refresh_token_s"]:
+                self.client.oauth.refresh_token()
 
     def __getattr__(self, param: str) -> Executor:
         self.params.append(param)

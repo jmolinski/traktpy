@@ -1,5 +1,7 @@
 # flake8: noqa: F403, F405
 
+import time
+
 import pytest
 from tests.client import MockRequests
 from tests.test_data.oauth import OAUTH_GET_TOKEN
@@ -33,7 +35,8 @@ def test_refresh_token():
         ),
     )
 
-    credentials = TraktCredentials("access", "refresh", "scope", 100)
+    expire_at = int(time.time()) + 2 * 30 * 24 * 60 * 60
+    credentials = TraktCredentials("access", "refresh", "scope", expire_at)
 
     ### refresh off
 
@@ -45,6 +48,17 @@ def test_refresh_token():
 
     ### refresh on
 
+    # token is not going to expire soon (should not refresh)
+    client = Trakt(
+        "", "", http_component=http, user=credentials, auto_refresh_token=True
+    )
+    client.get_countries(type="shows")
+
+    assert client.user.refresh_token == "refresh"
+    assert client.user.access_token == "access"
+
+    credentials = TraktCredentials("access", "refresh", "scope", 100)
+    # token is going to expire soon
     client = Trakt(
         "", "", http_component=http, user=credentials, auto_refresh_token=True
     )
