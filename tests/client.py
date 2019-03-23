@@ -34,7 +34,7 @@ class MockRequests:
                 self.m[path] = MockResponse(json_response, code)
 
     def request(self, method, path, *args, **kwargs):
-        p = path.split(".tv/")[1]
+        p = path.split(".tv/" if ".tv" in path else ".com/")[1]
 
         # log request
         self.req_map[p].append(

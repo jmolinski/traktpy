@@ -1,9 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Union
 
 from trakt.core.exceptions import ClientError
 from trakt.core.paths.validators import (
+    MULTI_FILTERS,
+    ExtendedValidator,
+    FiltersValidator,
     OptionalArgsValidator,
     RequiredArgsValidator,
     Validator,
@@ -12,7 +15,12 @@ from trakt.core.paths.validators import (
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.abstract import AbstractApi
 
-DEFAULT_VALIDATORS = [RequiredArgsValidator(), OptionalArgsValidator()]
+DEFAULT_VALIDATORS = [
+    RequiredArgsValidator(),
+    OptionalArgsValidator(),
+    ExtendedValidator(),
+    FiltersValidator(),
+]
 
 
 class Path:
@@ -23,6 +31,8 @@ class Path:
     methods: List[str]
     validators: List[Validator]
     aliases: List[str]
+    extended: List[str]
+    filters: Set[str]
 
     _output_structure: Any
 
@@ -37,6 +47,8 @@ class Path:
         validators: List[Validator] = None,
         qargs: Dict[str, str] = None,
         aliases: List[str] = None,
+        extended: List[str] = None,
+        filters: Set[str] = None,
     ) -> None:
         self.path = path
         self._output_structure = output_structure
@@ -59,6 +71,9 @@ class Path:
         self.args = args
 
         self.qargs = qargs or []
+
+        self.extended = extended or []
+        self.filters = filters or set()
 
         self.__bound_client = None
 
@@ -97,7 +112,31 @@ class Path:
             q: self.__bound_kwargs[q] for q in self.qargs if q in self.__bound_kwargs
         }
 
+        qargs.update(self._get_parsed_filters())
+
+        if "extended" in self.__bound_kwargs and self.__bound_kwargs["extended"]:
+            if self.__bound_kwargs["extended"] is True:
+                # if len(self.extended) == 1 setting extended=True
+                # sets it to the proper val (meta or full)
+                self.__bound_kwargs["extended"] = self.extended[0]
+
+            qargs["extended"] = self.__bound_kwargs["extended"]
+
         return "/".join(parts), qargs
+
+    def _get_parsed_filters(self) -> Dict[str, str]:
+        m = {}
+
+        for f in self.filters:
+            if f in self.__bound_kwargs:
+                val = self.__bound_kwargs[f]
+
+                if f in MULTI_FILTERS and isinstance(val, (tuple, list)):
+                    val = ",".join(val)
+
+                m[f] = str(val)
+
+        return m
 
     def is_bound(self) -> bool:
         return self.__bound_client is not None

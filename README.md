@@ -9,11 +9,11 @@ Todo:
 - oauth
 - pagination
 - sync
-- `extended` support
 - methods on models (episode.rate() etc)
 - error handling
 - http component retries etc
-- filters
+- filters - additional validation
 - define all paths & user friendly aliases
+- user profile
 - docs
 - pypi release

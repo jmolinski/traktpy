@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from typing import Any, Dict, cast
+import re
+from typing import Any, Dict
+from typing import List as ListType
+from typing import Union, cast
 
-from trakt.core.models import Movie
+from trakt.core.models import Episode, Show
 from trakt.core.paths.path import Path
 from trakt.core.paths.suite_interface import SuiteInterface
-from trakt.core.paths.validators import PerArgValidator
+from trakt.core.paths.validators import COMMON_FILTERS, SHOWS_FILTERS, PerArgValidator
 
 
 class CountriesInterface(SuiteInterface):
@@ -20,6 +23,31 @@ class CountriesInterface(SuiteInterface):
         )
     }
 
-    def get_countries(self, *, type: str, **kwargs: Any) -> Dict[str, str]:
+    def get_countries(self, *, type: str, **kwargs: Any) -> ListType[Dict[str, str]]:
         ret = self.run("get_countries", type=type, **kwargs)
-        return cast(Dict[str, str], ret)
+        return cast(ListType[Dict[str, str]], ret)
+
+
+class CalendarsInterface(SuiteInterface):
+    name = "calendars"
+
+    paths = {
+        "get_season_premieres": Path(
+            "calendars/all/shows/premieres/?start_date/?days",
+            [{"first_aired": str, "episode": Episode, "show": Show}],
+            validators=[
+                PerArgValidator("days", lambda t: isinstance(t, int)),
+                PerArgValidator(
+                    "start_date", lambda t: re.match(r"\d{4}-\d{2}-\d{2}", t)
+                ),
+            ],
+            filters=COMMON_FILTERS | SHOWS_FILTERS,
+            extended=["full"],
+        )
+    }
+
+    def get_season_premieres(
+        self, **kwargs: Any
+    ) -> ListType[Dict[str, Union[str, Episode, Show]]]:
+        ret = self.run("get_season_premieres", **kwargs)
+        return ret

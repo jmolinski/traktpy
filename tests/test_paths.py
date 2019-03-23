@@ -1,7 +1,7 @@
 # flake8: noqa: F403, F405
 import pytest
 from trakt import Trakt
-from trakt.core.exceptions import ClientError
+from trakt.core.exceptions import ArgumentError, ClientError
 from trakt.core.paths.path import Path
 
 
@@ -47,11 +47,67 @@ def test_required_args():
     assert p.aliases == [default_alias]
     assert p.does_match(default_alias)
 
-    with pytest.raises(ClientError):
+    with pytest.raises(ArgumentError):
         p.is_valid(client)
 
-    with pytest.raises(ClientError):  # intentional, assert didn't bind any values
+    with pytest.raises(ArgumentError):  # intentional, assert didn't bind any values
         p.is_valid(client)
 
     assert p.is_valid(client, b=10)
     assert p.get_path_and_qargs() == ("aaa/10/ccc", {})
+
+
+def test_extended():
+    client = Trakt("", "")
+
+    p = Path("a", {}, extended=["full"])
+
+    assert p.is_valid(client)
+    assert p.is_valid(client, extended="full")
+    assert p.is_valid(client, extended=True)
+
+    with pytest.raises(ArgumentError):
+        p.is_valid(client, extended="meta")
+
+    p.is_valid(client, extended=True)
+    _, quargs = p.get_path_and_qargs()
+    assert "extended" in quargs and quargs["extended"] == "full"
+
+    p = Path("a", {})
+    p.is_valid(client)
+    _, quargs = p.get_path_and_qargs()
+    assert "extended" not in quargs
+
+
+def test_filters():
+    client = Trakt("", "")
+    p = Path("a", {})
+
+    with pytest.raises(ArgumentError):
+        p.is_valid(client, genres="genre")
+
+    p = Path("a", {}, filters={"query", "genres"})
+
+    assert p.is_valid(client, query="xyz")
+
+    with pytest.raises(ArgumentError):
+        p.is_valid(client, query=["xyz", "abc"])
+
+    assert p.is_valid(client, genres="genre")
+    assert p.is_valid(client, genres=["abc", "xyz"])
+
+    with pytest.raises(ArgumentError):
+        p.is_valid(client, query=[100, "abc"])
+
+
+def test_get_quargs():
+    client = Trakt("", "")
+    p = Path("a", {}, filters={"query", "genres"}, extended=["metadata"])
+
+    assert p.is_valid(client, extended=True, query="xyz", genres=["a", "b"])
+
+    _, quargs = p.get_path_and_qargs()
+
+    expected = {"genres": "a,b", "query": "xyz", "extended": "metadata"}
+
+    assert quargs == expected

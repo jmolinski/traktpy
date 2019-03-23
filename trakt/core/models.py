@@ -1,12 +1,25 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict
+from typing import Any, Dict
 from typing import List as ListType
-from typing import Optional, Type, Union
+from typing import Optional, Union
 
+import jsons  # type: ignore
 from trakt.core.abstract import AbstractBaseModel
 
-MediaForeignIDType = Type[Union[int, str, None]]
+MediaForeignIDType = Union[int, str]
+
+
+# TODO is there a way to do it better? currently not in use
+
+
+def any_deserializer(obj: Any, *args, **kwargs) -> Any:
+    return obj
+
+
+jsons.set_deserializer(any_deserializer, Any)
+
+#
 
 
 @dataclass
