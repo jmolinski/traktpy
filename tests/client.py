@@ -17,6 +17,7 @@ class MockResponse:
     def __init__(self, json_response, code, headers):
         self.status_code = code
         self.json_response = json_response
+        self.original_json = json_response
         self.headers = headers
 
     def json(self):
@@ -46,7 +47,7 @@ class MockRequests:
 
         endpoint_identifier = self.find_path(path)
 
-        if endpoint_identifier in self.paginated_endpoints:
+        if endpoint_identifier[2:-2] in self.paginated_endpoints:
             return self.return_page(endpoint_identifier, **kwargs)
 
         return self.m[endpoint_identifier]
@@ -67,14 +68,14 @@ class MockRequests:
         limit = int(params["limit"])
 
         headers = {
-            "X-Pagination-Item-Count": str(len(response.json())),
+            "X-Pagination-Item-Count": str(len(response.original_json)),
             "X-Pagination-Limit": str(limit),
             "X-Pagination-Page": str(page),
-            "X-Pagination-Page-Count": str(ceil(len(response.json()) / limit)),
+            "X-Pagination-Page-Count": str(ceil(len(response.original_json) / limit)),
         }
 
         offset = (page - 1) * limit
-        response.json_response = response.json_response[offset : offset + limit]
+        response.json_response = response.original_json[offset : offset + limit]
         response.set_headers(headers)
 
         return response

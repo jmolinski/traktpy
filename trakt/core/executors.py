@@ -103,8 +103,8 @@ class Executor:
 
                 yield from response
 
-                stop_at_page = int(pagination["page_count"]) + 1
                 page += 1
+                stop_at_page = int(pagination["page_count"]) + 1
 
         return generator()
 

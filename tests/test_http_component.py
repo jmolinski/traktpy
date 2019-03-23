@@ -24,3 +24,27 @@ def test_bad_request_exception():
 
     with pytest.raises(BadRequest):
         http.request("...")
+
+
+def test_extra_info_return():
+    client = Trakt("", "")
+
+    resp_headers = {
+        "X-Pagination-Item-Count": 4,
+        "X-Pagination-Limit": 1,
+        "X-Pagination-Page": 2,
+        "X-Pagination-Page-Count": 3,
+    }
+    http = DefaultHttpComponent(
+        client,
+        requests_dependency=MockRequests({".*": [{"a": "v"}, 200, resp_headers]}),
+    )
+
+    res, code, pagination = http.request(
+        "abc", return_code=True, return_pagination=True
+    )
+
+    assert res == {"a": "v"}
+    assert code == 200
+    assert pagination["limit"] == 1
+    assert pagination["page_count"] == 3
