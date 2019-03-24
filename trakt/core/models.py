@@ -118,21 +118,21 @@ class Movie(AbstractBaseModel):
     year: int
     ids: Dict[str, MediaForeignIDType]
 
-    tagline: str
-    overview: str
-    released: datetime
-    runtime: int
-    country: str
-    updated_at: datetime
-    trailer: Optional[str]
-    homepage: Optional[str]
-    rating: int
-    votes: int
-    comment_count: int
-    language: str
-    available_translations: List[str]
-    genres: List[str]
-    certification: str
+    tagline: str = ""
+    overview: str = ""
+    released: str = ""
+    runtime: int = 0
+    country: str = ""
+    updated_at: str = ""
+    trailer: str = ""
+    homepage: str = ""
+    rating: int = 0
+    votes: int = 0
+    comment_count: int = 0
+    language: str = ""
+    available_translations: List[str] = field(default_factory=list)
+    genres: List[str] = field(default_factory=list)
+    certification: str = ""
 
 
 @dataclass

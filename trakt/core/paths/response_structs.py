@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from trakt.core.models import Episode, Show, TraktList, User
+from trakt.core.models import Episode, Movie, Show, TraktList, User
 
 
 @dataclass
-class SeasonPremiere:
+class EpisodePremiere:
     first_aired: str
     episode: Episode
     show: Show
@@ -47,3 +47,9 @@ class ListResponse:
     comment_count: int
     list: TraktList
     user: User
+
+
+@dataclass
+class MoviePremiere:
+    released: str
+    movie: Movie

@@ -33,5 +33,5 @@ class SuiteInterface:
             path=self._get_path(command), **kwargs
         )
 
-    def _get_path(self, command: str):
+    def _get_path(self, command: str) -> Path:
         return self.paths[command]
