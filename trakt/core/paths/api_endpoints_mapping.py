@@ -1,4 +1,3 @@
-import re
 from typing import Any, Iterable, List
 
 from trakt.core.paths.path import Path
@@ -7,7 +6,7 @@ from trakt.core.paths.response_structs import (
     Country,
     Genre,
     Language,
-    SeasonPremiere,
+    ListResponse,
     TrendingShow,
 )
 from trakt.core.paths.suite_interface import SuiteInterface
@@ -29,8 +28,7 @@ class CountriesI(SuiteInterface):
     }
 
     def get_countries(self, *, type: str, **kwargs: Any) -> List[Country]:
-        ret = self.run("get_countries", type=type, **kwargs)
-        return ret
+        return self.run("get_countries", type=type, **kwargs)
 
 
 class CertificationsI(SuiteInterface):
@@ -57,8 +55,7 @@ class GenresI(SuiteInterface):
     }
 
     def get_genres(self, *, type: str, **kwargs: Any) -> List[Genre]:
-        ret = self.run("get_genres", type=type, **kwargs)
-        return ret
+        return self.run("get_genres", type=type, **kwargs)
 
 
 class LanguagesI(SuiteInterface):
@@ -71,31 +68,7 @@ class LanguagesI(SuiteInterface):
     }
 
     def get_languages(self, *, type: str, **kwargs: Any) -> List[Language]:
-        ret = self.run("get_languages", type=type, **kwargs)
-        return ret
-
-
-class CalendarsI(SuiteInterface):
-    name = "calendars"
-
-    paths = {
-        "get_season_premieres": Path(
-            "calendars/all/shows/premieres/?start_date/?days",
-            [SeasonPremiere],
-            validators=[
-                PerArgValidator("days", lambda t: isinstance(t, int)),
-                PerArgValidator(
-                    "start_date", lambda t: re.match(r"\d{4}-\d{2}-\d{2}", t)
-                ),
-            ],
-            filters=COMMON_FILTERS | SHOWS_FILTERS,
-            extended=["full"],
-        )
-    }
-
-    def get_season_premieres(self, **kwargs: Any) -> List[SeasonPremiere]:
-        ret = self.run("get_season_premieres", **kwargs)
-        return ret
+        return self.run("get_languages", type=type, **kwargs)
 
 
 class ShowsI(SuiteInterface):
@@ -112,5 +85,23 @@ class ShowsI(SuiteInterface):
     }
 
     def get_trending(self, **kwargs: Any) -> Iterable[TrendingShow]:
-        ret = self.run("get_trending", **kwargs)
-        return ret
+        return self.run("get_trending", **kwargs)
+
+
+class ListsI(SuiteInterface):
+    name = "lists"
+
+    paths = {
+        "get_trending": Path(
+            "lists/trending", [ListResponse], extended=["full"], pagination=True
+        ),
+        "get_popular": Path(
+            "lists/popular", [ListResponse], extended=["full"], pagination=True
+        ),
+    }
+
+    def get_trending(self, **kwargs: Any) -> Iterable[ListResponse]:
+        return self.run("get_trending", **kwargs)
+
+    def get_popular(self, **kwargs: Any) -> Iterable[ListResponse]:
+        return self.run("get_popular", **kwargs)

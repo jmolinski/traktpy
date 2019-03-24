@@ -55,6 +55,13 @@ class User(AbstractBaseModel):
     vip_ep: bool
     ids: Dict[str, MediaForeignIDType]
 
+    joined_at: str = ""
+    location: str = ""
+    about: str = ""
+    gender: str = ""
+    age: int = 0
+    images: Dict[str, Any] = field(default_factory=dict)
+
 
 @dataclass
 class Comment(AbstractBaseModel):
@@ -111,9 +118,6 @@ class Movie(AbstractBaseModel):
     year: int
     ids: Dict[str, MediaForeignIDType]
 
-
-@dataclass
-class MovieDetails(Movie):
     tagline: str
     overview: str
     released: datetime
@@ -129,12 +133,6 @@ class MovieDetails(Movie):
     available_translations: List[str]
     genres: List[str]
     certification: str
-
-
-@dataclass
-class MovieAlias(AbstractBaseModel):
-    title: str
-    country: str
 
 
 @dataclass

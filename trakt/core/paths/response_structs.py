@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from trakt.core.models import Episode, Show
+from trakt.core.models import Episode, Show, TraktList, User
 
 
 @dataclass
@@ -39,3 +39,11 @@ class Genre:
 class Language:
     name: str
     code: str
+
+
+@dataclass
+class ListResponse:
+    like_count: int
+    comment_count: int
+    list: TraktList
+    user: User
