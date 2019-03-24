@@ -1,38 +1,81 @@
 import re
-from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, cast
+from typing import Any, Iterable, List
 
-from trakt.core.models import Episode, Show
 from trakt.core.paths.path import Path
+from trakt.core.paths.response_structs import (
+    Certification,
+    Country,
+    Genre,
+    Language,
+    SeasonPremiere,
+    TrendingShow,
+)
 from trakt.core.paths.suite_interface import SuiteInterface
 from trakt.core.paths.validators import COMMON_FILTERS, SHOWS_FILTERS, PerArgValidator
 
-
-@dataclass
-class SeasonPremiere:
-    first_aired: str
-    episode: Episode
-    show: Show
+TYPE_MOVIES_SHOWS = PerArgValidator("type", lambda t: t in {"shows", "movies"})
 
 
-class CountriesInterface(SuiteInterface):
+class CountriesI(SuiteInterface):
     name = "countries"
 
     paths = {
         "get_countries": Path(
             "countries/!type",
-            [{"name": str, "code": str}],
+            [Country],
             aliases=["get_countries", ""],
-            validators=[PerArgValidator("type", lambda t: t in {"shows", "movies"})],
+            validators=[TYPE_MOVIES_SHOWS],
         )
     }
 
-    def get_countries(self, *, type: str, **kwargs: Any) -> List[Dict[str, str]]:
+    def get_countries(self, *, type: str, **kwargs: Any) -> List[Country]:
         ret = self.run("get_countries", type=type, **kwargs)
-        return cast(List[Dict[str, str]], ret)
+        return ret
 
 
-class CalendarsInterface(SuiteInterface):
+class CertificationsI(SuiteInterface):
+    name = "certifications"
+
+    paths = {
+        "get_certifications": Path(
+            "certifications/!type",
+            {"us": [Certification]},
+            validators=[TYPE_MOVIES_SHOWS],
+        )
+    }
+
+    def get_certifications(self, *, type: str, **kwargs: Any) -> List[Certification]:
+        ret = self.run("get_certifications", type=type, **kwargs)
+        return ret["us"]
+
+
+class GenresI(SuiteInterface):
+    name = "genres"
+
+    paths = {
+        "get_genres": Path("genres/!type", [Genre], validators=[TYPE_MOVIES_SHOWS])
+    }
+
+    def get_genres(self, *, type: str, **kwargs: Any) -> List[Genre]:
+        ret = self.run("get_genres", type=type, **kwargs)
+        return ret
+
+
+class LanguagesI(SuiteInterface):
+    name = "languages"
+
+    paths = {
+        "get_languages": Path(
+            "languages/!type", [Language], validators=[TYPE_MOVIES_SHOWS]
+        )
+    }
+
+    def get_languages(self, *, type: str, **kwargs: Any) -> List[Language]:
+        ret = self.run("get_languages", type=type, **kwargs)
+        return ret
+
+
+class CalendarsI(SuiteInterface):
     name = "calendars"
 
     paths = {
@@ -55,19 +98,19 @@ class CalendarsInterface(SuiteInterface):
         return ret
 
 
-class ShowsInterface(SuiteInterface):
+class ShowsI(SuiteInterface):
     name = "shows"
 
     paths = {
         "get_trending": Path(
             "shows/trending",
-            [{"watchers": int, "show": Show}],
+            [TrendingShow],
             filters=COMMON_FILTERS | SHOWS_FILTERS,
             extended=["full"],
             pagination=True,
         )
     }
 
-    def get_trending(self, **kwargs: Any) -> Iterable[Any]:
+    def get_trending(self, **kwargs: Any) -> Iterable[TrendingShow]:
         ret = self.run("get_trending", **kwargs)
         return ret

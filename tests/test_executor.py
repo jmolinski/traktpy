@@ -1,6 +1,7 @@
 # flake8: noqa: F403, F405
 
 import types
+from dataclasses import asdict
 
 import pytest
 from tests.client import MockRequests
@@ -21,10 +22,14 @@ def test_executor():
 
     client = Trakt("", "", http_component=http)
 
-    assert client.request("countries", type="shows") == response
-    assert client.request("get_countries", type="shows") == response
-    assert client.request("countries.get_countries", type="shows") == response
-    assert client.get_countries(type="shows") == response
+    assert client.request("countries", type="shows") == client.request(
+        "get_countries", type="shows"
+    )
+    assert client.request(
+        "countries.get_countries", type="shows"
+    ) == client.get_countries(type="shows")
+    assert len(client.get_countries(type="shows")) == len(response)
+    assert [asdict(s) for s in client.get_countries(type="shows")] == response
 
     with pytest.raises(ClientError):
         client.count(type="shows")
