@@ -1,7 +1,7 @@
 # flake8: noqa: F403, F405
 
-import types
 import time
+import types
 
 import pytest
 from tests.client import MockRequests
