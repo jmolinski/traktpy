@@ -3,7 +3,10 @@ from dataclasses import dataclass
 from typing import Any
 
 import pytest
+from tests.test_data.episodes import EPISODE, EXTENDED_EPISODE
+from tests.test_data.shows import EXTENDED_SHOW, SHOW
 from trakt.core import json_parser
+from trakt.core.models import Episode, Show
 
 
 @dataclass
@@ -98,3 +101,13 @@ def test_wildcards():
     assert True not in parsed
     assert parsed[0.5] == "y"
     assert parsed[0.7] == 10
+
+
+def test_parser_nofail():
+    ep = json_parser.parse_tree(EPISODE, Episode)
+    epex = json_parser.parse_tree(EXTENDED_EPISODE, Episode)
+
+    sh = json_parser.parse_tree(SHOW, Show)
+    shex = json_parser.parse_tree(EXTENDED_SHOW, Show)
+
+    # print(shex)

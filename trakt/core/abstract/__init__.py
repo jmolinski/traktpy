@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import asdict
 from typing import TYPE_CHECKING, Optional
 
 from trakt.core.config import Config, TraktCredentials
@@ -35,3 +36,6 @@ class AbstractBaseModel:
     @property
     def client(self) -> AbstractApi:
         return self._client
+
+    def to_dict(self):
+        return asdict(self)

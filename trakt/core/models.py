@@ -1,8 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict
-from typing import List as ListType
-from typing import Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import jsons  # type: ignore
 from trakt.core.abstract import AbstractBaseModel
@@ -26,14 +24,26 @@ jsons.set_deserializer(any_deserializer, Any)
 class Show(AbstractBaseModel):
     title: str
     year: int
-    ids: Dict[str, MediaForeignIDType]
+    ids: Any
 
-
-@dataclass
-class Certification(AbstractBaseModel):
-    name: str
-    slug: str
-    description: str
+    overview: str = ""
+    first_aired: str = ""
+    airs: Dict[str, Any] = field(default_factory=dict)
+    runtime: int = 0
+    certification: str = ""
+    network: str = ""
+    country: str = ""
+    trailer: str = ""
+    homepage: str = ""
+    status: str = ""
+    rating: int = 0
+    votes: int = 0
+    comment_count: int = 0
+    updated_at: str = ""
+    language: str = ""
+    available_translations: List[str] = field(default_factory=list)
+    genres: List[str] = field(default_factory=list)
+    aired_episodes: int = 0
 
 
 @dataclass
@@ -61,7 +71,7 @@ class Comment(AbstractBaseModel):
 
 
 @dataclass
-class List(AbstractBaseModel):
+class TraktList(AbstractBaseModel):
     name: str
     description: str
     privacy: str
@@ -82,7 +92,17 @@ class Episode(AbstractBaseModel):
     season: int
     number: int
     title: str
-    ids: Dict[str, MediaForeignIDType]
+    ids: Any = ""
+
+    number_abs: int = 0
+    overview: str = ""
+    rating: int = 0
+    votes: int = 0
+    comment_count: int = 0
+    first_aired: str = ""
+    updated_at: str = ""
+    available_translations: List[str] = field(default_factory=list)
+    runtime: int = 0
 
 
 @dataclass
@@ -106,8 +126,8 @@ class MovieDetails(Movie):
     votes: int
     comment_count: int
     language: str
-    available_translations: ListType[str]
-    genres: ListType[str]
+    available_translations: List[str]
+    genres: List[str]
     certification: str
 
 
