@@ -1,6 +1,7 @@
 # flake8: noqa: F403, F405
 
 import types
+import time
 
 import pytest
 from tests.client import MockRequests
@@ -30,29 +31,38 @@ def test_executor():
         client.count(type="shows")
 
 
-def test_refresh_token():
-    http = lambda client: DefaultHttpComponent(
-        client,
-        requests_dependency=MockRequests(
-            {"countries/shows": [COUNTRIES, 200], "oauth/token": [OAUTH_GET_TOKEN, 200]}
-        ),
-    )
+TOKEN_REFRESH_HTTP = lambda client: DefaultHttpComponent(
+    client,
+    requests_dependency=MockRequests(
+        {"countries/shows": [[], 200], "oauth/token": [OAUTH_GET_TOKEN, 200]}
+    ),
+)
 
+
+def test_refresh_token_off():
     credentials = TraktCredentials("access", "refresh", "scope", 100)
 
-    ### refresh off
-
-    client = Trakt("", "", http_component=http, user=credentials)
+    client = Trakt("", "", http_component=TOKEN_REFRESH_HTTP, user=credentials)
     client.get_countries(type="shows")
 
     assert client.user.refresh_token == "refresh"
     assert client.user.access_token == "access"
 
-    ### refresh on
 
-    client = Trakt(
-        "", "", http_component=http, user=credentials, auto_refresh_token=True
-    )
+def test_refresh_token_on():
+    client = Trakt("", "", http_component=TOKEN_REFRESH_HTTP, auto_refresh_token=True)
+
+    # token is not going to expire soon (should not refresh)
+    expire_at = int(time.time()) + 2 * 30 * 24 * 60 * 60  # 60 days
+    client.set_user(TraktCredentials("access", "refresh", "scope", expire_at))
+    client.get_countries(type="shows")
+
+    assert client.user.refresh_token == "refresh"
+    assert client.user.access_token == "access"
+
+    # token is going to expire soon
+    expire_at = int(time.time()) + 15 * 24 * 60 * 60  # 15 days
+    client.set_user(TraktCredentials("access", "refresh", "scope", expire_at))
     client.get_countries(type="shows")
 
     assert client.user.refresh_token == OAUTH_GET_TOKEN["refresh_token"]
