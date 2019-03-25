@@ -88,15 +88,37 @@ def test_extended_validator():
 
 
 def test_filters_validator():
-    p = Path("a", {}, filters=["query", "genres"])
+    p = Path("a", {}, filters=["query", "genres", "years", "ratings"])
 
     assert FiltersValidator().validate(path=p) is None
     assert FiltersValidator().validate(path=p, query="xyz") is None
     assert FiltersValidator().validate(path=p, genres="xyz") is None
     assert FiltersValidator().validate(path=p, genres=["xyz", "abc"]) is None
+    assert FiltersValidator().validate(path=p, years=2015) is None
+    assert FiltersValidator().validate(path=p, years="2015") is None
+    assert FiltersValidator().validate(path=p, years="2013-2015") is None
+    assert FiltersValidator().validate(path=p, ratings="5-100") is None
 
     with pytest.raises(ArgumentError):
         FiltersValidator().validate(path=p, languages="xyz")
 
     with pytest.raises(ArgumentError):
         FiltersValidator().validate(path=p, query=["abc", "xyz"])
+
+    with pytest.raises(ArgumentError):
+        FiltersValidator().validate(path=p, years="500-2015")
+
+    with pytest.raises(ArgumentError):
+        FiltersValidator().validate(path=p, years="2014-2015-2016")
+
+    with pytest.raises(ArgumentError):
+        FiltersValidator().validate(path=p, years="-2015")
+
+    with pytest.raises(ArgumentError):
+        FiltersValidator().validate(path=p, years="20132015")
+
+    with pytest.raises(ArgumentError):
+        FiltersValidator().validate(path=p, years=0.5)
+
+    with pytest.raises(ArgumentError):
+        FiltersValidator().validate(path=p, ratings="20")
