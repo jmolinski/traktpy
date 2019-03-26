@@ -1,4 +1,4 @@
-from tests.client import SECRETS, get_mock_http_component
+from tests.client import get_mock_http_component
 from tests.test_data.calendars import SEASON_PREMIERES
 from trakt import Trakt
 
@@ -16,9 +16,3 @@ def test_get_season_premieres():
     assert premiere.first_aired
     assert premiere.episode.title == "Episode 1"
     assert premiere.show.title == "Make Or Break?"
-
-
-def test_XYZ():
-    http = lambda client: None
-
-    client = Trakt(**SECRETS)

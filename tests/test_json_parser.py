@@ -109,5 +109,3 @@ def test_parser_nofail():
 
     sh = json_parser.parse_tree(SHOW, Show)
     shex = json_parser.parse_tree(EXTENDED_SHOW, Show)
-
-    # print(shex)
