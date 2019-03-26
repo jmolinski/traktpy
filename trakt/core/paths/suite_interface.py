@@ -29,9 +29,10 @@ class SuiteInterface:
         return [p for p in poss_paths if p.does_match(alias)]
 
     def run(self, command: str, **kwargs: Any) -> Any:
-        return self.executor_class(self.client).run(
-            path=self._get_path(command), **kwargs
-        )
+        return self.run_path(path=self._get_path(command), **kwargs)
+
+    def run_path(self, path: Path, **kwargs: Any) -> Any:
+        return self.executor_class(self.client).run(path=path, **kwargs)
 
     def _get_path(self, command: str) -> Path:
         return self.paths[command]

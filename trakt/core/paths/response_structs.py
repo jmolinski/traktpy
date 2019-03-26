@@ -53,3 +53,26 @@ class ListResponse:
 class MoviePremiere:
     released: str
     movie: Movie
+
+
+@dataclass
+class Sharing:
+    twitter: bool
+    tumblr: bool
+
+
+@dataclass
+class EpisodeCheckin:
+    id: int
+    watched_at: str
+    sharing: Sharing
+    episode: Episode
+    show: Show
+
+
+@dataclass
+class MovieCheckin:
+    id: int
+    watched_at: str
+    sharing: Sharing
+    movie: Movie
