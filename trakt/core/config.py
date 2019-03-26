@@ -20,7 +20,10 @@ class Config:
 
 DEFAULT_CONFIG: InternalConfigType = {
     "http": {"base_url": "https://api.trakt.tv", "max_retries": 3},
-    "oauth": {"default_redirect_uri": "urn:ietf:wg:oauth:2.0:oob"},
+    "oauth": {
+        "default_redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
+        "refresh_token_s": 30 * 24 * 60 * 60,
+    },
 }
 
 
