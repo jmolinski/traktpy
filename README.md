@@ -6,13 +6,15 @@ Python wrapper for Trakt REST api
 
 ---
 Todo:
-- oauth
-- pagination
+- oauth tests
 - sync
 - methods on models (episode.rate() etc)
 - error handling
 - http component retries etc
 - define all paths & user friendly aliases
 - user profile
+- possibly get rid of abstracts
+- only refresh token if going to expire soon
+- pagination extras (limit exact items, per endpoint default limit?, config)
 - docs
 - pypi release

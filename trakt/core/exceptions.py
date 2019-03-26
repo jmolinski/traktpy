@@ -85,3 +85,7 @@ class ServiceUnavailable(RequestRelatedError):
 
 class TraktResponseError(ClientError):
     message = "Response parsing error. Check response json structure."
+
+
+class TraktTimeoutError(RequestRelatedError):
+    message = "Pool timed out"

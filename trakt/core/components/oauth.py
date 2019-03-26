@@ -6,7 +6,7 @@ from typing import NamedTuple, cast
 from trakt.core.abstract import AbstractComponent
 from trakt.core.config import TraktCredentials
 from trakt.core.decorators import auth_required
-from trakt.core.exceptions import ClientError
+from trakt.core.exceptions import TraktTimeoutError
 
 
 class CodeResponse(NamedTuple):
@@ -124,11 +124,12 @@ class DefaultOauthComponent(AbstractComponent):
                 break
 
             elapsed_time += code.interval + 0.3
-
             if elapsed_time > code.expires_in:
-                raise ClientError("Code expired; start the verification process again")
+                raise TraktTimeoutError(
+                    message="Code expired; start the verification process again"
+                )
 
-            time.sleep(code.interval + 0.3)
+            self.sleep(code.interval + 0.3)
 
         self.client.user = TraktCredentials(
             access_token=ret["access_token"],
@@ -138,3 +139,6 @@ class DefaultOauthComponent(AbstractComponent):
         )
 
         return self.client.user
+
+    def sleep(self, t: float):  # pragma: no cover
+        return time.sleep(t)
