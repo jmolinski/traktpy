@@ -4,7 +4,7 @@ from trakt import Trakt
 
 
 def test_get_season_premieres():
-    http = get_mock_http_component({"*": [SEASON_PREMIERES, 200]})
+    http = get_mock_http_component({".*": [SEASON_PREMIERES, 200]})
     client = Trakt("", "", http_component=http)
 
     premieres = client.calendars.get_season_premieres()

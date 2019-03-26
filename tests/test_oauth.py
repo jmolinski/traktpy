@@ -3,14 +3,6 @@ from tests.test_data.oauth import OAUTH_GET_TOKEN
 from trakt import Trakt
 
 
-def test_oauth():
-    client = Trakt("", "")
-
-    url = client.http.get_url("a/b/c", {"d": "e"})
-
-    assert url == "https://api.trakt.tv/a/b/c?d=e"
-
-
 def test_redirect_url():
     client = Trakt("123", "")
 
@@ -23,7 +15,7 @@ def test_redirect_url():
 
 def test_get_token():
     client = Trakt(
-        "123", "", http_component=get_mock_http_component({"*": [OAUTH_GET_TOKEN, 200]})
+        "", "", http_component=get_mock_http_component({".*": [OAUTH_GET_TOKEN, 200]})
     )
 
     trakt_credentials = client.oauth.get_token(code="code", redirect_uri="uri")

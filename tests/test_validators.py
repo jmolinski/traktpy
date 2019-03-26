@@ -100,3 +100,9 @@ def test_filters_validator():
 
     with pytest.raises(ArgumentError):
         FiltersValidator().validate(path=p, query=["abc", "xyz"])
+
+    with pytest.raises(ArgumentError):
+        FiltersValidator().validate(path=p, genres={"abc"})
+
+    with pytest.raises(ArgumentError):
+        FiltersValidator().validate(path=p, genres=["abc", 123])
