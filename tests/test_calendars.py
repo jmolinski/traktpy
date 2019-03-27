@@ -13,7 +13,6 @@ def test_get_season_premieres():
 
     premiere = premieres[0]
 
-    assert all(i in premiere for i in ["first_aired", "episode", "show"])
-
-    assert premiere["episode"].title == "Episode 1"
-    assert premiere["show"].title == "Make Or Break?"
+    assert premiere.first_aired
+    assert premiere.episode.title == "Episode 1"
+    assert premiere.show.title == "Make Or Break?"

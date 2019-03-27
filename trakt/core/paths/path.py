@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Union
 
 from trakt.core.exceptions import ClientError
@@ -37,13 +35,14 @@ class Path:
 
     _output_structure: Any
 
-    __bound_client: Optional[AbstractApi]
+    __bound_client: Optional["AbstractApi"]
     __bound_kwargs: Dict[str, Any]
 
     def __init__(
         self,
         path: str,
         output_structure: Any,
+        *,
         methods: Union[str, List[str]] = "GET",
         validators: List[Validator] = None,
         qargs: Dict[str, str] = None,
@@ -81,7 +80,7 @@ class Path:
     def does_match(self, name: str) -> bool:
         return name in self.aliases
 
-    def is_valid(self, client: AbstractApi, **kwargs: Any) -> bool:
+    def is_valid(self, client: "AbstractApi", **kwargs: Any) -> bool:
         for v in self.validators:
             v.validate(self, client=client, path=self, **kwargs)  # may raise
 

@@ -6,7 +6,15 @@ from trakt.core.abstract import AbstractApi, AbstractBaseModel
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 from trakt.core.config import DefaultConfig, TraktCredentials
 from trakt.core.executors import Executor
-from trakt.core.paths import CalendarsInterface, CountriesInterface, ShowsInterface
+from trakt.core.paths import (
+    CalendarsI,
+    CertificationsI,
+    CountriesI,
+    GenresI,
+    LanguagesI,
+    ListsI,
+    ShowsI,
+)
 
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.paths.suite_interface import SuiteInterface
@@ -20,9 +28,13 @@ class TraktApi(AbstractApi):
         *,
         http_component: Optional[Type[DefaultHttpComponent]] = None,
         oauth_component: Optional[Type[DefaultOauthComponent]] = None,
-        countries_interface: Optional[Type[CountriesInterface]] = None,
-        calendars_interface: Optional[Type[CalendarsInterface]] = None,
-        shows_interface: Optional[Type[ShowsInterface]] = None,
+        countries_interface: Optional[Type[CountriesI]] = None,
+        calendars_interface: Optional[Type[CalendarsI]] = None,
+        shows_interface: Optional[Type[ShowsI]] = None,
+        genres_interface: Optional[Type[GenresI]] = None,
+        certifications_interface: Optional[Type[CertificationsI]] = None,
+        languages_interface: Optional[Type[LanguagesI]] = None,
+        lists_interface: Optional[Type[ListsI]] = None,
         user: Optional[TraktCredentials] = None,
         auto_refresh_token: bool = False,
         **config: str
@@ -43,9 +55,15 @@ class TraktApi(AbstractApi):
 
         self.http = (http_component or DefaultHttpComponent)(self)
         self.oauth = (oauth_component or DefaultOauthComponent)(self)
-        self.countries = (countries_interface or CountriesInterface)(self, Executor)
-        self.calendars = (calendars_interface or CalendarsInterface)(self, Executor)
-        self.shows = (shows_interface or ShowsInterface)(self, Executor)
+        self.countries = (countries_interface or CountriesI)(self, Executor)
+        self.calendars = (calendars_interface or CalendarsI)(self, Executor)
+        self.shows = (shows_interface or ShowsI)(self, Executor)
+        self.genres = (genres_interface or GenresI)(self, Executor)
+        self.certifications = (certifications_interface or CertificationsI)(
+            self, Executor
+        )
+        self.languages = (languages_interface or LanguagesI)(self, Executor)
+        self.lists = (lists_interface or ListsI)(self, Executor)
 
     def request(self, params: Union[str, List[str]], **kwargs: Any) -> Any:
         if isinstance(params, str):
@@ -66,4 +84,12 @@ class TraktApi(AbstractApi):
         return e
 
     def _get_executor_paths(self) -> List[SuiteInterface]:
-        return [self.countries, self.calendars, self.shows]
+        return [
+            self.calendars,
+            self.certifications,
+            self.countries,
+            self.genres,
+            self.shows,
+            self.languages,
+            self.lists,
+        ]

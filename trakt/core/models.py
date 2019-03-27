@@ -1,8 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict
-from typing import List as ListType
-from typing import Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import jsons  # type: ignore
 from trakt.core.abstract import AbstractBaseModel
@@ -26,14 +24,26 @@ jsons.set_deserializer(any_deserializer, Any)
 class Show(AbstractBaseModel):
     title: str
     year: int
-    ids: Dict[str, MediaForeignIDType]
+    ids: Any
 
-
-@dataclass
-class Certification(AbstractBaseModel):
-    name: str
-    slug: str
-    description: str
+    overview: str = ""
+    first_aired: str = ""
+    airs: Dict[str, Any] = field(default_factory=dict)
+    runtime: int = 0
+    certification: str = ""
+    network: str = ""
+    country: str = ""
+    trailer: str = ""
+    homepage: str = ""
+    status: str = ""
+    rating: int = 0
+    votes: int = 0
+    comment_count: int = 0
+    updated_at: str = ""
+    language: str = ""
+    available_translations: List[str] = field(default_factory=list)
+    genres: List[str] = field(default_factory=list)
+    aired_episodes: int = 0
 
 
 @dataclass
@@ -44,6 +54,13 @@ class User(AbstractBaseModel):
     vip: bool
     vip_ep: bool
     ids: Dict[str, MediaForeignIDType]
+
+    joined_at: str = ""
+    location: str = ""
+    about: str = ""
+    gender: str = ""
+    age: int = 0
+    images: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -61,7 +78,7 @@ class Comment(AbstractBaseModel):
 
 
 @dataclass
-class List(AbstractBaseModel):
+class TraktList(AbstractBaseModel):
     name: str
     description: str
     privacy: str
@@ -82,7 +99,17 @@ class Episode(AbstractBaseModel):
     season: int
     number: int
     title: str
-    ids: Dict[str, MediaForeignIDType]
+    ids: Any = ""
+
+    number_abs: int = 0
+    overview: str = ""
+    rating: int = 0
+    votes: int = 0
+    comment_count: int = 0
+    first_aired: str = ""
+    updated_at: str = ""
+    available_translations: List[str] = field(default_factory=list)
+    runtime: int = 0
 
 
 @dataclass
@@ -91,30 +118,21 @@ class Movie(AbstractBaseModel):
     year: int
     ids: Dict[str, MediaForeignIDType]
 
-
-@dataclass
-class MovieDetails(Movie):
-    tagline: str
-    overview: str
-    released: datetime
-    runtime: int
-    country: str
-    updated_at: datetime
-    trailer: Optional[str]
-    homepage: Optional[str]
-    rating: int
-    votes: int
-    comment_count: int
-    language: str
-    available_translations: ListType[str]
-    genres: ListType[str]
-    certification: str
-
-
-@dataclass
-class MovieAlias(AbstractBaseModel):
-    title: str
-    country: str
+    tagline: str = ""
+    overview: str = ""
+    released: str = ""
+    runtime: int = 0
+    country: str = ""
+    updated_at: str = ""
+    trailer: str = ""
+    homepage: str = ""
+    rating: int = 0
+    votes: int = 0
+    comment_count: int = 0
+    language: str = ""
+    available_translations: List[str] = field(default_factory=list)
+    genres: List[str] = field(default_factory=list)
+    certification: str = ""
 
 
 @dataclass
