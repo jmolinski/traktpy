@@ -11,7 +11,6 @@ Todo:
 - methods on models (episode.rate() etc)
 - error handling
 - http component retries etc
-- filters - additional validation
 - define all paths & user friendly aliases
 - user profile
 - possibly get rid of abstracts
