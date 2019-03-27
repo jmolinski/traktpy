@@ -2,9 +2,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
+import pytest
 from tests.test_data.episodes import EPISODE, EXTENDED_EPISODE
 from tests.test_data.shows import EXTENDED_SHOW, SHOW
 from trakt.core import json_parser
+from trakt.core.exceptions import TraktResponseError
 from trakt.core.models import Episode, Show
 
 
@@ -117,4 +119,15 @@ def test_parser_datetime():
     assert show.first_aired == datetime.strptime(
         EXTENDED_SHOW["first_aired"][:-5] + "Z", "%Y-%m-%dT%H:%M:%S%z"
     )
-    # assert show.first_aired == datetime.fromisoformat(EXTENDED_SHOW["first_aired"])
+
+
+def test_parser_default_none():
+    show = json_parser.parse_tree(EXTENDED_SHOW, Show)
+
+    assert show.country == "gb"
+    assert show.trailer is None
+
+
+def test_parser_invalid_structure():
+    with pytest.raises(TraktResponseError):
+        json_parser.parse_tree([{"a": "b"}], Show)

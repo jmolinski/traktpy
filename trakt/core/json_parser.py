@@ -9,9 +9,23 @@ ITERABLES = {list, dict}
 
 def parse_tree(data: Any, tree_structure: Any) -> Any:
     try:
+        data = _substiture_none_val(data)
         return _parse_tree(data, tree_structure)
     except Exception as e:
         raise TraktResponseError(errors=[e])
+
+
+def _substiture_none_val(data: Any):
+    """Trakt represents null-value as {}. Change it to None."""
+    if data == {}:
+        return None
+
+    if isinstance(data, list):
+        data = [_substiture_none_val(v) for v in data]
+    if isinstance(data, dict):
+        data = {k: _substiture_none_val(v) for k, v in data.items()}
+
+    return data
 
 
 def _parse_tree(data: Any, tree_structure: Any) -> Any:
@@ -34,6 +48,8 @@ def _is_arbitrary_value(x: Any) -> bool:
 def _parse_list(data: List[Any], single_item_type: Any) -> List[Any]:
     if single_item_type is Any:
         return data
+    if data is None:
+        return []
 
     return [_parse_tree(e, single_item_type) for e in data]
 

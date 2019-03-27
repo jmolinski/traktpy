@@ -1,4 +1,5 @@
 from trakt.core.paths.endpoint_mappings.calendars import CalendarsI  # NOQA
+from trakt.core.paths.endpoint_mappings.checkin import CheckinI  # NOQA
 from trakt.core.paths.endpoint_mappings.misc_mappings import (  # NOQA
     CertificationsI,
     CountriesI,
