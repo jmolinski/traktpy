@@ -26,9 +26,9 @@ def _apply_name_mapping(data: Any):
             GLOBAL_NAME_MAPPING.get(k, k): _apply_name_mapping(v)
             for k, v in data.items()
         }
-    
+
     return data
- 
+
 
 def _substitute_none_val(data: Any):
     """Trakt represents null-value as {}. Change it to None."""
