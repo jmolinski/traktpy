@@ -9,6 +9,7 @@ from trakt.core.executors import Executor
 from trakt.core.paths import (
     CalendarsI,
     CertificationsI,
+    CheckinI,
     CountriesI,
     GenresI,
     LanguagesI,
@@ -35,6 +36,7 @@ class TraktApi(AbstractApi):
         certifications_interface: Optional[Type[CertificationsI]] = None,
         languages_interface: Optional[Type[LanguagesI]] = None,
         lists_interface: Optional[Type[ListsI]] = None,
+        checkin_interface: Optional[Type[CheckinI]] = None,
         user: Optional[TraktCredentials] = None,
         auto_refresh_token: bool = False,
         **config: str
@@ -64,6 +66,7 @@ class TraktApi(AbstractApi):
         )
         self.languages = (languages_interface or LanguagesI)(self, Executor)
         self.lists = (lists_interface or ListsI)(self, Executor)
+        self.checkin = (checkin_interface or CheckinI)(self, Executor)
 
     def request(self, params: Union[str, List[str]], **kwargs: Any) -> Any:
         if isinstance(params, str):
