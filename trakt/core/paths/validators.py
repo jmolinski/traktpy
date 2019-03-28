@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import re
 from typing import Any, Callable, Dict, List
 
@@ -175,3 +176,11 @@ class FiltersValidator(Validator):
     @staticmethod
     def ratings_filter_validator(ratings: Any):
         return isinstance(ratings, str) and re.match(r"\d{1,2}-\d{1,3}", ratings)
+
+
+def is_date(d: str, format: str = "%Y-%m-%d") -> bool:
+    try:
+        datetime.datetime.strptime(d, format)
+        return True
+    except ValueError:
+        return False

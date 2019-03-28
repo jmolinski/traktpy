@@ -13,6 +13,7 @@ from trakt.core.paths import (
     GenresI,
     LanguagesI,
     ListsI,
+    MoviesI,
     ShowsI,
 )
 
@@ -35,6 +36,7 @@ class TraktApi(AbstractApi):
         certifications_interface: Optional[Type[CertificationsI]] = None,
         languages_interface: Optional[Type[LanguagesI]] = None,
         lists_interface: Optional[Type[ListsI]] = None,
+        movies_interface: Optional[Type[MoviesI]] = None,
         user: Optional[TraktCredentials] = None,
         auto_refresh_token: bool = False,
         **config: str
@@ -64,6 +66,7 @@ class TraktApi(AbstractApi):
         )
         self.languages = (languages_interface or LanguagesI)(self, Executor)
         self.lists = (lists_interface or ListsI)(self, Executor)
+        self.movies = (movies_interface or MoviesI)(self, Executor)
 
     def request(self, params: Union[str, List[str]], **kwargs: Any) -> Any:
         if isinstance(params, str):
@@ -92,4 +95,5 @@ class TraktApi(AbstractApi):
             self.shows,
             self.languages,
             self.lists,
+            self.movies,
         ]

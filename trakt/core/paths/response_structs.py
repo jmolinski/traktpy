@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 from trakt.core.models import Episode, Movie, Show, TraktList, User
 
@@ -20,6 +21,12 @@ class Country:
 class TrendingShow:
     watchers: int
     show: Show
+
+
+@dataclass
+class TrendingMovie:
+    watchers: int
+    show: Movie
 
 
 @dataclass
@@ -75,4 +82,30 @@ class MovieCheckin:
     id: int
     watched_at: str
     sharing: Sharing
+    movie: Movie
+
+
+@dataclass
+class MovieStats:
+    watcher_count: int
+    player_count: int
+    collected_count: int
+    movie: Movie
+
+
+@dataclass
+class AnticipatedMovie:
+    list_count: int
+    movie: Movie
+
+
+@dataclass
+class BoxOffice:
+    revenue: int
+    movie: Movie
+
+
+@dataclass
+class UpdatedMovie:
+    updated_at: datetime
     movie: Movie
