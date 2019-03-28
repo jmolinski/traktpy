@@ -24,26 +24,26 @@ jsons.set_deserializer(any_deserializer, Any)
 class Show(AbstractBaseModel):
     title: str
     year: int
-    ids: Any
+    ids: Dict[str, MediaForeignIDType]
 
-    overview: str = ""
-    first_aired: str = ""
-    airs: Dict[str, Any] = field(default_factory=dict)
-    runtime: int = 0
-    certification: str = ""
-    network: str = ""
-    country: str = ""
-    trailer: str = ""
-    homepage: str = ""
-    status: str = ""
-    rating: int = 0
-    votes: int = 0
-    comment_count: int = 0
-    updated_at: str = ""
-    language: str = ""
-    available_translations: List[str] = field(default_factory=list)
-    genres: List[str] = field(default_factory=list)
-    aired_episodes: int = 0
+    overview: Optional[str] = None
+    first_aired: Optional[datetime] = None
+    airs: Optional[Dict[str, Any]] = None
+    runtime: Optional[int] = None
+    certification: Optional[str] = None
+    network: Optional[str] = None
+    country: Optional[str] = None
+    trailer: Optional[str] = None
+    homepage: Optional[str] = None
+    status: Optional[str] = None
+    rating: Optional[int] = None
+    votes: Optional[int] = None
+    comment_count: Optional[int] = None
+    updated_at: Optional[datetime] = None
+    language: Optional[str] = None
+    available_translations: Optional[List[str]] = None
+    genres: Optional[List[str]] = None
+    aired_episodes: Optional[int] = None
 
 
 @dataclass
@@ -55,12 +55,12 @@ class User(AbstractBaseModel):
     vip_ep: bool
     ids: Dict[str, MediaForeignIDType]
 
-    joined_at: str = ""
-    location: str = ""
-    about: str = ""
-    gender: str = ""
-    age: int = 0
-    images: Dict[str, Any] = field(default_factory=dict)
+    joined_at: Optional[datetime] = None
+    location: Optional[str] = None
+    about: Optional[str] = None
+    gender: Optional[str] = None
+    age: Optional[int] = None
+    images: Optional[Dict[str, Any]] = None
 
 
 @dataclass
@@ -100,17 +100,17 @@ class Episode(AbstractBaseModel):
     season: int
     number: int
     title: str
-    ids: Any = ""
+    ids: Dict[str, MediaForeignIDType] = field(default_factory=dict)
 
-    number_abs: int = 0
-    overview: str = ""
-    rating: int = 0
-    votes: int = 0
-    comment_count: int = 0
-    first_aired: str = ""
-    updated_at: str = ""
-    available_translations: List[str] = field(default_factory=list)
-    runtime: int = 0
+    number_abs: Optional[int] = None
+    overview: Optional[str] = None
+    rating: Optional[int] = None
+    votes: Optional[int] = None
+    comment_count: Optional[int] = None
+    first_aired: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    available_translations: Optional[List[str]] = None
+    runtime: Optional[int] = None
 
 
 @dataclass
@@ -119,21 +119,21 @@ class Movie(AbstractBaseModel):
     year: int
     ids: Dict[str, MediaForeignIDType]
 
-    tagline: str = ""
-    overview: str = ""
-    released: str = ""
-    runtime: int = 0
-    country: str = ""
-    updated_at: str = ""
-    trailer: str = ""
-    homepage: str = ""
-    rating: int = 0
-    votes: int = 0
-    comment_count: int = 0
-    language: str = ""
-    available_translations: List[str] = field(default_factory=list)
-    genres: List[str] = field(default_factory=list)
-    certification: str = ""
+    tagline: Optional[str] = None
+    overview: Optional[str] = None
+    released: Optional[datetime] = None
+    runtime: Optional[int] = None
+    country: Optional[str] = None
+    updated_at: Optional[datetime] = None
+    trailer: Optional[str] = None
+    homepage: Optional[str] = None
+    rating: Optional[int] = None
+    votes: Optional[int] = None
+    comment_count: Optional[int] = None
+    language: Optional[str] = None
+    available_translations: Optional[List[str]] = None
+    genres: Optional[List[str]] = None
+    certification: Optional[str] = None
 
 
 @dataclass
