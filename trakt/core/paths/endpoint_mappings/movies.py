@@ -110,7 +110,7 @@ class MoviesI(SuiteInterface):
             )
 
         return Path(
-            "calendars/" + resource_path,
+            self.name + "/" + resource_path,
             return_type,
             extended=["full"],
             filters=COMMON_FILTERS,
@@ -177,9 +177,8 @@ class MoviesI(SuiteInterface):
     def get_comments(
         self, *, movie: Union[Movie, str, int], sort: str = "newest", **kwargs
     ) -> Iterable[Comment]:
-        return self.run(
-            "get_comments", **kwargs, sort=sort, movie=self._get_movie_id(movie)
-        )
+        movie_id = self._get_movie_id(movie)
+        return self.run("get_comments", **kwargs, sort=sort, movie=movie_id)
 
     def get_lists(
         self,
@@ -189,9 +188,8 @@ class MoviesI(SuiteInterface):
         sort: str = "popular",
         **kwargs
     ) -> Iterable[TraktList]:
-        return self.run(
-            "get_lists", **kwargs, type=type, sort=sort, movie=self._get_movie_id(movie)
-        )
+        movie_id = self._get_movie_id(movie)
+        return self.run("get_lists", **kwargs, type=type, sort=sort, movie=movie_id)
 
     def get_people(self, *, movie: Union[Movie, str, int], **kwargs) -> CastCrewList:
         return self.run("get_people", **kwargs, movie=self._get_movie_id(movie))
