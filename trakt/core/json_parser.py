@@ -6,12 +6,27 @@ from trakt.core.exceptions import TraktResponseError
 TYPE_TYPE = int.__class__
 ITERABLES = {list, dict}
 
+GLOBAL_NAME_MAPPING = {"costume & make-up": "costume_make_up"}
+
 
 def parse_tree(data: Any, tree_structure: Any) -> Any:
     try:
+        data = _apply_name_mapping(data)
         return _parse_tree(data, tree_structure)
     except Exception as e:
         raise TraktResponseError(errors=[e])
+
+
+def _apply_name_mapping(data: Any):
+    if isinstance(data, list):
+        data = [_apply_name_mapping(v) for v in data]
+    if isinstance(data, dict):
+        data = {
+            GLOBAL_NAME_MAPPING.get(k, k): _apply_name_mapping(v)
+            for k, v in data.items()
+        }
+
+    return data
 
 
 def _parse_tree(data: Any, tree_structure: Any) -> Any:

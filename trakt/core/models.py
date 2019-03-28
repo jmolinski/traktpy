@@ -140,10 +140,3 @@ class Movie(AbstractBaseModel):
 class Person(AbstractBaseModel):
     name: str
     ids: Dict[str, MediaForeignIDType]
-
-
-@dataclass
-class Rating(AbstractBaseModel):
-    rating: float
-    votes: int
-    distribution: Dict[str, int]

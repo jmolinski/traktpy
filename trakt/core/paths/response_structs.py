@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
+from typing import Any, Dict, List
 
-from trakt.core.models import Episode, Movie, Show, TraktList, User
+from trakt.core.models import Episode, Movie, Person, Show, TraktList, User
 
 
 @dataclass
@@ -87,11 +87,21 @@ class MovieCheckin:
 
 
 @dataclass
-class MovieStats:
+class MovieWithStats:
     watcher_count: int
     player_count: int
     collected_count: int
     movie: Movie
+
+
+@dataclass
+class MovieStats:
+    watchers: int
+    plays: int
+    collectors: int
+    comments: int
+    lists: int
+    votes: int
 
 
 @dataclass
@@ -133,3 +143,40 @@ class MovieTranslation:
     overview: str
     tagline: str
     language: str
+
+
+@dataclass
+class CastMember:
+    character: str
+    person: Person
+
+
+@dataclass
+class CrewMember:
+    job: str
+    person: Person
+
+
+@dataclass
+class CrewList:
+    production: List[CrewMember]
+    art: List[CrewMember]
+    crew: List[CrewMember]
+    costume_make_up: List[CrewMember]
+    directing: List[CrewMember]
+    writing: List[CrewMember]
+    sound: List[CrewMember]
+    camera: List[CrewMember]
+
+
+@dataclass
+class CastCrewList:
+    cast: List[CastMember]
+    crew: CrewList
+
+
+@dataclass
+class MovieRatings:
+    rating: float
+    votes: int
+    distribution: Dict[str, int]

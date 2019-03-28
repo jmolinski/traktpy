@@ -6,13 +6,18 @@ from trakt.core.paths.path import Path
 from trakt.core.paths.response_structs import (
     AnticipatedMovie,
     BoxOffice,
+    CastCrewList,
     Movie,
     MovieAlias,
+    MovieRatings,
     MovieRelease,
     MovieStats,
     MovieTranslation,
+    MovieWithStats,
+    TraktList,
     TrendingMovie,
     UpdatedMovie,
+    User,
 )
 from trakt.core.paths.suite_interface import SuiteInterface
 from trakt.core.paths.validators import (
@@ -34,9 +39,9 @@ class MoviesI(SuiteInterface):
     base_paths = {
         "get_trending": ["trending", [TrendingMovie]],
         "get_popular": ["popular", [Movie]],
-        "get_most_played": ["played/?period", [MovieStats]],
-        "get_most_watched": ["watched/?period", [MovieStats]],
-        "get_most_collected": ["collected/?period", [MovieStats]],
+        "get_most_played": ["played/?period", [MovieWithStats]],
+        "get_most_watched": ["watched/?period", [MovieWithStats]],
+        "get_most_collected": ["collected/?period", [MovieWithStats]],
         "get_most_anticipated": ["anticipated", [AnticipatedMovie]],
     }
 
@@ -75,13 +80,20 @@ class MoviesI(SuiteInterface):
         ),
         "get_lists": Path(
             "movies/!id/lists/?type/?sort",
-            [Comment],
+            [TraktList],
             validators=[
                 PerArgValidator("type", lambda t: t in LIST_TYPE_VALUES),
                 PerArgValidator("sort", lambda s: s in LIST_SORT_VALUES),
             ],
             pagination=True,
         ),
+        "get_people": Path("movies/!id/people", CastCrewList, extended=["full"]),
+        "get_ratings": Path("movies/!id/ratings", MovieRatings),
+        "get_related": Path(
+            "movies/!id/related", [Movie], extended=["full"], pagination=True
+        ),
+        "get_stats": Path("movies/!id/stats", MovieStats),
+        "get_users_watching": Path("movies/!id/watching", [User], extended=["full"]),
     }
 
     def __init__(self, *args, **kwargs):
@@ -114,17 +126,17 @@ class MoviesI(SuiteInterface):
 
     def get_most_played(
         self, *, period: str = "weekly", **kwargs
-    ) -> Iterable[MovieStats]:
+    ) -> Iterable[MovieWithStats]:
         return self.run("get_most_played", **kwargs, period=period)
 
     def get_most_watched(
         self, *, period: str = "weekly", **kwargs
-    ) -> Iterable[MovieStats]:
+    ) -> Iterable[MovieWithStats]:
         return self.run("get_most_watched", **kwargs, period=period)
 
     def get_most_collected(
         self, *, period: str = "weekly", **kwargs
-    ) -> Iterable[MovieStats]:
+    ) -> Iterable[MovieWithStats]:
         return self.run("get_most_collected", **kwargs, period=period)
 
     def get_most_anticipated(self, **kwargs) -> Iterable[AnticipatedMovie]:
@@ -176,10 +188,27 @@ class MoviesI(SuiteInterface):
         type: str = "personal",
         sort: str = "popular",
         **kwargs
-    ) -> Iterable[Comment]:
+    ) -> Iterable[TraktList]:
         return self.run(
             "get_lists", **kwargs, type=type, sort=sort, movie=self._get_movie_id(movie)
         )
+
+    def get_people(self, *, movie: Union[Movie, str, int], **kwargs) -> CastCrewList:
+        return self.run("get_people", **kwargs, movie=self._get_movie_id(movie))
+
+    def get_ratings(self, *, movie: Union[Movie, str, int], **kwargs) -> MovieRatings:
+        return self.run("get_ratings", **kwargs, movie=self._get_movie_id(movie))
+
+    def get_related(self, *, movie: Union[Movie, str, int], **kwargs) -> List[Movie]:
+        return self.run("get_related", **kwargs, movie=self._get_movie_id(movie))
+
+    def get_stats(self, *, movie: Union[Movie, str, int], **kwargs) -> List[Movie]:
+        return self.run("get_stats", **kwargs, movie=self._get_movie_id(movie))
+
+    def get_users_watching(
+        self, *, movie: Union[Movie, str, int], **kwargs
+    ) -> List[User]:
+        return self.run("get_users_watching", **kwargs, movie=self._get_movie_id(movie))
 
     def _get_movie_id(self, movie: Union[Movie, str, int]) -> str:
         if isinstance(movie, Movie):
