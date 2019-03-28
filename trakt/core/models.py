@@ -68,6 +68,7 @@ class Comment(AbstractBaseModel):
     id: int
     parent_id: Optional[int]
     created_at: datetime
+    updated_at: datetime
     comment: str
     spoiler: bool
     review: bool
@@ -136,23 +137,6 @@ class Movie(AbstractBaseModel):
 
 
 @dataclass
-class MovieRelease(AbstractBaseModel):
-    country: str
-    certification: str
-    release_date: datetime
-    release_type: str
-    note: Optional[str]
-
-
-@dataclass
-class MovieTranslation(AbstractBaseModel):
-    title: str
-    overview: str
-    tagline: str
-    language: str
-
-
-@dataclass
 class Person(AbstractBaseModel):
     name: str
     ids: Dict[str, MediaForeignIDType]
@@ -163,13 +147,3 @@ class Rating(AbstractBaseModel):
     rating: float
     votes: int
     distribution: Dict[str, int]
-
-
-@dataclass
-class MovieStats(AbstractBaseModel):
-    watchers: int
-    plays: int
-    collectors: int
-    comments: int
-    lists: int
-    votes: int

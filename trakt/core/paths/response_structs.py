@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any
 
 from trakt.core.models import Episode, Movie, Show, TraktList, User
 
@@ -109,3 +110,26 @@ class BoxOffice:
 class UpdatedMovie:
     updated_at: datetime
     movie: Movie
+
+
+@dataclass
+class MovieAlias:
+    title: str
+    country: str
+
+
+@dataclass
+class MovieRelease:
+    country: str
+    certification: str
+    release_date: datetime
+    release_type: str
+    note: Any
+
+
+@dataclass
+class MovieTranslation:
+    title: str
+    overview: str
+    tagline: str
+    language: str
