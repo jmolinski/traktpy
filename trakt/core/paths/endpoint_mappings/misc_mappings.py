@@ -113,5 +113,5 @@ class NetworksI(SuiteInterface):
 
     paths = {"get_networks": Path("networks", [Network])}
 
-    def get_networks(self, *, type: str, **kwargs: Any) -> List[Network]:
-        return self.run("get_networks", type=type, **kwargs)
+    def get_networks(self, **kwargs: Any) -> List[Network]:
+        return self.run("get_networks", **kwargs)
