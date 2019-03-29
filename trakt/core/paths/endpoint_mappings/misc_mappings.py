@@ -7,6 +7,7 @@ from trakt.core.paths.response_structs import (
     Genre,
     Language,
     ListResponse,
+    Network,
     TrendingShow,
 )
 from trakt.core.paths.suite_interface import SuiteInterface
@@ -105,3 +106,12 @@ class ListsI(SuiteInterface):
 
     def get_popular(self, **kwargs: Any) -> Iterable[ListResponse]:
         return self.run("get_popular", **kwargs)
+
+
+class NetworksI(SuiteInterface):
+    name = "networks"
+
+    paths = {"get_networks": Path("networks", [Network])}
+
+    def get_networks(self, *, type: str, **kwargs: Any) -> List[Network]:
+        return self.run("get_networks", type=type, **kwargs)

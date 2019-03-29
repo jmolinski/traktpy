@@ -180,3 +180,8 @@ class MovieRatings:
     rating: float
     votes: int
     distribution: Dict[str, int]
+
+
+@dataclass
+class Network:
+    name: str

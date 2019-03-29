@@ -7,6 +7,7 @@ from trakt.core.paths.endpoint_mappings.misc_mappings import (
     GenresI,
     LanguagesI,
     ListsI,
+    NetworksI,
     Path,
     ShowsI,
 )
