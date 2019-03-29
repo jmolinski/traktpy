@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, List, Type, Union
 
+from trakt.core.exceptions import ArgumentError
+from trakt.core.models import Episode, Movie, Season, Show, TraktList
+from trakt.core.paths.response_structs import Comment
+
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.abstract import AbstractApi
     from trakt.core.executors import Executor
@@ -36,3 +40,16 @@ class SuiteInterface:
 
     def _get_path(self, command: str) -> Path:
         return self.paths[command]
+
+    @staticmethod
+    def _generic_get_id(
+        item: Union[Movie, Episode, Show, Season, Comment, str, int]
+    ) -> str:
+        if isinstance(item, (int, str)):
+            return str(item)
+        if isinstance(item, Comment):
+            return str(item.id)
+        elif isinstance(item, (Movie, Episode, Show, Season, TraktList)):
+            return str(item.ids["trakt"])
+        else:
+            raise ArgumentError("item: invalid id")

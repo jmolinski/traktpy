@@ -10,11 +10,13 @@ from trakt.core.paths import (
     CalendarsI,
     CertificationsI,
     CheckinI,
+    CommentsI,
     CountriesI,
     GenresI,
     LanguagesI,
     ListsI,
     MoviesI,
+    NetworksI,
     ShowsI,
 )
 
@@ -39,6 +41,8 @@ class TraktApi(AbstractApi):
         lists_interface: Optional[Type[ListsI]] = None,
         movies_interface: Optional[Type[MoviesI]] = None,
         checkin_interface: Optional[Type[CheckinI]] = None,
+        networks_interface: Optional[Type[NetworksI]] = None,
+        comments_interface: Optional[Type[CommentsI]] = None,
         user: Optional[TraktCredentials] = None,
         auto_refresh_token: bool = False,
         **config: str
@@ -70,6 +74,8 @@ class TraktApi(AbstractApi):
         self.lists = (lists_interface or ListsI)(self, Executor)
         self.movies = (movies_interface or MoviesI)(self, Executor)
         self.checkin = (checkin_interface or CheckinI)(self, Executor)
+        self.networks = (networks_interface or NetworksI)(self, Executor)
+        self.comments = (comments_interface or CommentsI)(self, Executor)
 
     def request(self, params: Union[str, List[str]], **kwargs: Any) -> Any:
         if isinstance(params, str):
@@ -93,10 +99,12 @@ class TraktApi(AbstractApi):
         return [
             self.calendars,
             self.certifications,
+            self.comments,
             self.countries,
             self.genres,
             self.shows,
             self.languages,
             self.lists,
             self.movies,
+            self.networks,
         ]

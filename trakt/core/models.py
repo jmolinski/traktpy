@@ -64,21 +64,6 @@ class User(AbstractBaseModel):
 
 
 @dataclass
-class Comment(AbstractBaseModel):
-    id: int
-    parent_id: Optional[int]
-    created_at: datetime
-    updated_at: datetime
-    comment: str
-    spoiler: bool
-    review: bool
-    replies: int
-    likes: int
-    user_rating: int
-    user: User
-
-
-@dataclass
 class TraktList(AbstractBaseModel):
     name: str
     description: str
@@ -140,3 +125,23 @@ class Movie(AbstractBaseModel):
 class Person(AbstractBaseModel):
     name: str
     ids: Dict[str, MediaForeignIDType]
+
+
+@dataclass
+class Season(AbstractBaseModel):
+    ids: Dict[str, MediaForeignIDType]
+
+
+@dataclass
+class Comment:
+    id: int
+    parent_id: Optional[int]
+    created_at: datetime
+    updated_at: datetime
+    comment: str
+    spoiler: bool
+    review: bool
+    replies: int
+    likes: int
+    user_rating: Optional[int]
+    user: User

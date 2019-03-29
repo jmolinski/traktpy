@@ -11,13 +11,17 @@ Python3.7+ is required to run this library.
 All methods have detailed type annotations. That allows for precise code completion both for API calls and accessing response structs.
 
 ---
-Todo:
-- sync
-- methods on models (episode.rate() etc)
+Todo 0.1.0:
 - http component retries etc
 - define all paths & user friendly aliases
-- user profile
 - possibly get rid of abstracts
 - pagination extras (limit exact items, per endpoint default limit?, config)
 - docs
 - pypi release
+
+---
+Todo 0.2.0:
+- sync
+- methods on models (episode.rate() etc)
+- user profile
+- caching (networks, countries etc)
