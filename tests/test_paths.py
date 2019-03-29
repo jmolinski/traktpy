@@ -3,6 +3,7 @@ import pytest
 from trakt import Trakt
 from trakt.core.exceptions import ArgumentError
 from trakt.core.paths.path import Path
+from trakt.core.paths.validators import PerArgValidator
 
 
 def test_aliases():
@@ -111,3 +112,20 @@ def test_get_quargs():
     expected = {"genres": "a,b", "query": "xyz", "extended": "metadata"}
 
     assert quargs == expected
+
+
+def test_multiple_validators_for_field():
+    p = Path(
+        "?a",
+        {},
+        validators=[
+            PerArgValidator("a", lambda x: x > 10),
+            PerArgValidator("a", lambda x: x % 3 == 0),
+        ],
+    )
+
+    assert p.is_valid(None, a=30)
+
+    for val in [6, 13]:
+        with pytest.raises(ArgumentError):
+            p.is_valid(None, a=val)
