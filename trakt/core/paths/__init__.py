@@ -11,3 +11,4 @@ from trakt.core.paths.endpoint_mappings.misc_mappings import (
     ShowsI,
 )
 from trakt.core.paths.endpoint_mappings.movies import MoviesI
+from trakt.core.paths.endpoint_mappings.people import PeopleI
