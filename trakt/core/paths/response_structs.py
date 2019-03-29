@@ -1,8 +1,17 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-from trakt.core.models import Episode, Movie, Person, Show, TraktList, User
+from trakt.core.models import (
+    Comment,
+    Episode,
+    Movie,
+    Person,
+    Season,
+    Show,
+    TraktList,
+    User,
+)
 
 
 @dataclass
@@ -65,8 +74,9 @@ class MoviePremiere:
 
 @dataclass
 class Sharing:
-    twitter: bool
-    tumblr: bool
+    twitter: bool = False
+    tumblr: bool = False
+    medium: bool = False
 
 
 @dataclass
@@ -240,3 +250,34 @@ class ShowCrewCredits:
 class ShowCredits:
     cast: List[ShowCastCredit]
     crew: ShowCrewCredits
+
+      
+@dataclass
+class Network:
+    name: str
+
+
+@dataclass
+class CommentResponse(Comment):
+    sharing: Sharing
+
+
+@dataclass
+class CommentItemOnly:
+    type: str
+    list: Optional[TraktList] = None
+    movie: Optional[Movie] = None
+    episode: Optional[Episode] = None
+    show: Optional[Show] = None
+    season: Optional[Season] = None
+
+
+@dataclass
+class CommentAndItem:
+    type: str
+    comment: Comment
+    list: Optional[TraktList] = None
+    movie: Optional[Movie] = None
+    episode: Optional[Episode] = None
+    show: Optional[Show] = None
+    season: Optional[Season] = None

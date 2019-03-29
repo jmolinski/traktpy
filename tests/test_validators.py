@@ -88,7 +88,7 @@ def test_extended_validator():
 
 
 def test_filters_validator():
-    p = Path("a", {}, filters=["query", "genres", "years", "ratings"])
+    p = Path("a", {}, filters={"query", "genres", "years", "ratings"})
 
     assert FiltersValidator().validate(path=p) is None
     assert FiltersValidator().validate(path=p, query="xyz") is None
