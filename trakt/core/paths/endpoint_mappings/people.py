@@ -56,7 +56,7 @@ class PeopleI(SuiteInterface):
         self, person: Union[Person, str, int], **kwargs
     ) -> ShowCredits:
         id = self._get_person_id(person)
-        return self.run("get_movieget_show_credits_credits", **kwargs, id=id)
+        return self.run("get_show_credits", **kwargs, id=id)
 
     def get_lists(self, person: Union[Person, str, int], **kwargs) -> List[TraktList]:
         id = self._get_person_id(person)
