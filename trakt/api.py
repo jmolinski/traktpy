@@ -17,6 +17,7 @@ from trakt.core.paths import (
     ListsI,
     MoviesI,
     NetworksI,
+    PeopleI,
     ShowsI,
 )
 
@@ -41,6 +42,7 @@ class TraktApi(AbstractApi):
         lists_interface: Optional[Type[ListsI]] = None,
         movies_interface: Optional[Type[MoviesI]] = None,
         checkin_interface: Optional[Type[CheckinI]] = None,
+        people_interface: Optional[Type[PeopleI]] = None,
         networks_interface: Optional[Type[NetworksI]] = None,
         comments_interface: Optional[Type[CommentsI]] = None,
         user: Optional[TraktCredentials] = None,
@@ -74,6 +76,7 @@ class TraktApi(AbstractApi):
         self.lists = (lists_interface or ListsI)(self, Executor)
         self.movies = (movies_interface or MoviesI)(self, Executor)
         self.checkin = (checkin_interface or CheckinI)(self, Executor)
+        self.people = (people_interface or PeopleI)(self, Executor)
         self.networks = (networks_interface or NetworksI)(self, Executor)
         self.comments = (comments_interface or CommentsI)(self, Executor)
 
@@ -106,5 +109,6 @@ class TraktApi(AbstractApi):
             self.languages,
             self.lists,
             self.movies,
+            self.people,
             self.networks,
         ]

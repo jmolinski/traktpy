@@ -193,6 +193,66 @@ class MovieRatings:
 
 
 @dataclass
+class MovieCastCredit:
+    character: str
+    movie: Movie
+
+
+@dataclass
+class MovieCrewCredit:
+    job: str
+    movie: Movie
+
+
+@dataclass
+class MovieCrewCredits:
+    production: List[MovieCrewCredit]
+    art: List[MovieCrewCredit]
+    crew: List[MovieCrewCredit]
+    costume_make_up: List[MovieCrewCredit]
+    directing: List[MovieCrewCredit]
+    writing: List[MovieCrewCredit]
+    sound: List[MovieCrewCredit]
+    camera: List[MovieCrewCredit]
+
+
+@dataclass
+class MovieCredits:
+    cast: List[MovieCastCredit]
+    crew: MovieCrewCredits
+
+
+@dataclass
+class ShowCastCredit:
+    character: str
+    show: Show
+
+
+@dataclass
+class ShowCrewCredit:
+    job: str
+    show: Show
+
+
+@dataclass
+class ShowCrewCredits:
+    production: List[ShowCrewCredit]
+    art: List[ShowCrewCredit]
+    crew: List[ShowCrewCredit]
+    costume_make_up: List[ShowCrewCredit]
+    directing: List[ShowCrewCredit]
+    writing: List[ShowCrewCredit]
+    sound: List[ShowCrewCredit]
+    camera: List[ShowCrewCredit]
+
+
+@dataclass
+class ShowCredits:
+    cast: List[ShowCastCredit]
+    crew: ShowCrewCredits
+
+
+@dataclass
 class Network:
     name: str
 

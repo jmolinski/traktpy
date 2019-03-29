@@ -78,6 +78,7 @@ class TraktList(AbstractBaseModel):
     comment_count: int
     likes: int
     ids: Dict[str, MediaForeignIDType]
+    user: Optional[User] = None
 
 
 @dataclass
@@ -125,6 +126,12 @@ class Movie(AbstractBaseModel):
 class Person(AbstractBaseModel):
     name: str
     ids: Dict[str, MediaForeignIDType]
+
+    biography: Optional[str] = None
+    birthday: Optional[datetime] = None
+    death: Optional[datetime] = None
+    birthplace: Optional[str] = None
+    homepage: Optional[str] = None
 
 
 @dataclass
