@@ -251,7 +251,7 @@ class ShowCredits:
     cast: List[ShowCastCredit]
     crew: ShowCrewCredits
 
-      
+
 @dataclass
 class Network:
     name: str

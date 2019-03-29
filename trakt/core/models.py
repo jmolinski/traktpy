@@ -152,4 +152,3 @@ class Comment:
     likes: int
     user_rating: Optional[int]
     user: User
-
