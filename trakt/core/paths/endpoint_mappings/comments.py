@@ -1,10 +1,6 @@
-# flake8: noqa: F401
+from typing import Iterable, List, Optional, Union
 
-from typing import Any, Iterable, List, Optional, Union
-
-from trakt.core.exceptions import ArgumentError
-from trakt.core.json_parser import parse_tree
-from trakt.core.models import Episode, Movie, Season, Show, TraktList
+from trakt.core.models import Episode, Movie, Season, Show
 from trakt.core.paths.path import Path
 from trakt.core.paths.response_structs import (
     Comment,
@@ -14,7 +10,11 @@ from trakt.core.paths.response_structs import (
     Sharing,
 )
 from trakt.core.paths.suite_interface import SuiteInterface
-from trakt.core.paths.validators import AuthRequiredValidator, PerArgValidator
+from trakt.core.paths.validators import (
+    AuthRequiredValidator,
+    PerArgValidator,
+    Validator,
+)
 
 COMMENT_TEXT_VALIDATOR = PerArgValidator(
     "comment", lambda c: isinstance(c, str) and len(c.split(" ")) > 4
@@ -24,7 +24,7 @@ COMMENT_ID_VALIDATOR = PerArgValidator("id", lambda c: isinstance(c, int))
 COMMENT_TYPES = ["all", "reviews", "shouts"]
 MEDIA_TYPES = ["all", "movies", "shows", "seasons", "episodes", "lists"]
 
-TRENDING_RECENT_UPDATED_VALIDATORS = [
+TRENDING_RECENT_UPDATED_VALIDATORS: List[Validator] = [
     PerArgValidator("comment_type", lambda c: c in COMMENT_TYPES),
     PerArgValidator("type", lambda c: c in MEDIA_TYPES),
     PerArgValidator("include_replies", lambda i: isinstance(i, bool)),
@@ -60,7 +60,7 @@ class CommentsI(SuiteInterface):
         ),
         "get_item": Path(
             "comments/!id/item",
-            Any,
+            CommentItemOnly,
             validators=[COMMENT_ID_VALIDATOR],
             extended=["full"],
         ),
@@ -142,25 +142,9 @@ class CommentsI(SuiteInterface):
 
         return self.run("post_reply", **kwargs, id=id, body=body, comment=comment)
 
-    def get_item(
-        self, *, id: Union[Comment, str, int], **kwargs
-    ) -> Union[Show, TraktList, Episode, Movie, Season]:
+    def get_item(self, *, id: Union[Comment, str, int], **kwargs) -> CommentItemOnly:
         id = int(self._generic_get_id(id))
-
-        response = self.run("get_item", **kwargs, id=id)
-
-        ret_types = {
-            "show": Show,
-            "list": TraktList,
-            "episode": Episode,
-            "season": Season,
-            "movie": Movie,
-        }
-
-        type, data = response["type"], response[response["type"]]
-        ret_type = ret_types[type]
-
-        return parse_tree(data, ret_type)
+        return self.run("get_item", **kwargs, id=id)
 
     def like_comment(self, *, id: Union[Comment, str, int], **kwargs) -> None:
         id = int(self._generic_get_id(id))
