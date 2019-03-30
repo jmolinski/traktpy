@@ -21,6 +21,7 @@ class RecommendationsI(SuiteInterface):
             [Movie],
             validators=[AuthRequiredValidator(), IGNORE_COLLECTED_VALIDATOR],
             extended=["full"],
+            qargs=["ignore_collected"],
         ),
         "hide_movie": Path(
             "recommendations/movies/!id",
@@ -32,6 +33,7 @@ class RecommendationsI(SuiteInterface):
             [Show],
             validators=[AuthRequiredValidator(), IGNORE_COLLECTED_VALIDATOR],
             extended=["full"],
+            qargs=["ignore_collected"],
         ),
         "hide_show": Path(
             "recommendations/shows/!id",

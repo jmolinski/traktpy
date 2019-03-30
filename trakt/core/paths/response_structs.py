@@ -281,3 +281,22 @@ class CommentAndItem:
     episode: Optional[Episode] = None
     show: Optional[Show] = None
     season: Optional[Season] = None
+
+
+@dataclass
+class MovieScrobble:
+    id: int
+    action: str
+    progress: float
+    sharing: Sharing
+    movie: Movie
+
+
+@dataclass
+class EpisodeScrobble:
+    id: int
+    action: str
+    progress: float
+    sharing: Sharing
+    episode: Episode
+    show: Show
