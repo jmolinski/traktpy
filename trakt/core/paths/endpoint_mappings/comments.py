@@ -42,6 +42,15 @@ class CommentsI(SuiteInterface):
             validators=[AuthRequiredValidator(), COMMENT_TEXT_VALIDATOR],
         ),
         "get_comment": Path("comments/!id", Comment, validators=[COMMENT_ID_VALIDATOR]),
+        "update_comment": Path(
+            "comments/!id",
+            Comment,
+            methods="PUT",
+            validators=[COMMENT_ID_VALIDATOR, COMMENT_TEXT_VALIDATOR],
+        ),
+        "delete_comment": Path(
+            "comments/!id", {}, methods="DELETE", validators=[COMMENT_ID_VALIDATOR]
+        ),
         "get_replies": Path(
             "comments/!id/replies",
             [Comment],
@@ -121,6 +130,21 @@ class CommentsI(SuiteInterface):
     def get_comment(self, *, id: Union[Comment, str, int], **kwargs) -> Comment:
         id = int(self._generic_get_id(id))
         return self.run("get_comment", **kwargs, id=id)
+
+    def update_comment(
+        self,
+        *,
+        id: Union[Comment, str, int],
+        comment: str,
+        spoiler: bool = False,
+        **kwargs
+    ) -> Comment:
+        body = {"id": self._generic_get_id(id), "comment": comment, "spoiler": spoiler}
+        return self.run("update_comment", **kwargs, body=body, id=id, comment=comment)
+
+    def delete_comment(self, *, id: Union[Comment, str, int], **kwargs) -> None:
+        id = int(self._generic_get_id(id))
+        self.run("delete_comment", **kwargs, id=id)
 
     def get_replies(
         self, *, id: Union[Comment, str, int], **kwargs
