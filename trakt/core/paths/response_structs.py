@@ -281,3 +281,14 @@ class CommentAndItem:
     episode: Optional[Episode] = None
     show: Optional[Show] = None
     season: Optional[Season] = None
+
+
+@dataclass
+class SearchResult:
+    type: str
+    score: Optional[float]
+    movie: Optional[Movie] = None
+    list: Optional[TraktList] = None
+    person: Optional[Person] = None
+    episode: Optional[Episode] = None
+    show: Optional[Show] = None
