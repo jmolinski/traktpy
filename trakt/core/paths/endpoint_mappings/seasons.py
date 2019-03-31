@@ -1,6 +1,6 @@
 from typing import Iterable, List, Union
 
-from trakt.core.models import Comment, Season
+from trakt.core.models import Comment, Episode, Season
 from trakt.core.paths.endpoint_mappings.movies import (
     COMMENT_SORT_VALUES,
     LIST_SORT_VALUES,
@@ -33,7 +33,7 @@ class SeasonsI(SuiteInterface):
         ),
         "get_season": Path(
             "shows/!id/seasons/!season",
-            Season,
+            [Episode],
             extended=["full", "episodes"],
             validators=[
                 ID_VALIDATOR,
@@ -93,7 +93,7 @@ class SeasonsI(SuiteInterface):
 
     def get_season(
         self, *, show: Union[Show, str, int], season: Union[Season, str, int], **kwargs
-    ) -> Season:
+    ) -> List[Episode]:
         id = self._generic_get_id(show)
         season = self._generic_get_id(season)
         return self.run("get_season", **kwargs, id=id, season=season)

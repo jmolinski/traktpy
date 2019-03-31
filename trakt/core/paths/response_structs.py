@@ -36,7 +36,7 @@ class TrendingShow:
 @dataclass
 class TrendingMovie:
     watchers: int
-    show: Movie
+    movie: Movie
 
 
 @dataclass
