@@ -292,3 +292,22 @@ class SearchResult:
     person: Optional[Person] = None
     episode: Optional[Episode] = None
     show: Optional[Show] = None
+
+@dataclass  
+class MovieScrobble:
+    id: int
+    action: str
+    progress: float
+    sharing: Sharing
+    movie: Movie
+
+
+@dataclass
+class EpisodeScrobble:
+    id: int
+    action: str
+    progress: float
+    sharing: Sharing
+    episode: Episode
+    show: Show
+

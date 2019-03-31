@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Union
 
 from trakt.core.exceptions import ClientError
@@ -35,7 +37,7 @@ class Path:
 
     _output_structure: Any
 
-    __bound_client: Optional["AbstractApi"]
+    __bound_client: Optional[AbstractApi]
     __bound_kwargs: Dict[str, Any]
 
     def __init__(
@@ -45,7 +47,7 @@ class Path:
         *,
         methods: Union[str, List[str]] = "GET",
         validators: List[Validator] = None,
-        qargs: Dict[str, str] = None,
+        qargs: List[str] = None,
         aliases: List[str] = None,
         extended: List[str] = None,
         filters: Set[str] = None,
@@ -57,7 +59,7 @@ class Path:
         if isinstance(methods, str):
             methods = [methods]
 
-        self.methods = methods
+        self.methods = [m.upper() for m in methods]
         self.validators = DEFAULT_VALIDATORS + (validators or [])
 
         self.params = path.split("/")
