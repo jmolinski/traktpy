@@ -1,4 +1,5 @@
-from typing import Iterable, List, Optional, Union
+from dataclasses import asdict
+from typing import Dict, Iterable, List, Optional, Union
 
 from trakt.core.models import Episode, Movie, Season, Show
 from trakt.core.paths.path import Path
@@ -114,15 +115,17 @@ class CommentsI(SuiteInterface):
         item: Union[str, int, Movie, Season, Show, Episode],
         comment: str,
         spoiler: bool = False,
-        sharing: Optional[Sharing] = None,
+        sharing: Optional[Union[Sharing, Dict[str, bool]]] = None,
         **kwargs
     ) -> CommentResponse:
-        body = {
+        body: Dict[str, Union[str, int, Dict[str, bool]]] = {
             "item_id": self._generic_get_id(item),
             "comment": comment,
             "spoiler": spoiler,
         }
         if sharing:
+            if isinstance(sharing, Sharing):
+                sharing = asdict(sharing)
             body["sharing"] = sharing
 
         return self.run("post_comment", **kwargs, body=body, comment=comment)
