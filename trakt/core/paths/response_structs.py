@@ -311,3 +311,21 @@ class EpisodeScrobble:
     sharing: Sharing
     episode: Episode
     show: Show
+
+
+@dataclass
+class SeasonStats:
+    watchers: int
+    plays: int
+    collectors: int
+    collected_episodes: int
+    comments: int
+    lists: int
+    votes: int
+
+
+@dataclass
+class RatingsSummary:
+    rating: float
+    votes: int
+    distribution: Dict[str, int]

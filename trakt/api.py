@@ -21,6 +21,7 @@ from trakt.core.paths import (
     RecommendationsI,
     ScrobbleI,
     SearchI,
+    SeasonsI,
     ShowsI,
 )
 
@@ -51,6 +52,7 @@ class TraktApi(AbstractApi):
         search_interface: Optional[Type[SearchI]] = None,
         recommendations_interface: Optional[Type[RecommendationsI]] = None,
         scrobble_interface: Optional[Type[ScrobbleI]] = None,
+        seasons_interface: Optional[Type[SeasonsI]] = None,
         user: Optional[TraktCredentials] = None,
         auto_refresh_token: bool = False,
         **config: str
@@ -90,6 +92,7 @@ class TraktApi(AbstractApi):
             self, Executor
         )
         self.scrobble = (scrobble_interface or ScrobbleI)(self, Executor)
+        self.seasons = (seasons_interface or SeasonsI)(self, Executor)
 
     def request(self, params: Union[str, List[str]], **kwargs: Any) -> Any:
         if isinstance(params, str):
