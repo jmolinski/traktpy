@@ -293,7 +293,8 @@ class SearchResult:
     episode: Optional[Episode] = None
     show: Optional[Show] = None
 
-@dataclass  
+
+@dataclass
 class MovieScrobble:
     id: int
     action: str
@@ -310,4 +311,3 @@ class EpisodeScrobble:
     sharing: Sharing
     episode: Episode
     show: Show
-
