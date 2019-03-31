@@ -20,6 +20,7 @@ from trakt.core.paths import (
     PeopleI,
     RecommendationsI,
     ScrobbleI,
+    SearchI,
     ShowsI,
 )
 
@@ -47,6 +48,7 @@ class TraktApi(AbstractApi):
         people_interface: Optional[Type[PeopleI]] = None,
         networks_interface: Optional[Type[NetworksI]] = None,
         comments_interface: Optional[Type[CommentsI]] = None,
+        search_interface: Optional[Type[SearchI]] = None,
         recommendations_interface: Optional[Type[RecommendationsI]] = None,
         scrobble_interface: Optional[Type[ScrobbleI]] = None,
         user: Optional[TraktCredentials] = None,
@@ -83,6 +85,7 @@ class TraktApi(AbstractApi):
         self.people = (people_interface or PeopleI)(self, Executor)
         self.networks = (networks_interface or NetworksI)(self, Executor)
         self.comments = (comments_interface or CommentsI)(self, Executor)
+        self.search = (search_interface or SearchI)(self, Executor)
         self.recommendations = (recommendations_interface or RecommendationsI)(
             self, Executor
         )
@@ -121,4 +124,5 @@ class TraktApi(AbstractApi):
             self.networks,
             self.recommendations,
             self.scrobble,
+            self.search,
         ]
