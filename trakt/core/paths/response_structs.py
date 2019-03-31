@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Dict, List, Optional
 
 from trakt.core.models import (
@@ -16,7 +16,7 @@ from trakt.core.models import (
 
 @dataclass
 class EpisodePremiere:
-    first_aired: str
+    first_aired: datetime
     episode: Episode
     show: Show
 
@@ -68,7 +68,7 @@ class ListResponse:
 
 @dataclass
 class MoviePremiere:
-    released: str
+    released: date
     movie: Movie
 
 

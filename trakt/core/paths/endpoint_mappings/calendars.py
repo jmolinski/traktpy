@@ -18,9 +18,9 @@ class CalendarsI(SuiteInterface):
 
     base_paths = {
         "get_shows": ["all/shows/?start_date/?days", [EpisodePremiere]],
-        "get_my_shows": ["all/shows/?start_date/?days", [EpisodePremiere]],
+        "get_my_shows": ["my/shows/?start_date/?days", [EpisodePremiere]],
         "get_new_shows": ["all/shows/new/?start_date/?days", [EpisodePremiere]],
-        "get_my_new_shows": ["my/shows/premieres/?start_date/?days", [EpisodePremiere]],
+        "get_my_new_shows": ["my/shows/new/?start_date/?days", [EpisodePremiere]],
         "get_season_premieres": [
             "all/shows/premieres/?start_date/?days",
             [EpisodePremiere],
@@ -45,7 +45,7 @@ class CalendarsI(SuiteInterface):
         self.paths = {k: self._make_path(*r) for k, r in self.base_paths.items()}
 
     def _make_path(self, resource_path: str, return_type: Any) -> Path:
-        extra_validators = [AuthRequiredValidator()] if "_my__" in resource_path else []
+        extra_validators = [AuthRequiredValidator()] if "my/" in resource_path else []
 
         return Path(
             "calendars/" + resource_path,
