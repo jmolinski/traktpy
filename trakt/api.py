@@ -18,6 +18,8 @@ from trakt.core.paths import (
     MoviesI,
     NetworksI,
     PeopleI,
+    RecommendationsI,
+    ScrobbleI,
     ShowsI,
 )
 
@@ -45,6 +47,8 @@ class TraktApi(AbstractApi):
         people_interface: Optional[Type[PeopleI]] = None,
         networks_interface: Optional[Type[NetworksI]] = None,
         comments_interface: Optional[Type[CommentsI]] = None,
+        recommendations_interface: Optional[Type[RecommendationsI]] = None,
+        scrobble_interface: Optional[Type[ScrobbleI]] = None,
         user: Optional[TraktCredentials] = None,
         auto_refresh_token: bool = False,
         **config: str
@@ -79,6 +83,10 @@ class TraktApi(AbstractApi):
         self.people = (people_interface or PeopleI)(self, Executor)
         self.networks = (networks_interface or NetworksI)(self, Executor)
         self.comments = (comments_interface or CommentsI)(self, Executor)
+        self.recommendations = (recommendations_interface or RecommendationsI)(
+            self, Executor
+        )
+        self.scrobble = (scrobble_interface or ScrobbleI)(self, Executor)
 
     def request(self, params: Union[str, List[str]], **kwargs: Any) -> Any:
         if isinstance(params, str):
@@ -111,4 +119,6 @@ class TraktApi(AbstractApi):
             self.movies,
             self.people,
             self.networks,
+            self.recommendations,
+            self.scrobble,
         ]
