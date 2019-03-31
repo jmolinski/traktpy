@@ -286,7 +286,7 @@ class CommentAndItem:
 @dataclass
 class SearchResult:
     type: str
-    score: Optional[float]
+    score: Optional[float] = None
     movie: Optional[Movie] = None
     list: Optional[TraktList] = None
     person: Optional[Person] = None
