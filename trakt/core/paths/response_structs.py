@@ -314,7 +314,7 @@ class EpisodeScrobble:
 
 
 @dataclass
-class SeasonStats:
+class SeasoneEpisodeStats:
     watchers: int
     plays: int
     collectors: int
@@ -329,3 +329,10 @@ class RatingsSummary:
     rating: float
     votes: int
     distribution: Dict[str, int]
+
+
+@dataclass
+class EpisodeTranslation:
+    title: str
+    overview: str
+    language: str
