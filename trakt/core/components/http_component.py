@@ -42,6 +42,7 @@ class DefaultHttpComponent(AbstractComponent):
         headers: Optional[Dict[str, str]] = None,
         no_raise: bool = False,
         return_pagination: bool = False,
+        return_original_response: bool = False,
         only_json: bool = True,
         **kwargs: Any,
     ) -> Any:
@@ -65,7 +66,9 @@ class DefaultHttpComponent(AbstractComponent):
 
         json_response = self._get_json(response, no_raise=no_raise)
 
-        only_json = only_json and not return_code and not return_pagination
+        only_json = only_json and not any(
+            [return_code, return_pagination, return_original_response]
+        )
 
         if only_json:
             return json_response
@@ -76,6 +79,9 @@ class DefaultHttpComponent(AbstractComponent):
 
         if return_pagination:
             res += [self.get_pagination_headers(response)]
+
+        if return_original_response:
+            res += [response]
 
         return res
 

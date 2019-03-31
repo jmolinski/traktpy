@@ -136,6 +136,7 @@ class Person(AbstractBaseModel):
 
 @dataclass
 class Season(AbstractBaseModel):
+    number: int
     ids: Dict[str, MediaForeignIDType]
 
 

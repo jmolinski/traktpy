@@ -4,16 +4,16 @@ from trakt.core.exceptions import ArgumentError
 from trakt.core.models import Comment
 from trakt.core.paths.path import Path
 from trakt.core.paths.response_structs import (
+    Alias,
     AnticipatedMovie,
     BoxOffice,
     CastCrewList,
     Movie,
-    MovieAlias,
-    MovieRatings,
     MovieRelease,
     MovieStats,
     MovieTranslation,
     MovieWithStats,
+    RatingsSummary,
     TraktList,
     TrendingMovie,
     UpdatedMovie,
@@ -55,7 +55,7 @@ class MoviesI(SuiteInterface):
             validators=[PerArgValidator("start_date", is_date)],
         ),
         "get_summary": Path("movies/!id", Movie, extended=["full"]),
-        "get_aliases": Path("movies/!id/aliases", [MovieAlias]),
+        "get_aliases": Path("movies/!id/aliases", [Alias]),
         "get_releases": Path(
             "movies/!id/releases/?country",
             [MovieRelease],
@@ -88,7 +88,7 @@ class MoviesI(SuiteInterface):
             pagination=True,
         ),
         "get_people": Path("movies/!id/people", CastCrewList, extended=["full"]),
-        "get_ratings": Path("movies/!id/ratings", MovieRatings),
+        "get_ratings": Path("movies/!id/ratings", RatingsSummary),
         "get_related": Path(
             "movies/!id/related", [Movie], extended=["full"], pagination=True
         ),
@@ -156,6 +156,10 @@ class MoviesI(SuiteInterface):
         movie_id = self._get_movie_id(movie)
         return self.run("get_summary", **kwargs, id=movie_id)
 
+    def get_aliases(self, *, movie: Union[Movie, str, int], **kwargs) -> List[Alias]:
+        movie_id = self._get_movie_id(movie)
+        return self.run("get_aliases", **kwargs, id=movie_id)
+
     def get_releases(
         self, *, movie: Union[Movie, str, int], country: Optional[str] = None, **kwargs
     ) -> List[MovieRelease]:
@@ -178,7 +182,7 @@ class MoviesI(SuiteInterface):
         self, *, movie: Union[Movie, str, int], sort: str = "newest", **kwargs
     ) -> Iterable[Comment]:
         movie_id = self._get_movie_id(movie)
-        return self.run("get_comments", **kwargs, sort=sort, movie=movie_id)
+        return self.run("get_comments", **kwargs, sort=sort, id=movie_id)
 
     def get_lists(
         self,
@@ -189,24 +193,26 @@ class MoviesI(SuiteInterface):
         **kwargs
     ) -> Iterable[TraktList]:
         movie_id = self._get_movie_id(movie)
-        return self.run("get_lists", **kwargs, type=type, sort=sort, movie=movie_id)
+        return self.run("get_lists", **kwargs, type=type, sort=sort, id=movie_id)
 
     def get_people(self, *, movie: Union[Movie, str, int], **kwargs) -> CastCrewList:
-        return self.run("get_people", **kwargs, movie=self._get_movie_id(movie))
+        return self.run("get_people", **kwargs, id=self._get_movie_id(movie))
 
-    def get_ratings(self, *, movie: Union[Movie, str, int], **kwargs) -> MovieRatings:
-        return self.run("get_ratings", **kwargs, movie=self._get_movie_id(movie))
+    def get_ratings(self, *, movie: Union[Movie, str, int], **kwargs) -> RatingsSummary:
+        return self.run("get_ratings", **kwargs, id=self._get_movie_id(movie))
 
-    def get_related(self, *, movie: Union[Movie, str, int], **kwargs) -> List[Movie]:
-        return self.run("get_related", **kwargs, movie=self._get_movie_id(movie))
+    def get_related(
+        self, *, movie: Union[Movie, str, int], **kwargs
+    ) -> Iterable[Movie]:
+        return self.run("get_related", **kwargs, id=self._get_movie_id(movie))
 
-    def get_stats(self, *, movie: Union[Movie, str, int], **kwargs) -> List[Movie]:
-        return self.run("get_stats", **kwargs, movie=self._get_movie_id(movie))
+    def get_stats(self, *, movie: Union[Movie, str, int], **kwargs) -> MovieStats:
+        return self.run("get_stats", **kwargs, id=self._get_movie_id(movie))
 
     def get_users_watching(
         self, *, movie: Union[Movie, str, int], **kwargs
     ) -> List[User]:
-        return self.run("get_users_watching", **kwargs, movie=self._get_movie_id(movie))
+        return self.run("get_users_watching", **kwargs, id=self._get_movie_id(movie))
 
     def _get_movie_id(self, movie: Union[Movie, str, int]) -> str:
         if isinstance(movie, Movie):
