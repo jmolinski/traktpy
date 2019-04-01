@@ -4,10 +4,12 @@ from typing import Any
 
 import pytest
 from tests.test_data.episodes import EPISODE, EXTENDED_EPISODE
+from tests.test_data.lists import LIST, TRENDING_LISTS, USER
 from tests.test_data.shows import EXTENDED_SHOW, SHOW
 from trakt.core import json_parser
 from trakt.core.exceptions import TraktResponseError
-from trakt.core.models import Episode, Show
+from trakt.core.models import Episode, Show, TraktList, User
+from trakt.core.paths.response_structs import ListResponse
 
 
 @dataclass
@@ -110,6 +112,11 @@ def test_parser_nofail():
 
     sh = json_parser.parse_tree(SHOW, Show)
     shex = json_parser.parse_tree(EXTENDED_SHOW, Show)
+
+    l = json_parser.parse_tree(LIST, TraktList)
+    tl = json_parser.parse_tree(TRENDING_LISTS, [ListResponse])
+
+    u = json_parser.parse_tree(USER, User)
 
 
 def test_parser_datetime():
