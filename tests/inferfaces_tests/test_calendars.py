@@ -1,17 +1,13 @@
 from datetime import date
 
 import pytest
-from tests.client import get_mock_http_component
 from tests.test_data.calendars import MOVIE_PREMIERES, SEASON_PREMIERES, SHOWS
-from trakt import Trakt, TraktCredentials
+from tests.utils import USER, mk_mock_client
 from trakt.core.exceptions import NotAuthenticated
-
-USER = TraktCredentials("", "", "", 10e14)
 
 
 def test_shows():
-    http = get_mock_http_component({r".*calendars/.*/shows.*": [SHOWS, 200]})
-    client = Trakt("", "", http_component=http)
+    client = mk_mock_client({r".*calendars/.*/shows.*": [SHOWS, 200]}, user=None)
 
     with pytest.raises(NotAuthenticated):
         client.calendars.get_my_shows()
@@ -24,8 +20,9 @@ def test_shows():
 
 
 def test_new_shows():
-    http = get_mock_http_component({r".*calendars/(my|all)/shows/new.*": [SHOWS, 200]})
-    client = Trakt("", "", http_component=http)
+    client = mk_mock_client(
+        {r".*calendars/(my|all)/shows/new.*": [SHOWS, 200]}, user=None
+    )
 
     with pytest.raises(NotAuthenticated):
         client.calendars.get_my_new_shows()
@@ -38,10 +35,9 @@ def test_new_shows():
 
 
 def test_season_premieres():
-    http = get_mock_http_component(
+    client = mk_mock_client(
         {r".*calendars/(my|all)/shows/premieres.*": [SEASON_PREMIERES, 200]}
     )
-    client = Trakt("", "", http_component=http, user=USER)
 
     premieres = client.calendars.get_season_premieres()
     my_premieres = client.calendars.get_my_season_premieres()
@@ -58,10 +54,7 @@ def test_season_premieres():
 
 
 def test_movies():
-    http = get_mock_http_component(
-        {r".*calendars/(my|all)/movies.*": [MOVIE_PREMIERES, 200]}
-    )
-    client = Trakt("", "", http_component=http, user=USER)
+    client = mk_mock_client({r".*calendars/(my|all)/movies.*": [MOVIE_PREMIERES, 200]})
 
     movies = client.calendars.get_movies()
     my_movies = client.calendars.get_my_movies()
@@ -72,10 +65,7 @@ def test_movies():
 
 
 def test_dvd():
-    http = get_mock_http_component(
-        {r".*calendars/(my|all)/dvd.*": [MOVIE_PREMIERES, 200]}
-    )
-    client = Trakt("", "", http_component=http, user=USER)
+    client = mk_mock_client({r".*calendars/(my|all)/dvd.*": [MOVIE_PREMIERES, 200]})
 
     dvd = client.calendars.get_dvd_releases()
     my_dvd = client.calendars.get_my_dvd_releases()

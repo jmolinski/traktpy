@@ -1,22 +1,12 @@
-from datetime import date
-
 import pytest
-from tests.client import get_mock_http_component
 from tests.test_data.certifications import CERTIFICATIONS
 from tests.test_data.countries import COUNTRIES
 from tests.test_data.genres import GENRES
 from tests.test_data.languages import LANGUAGES
 from tests.test_data.lists import TRENDING_LISTS
 from tests.test_data.networks import NETWORKS
-from trakt import Trakt, TraktCredentials
+from tests.utils import mk_mock_client
 from trakt.core.exceptions import ArgumentError
-
-USER = TraktCredentials("", "", "", 10e14)
-
-
-def mk_mock_client(endpoints, client_id="", client_secret="", user=None):
-    http = get_mock_http_component(endpoints)
-    return Trakt(client_id, client_secret, http_component=http, user=user or USER)
 
 
 def test_countries():

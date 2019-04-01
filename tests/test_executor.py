@@ -5,9 +5,9 @@ import types
 from dataclasses import asdict
 
 import pytest
-from tests.client import MockRequests
 from tests.test_data.countries import COUNTRIES
 from tests.test_data.oauth import OAUTH_GET_TOKEN
+from tests.utils import MockRequests
 from trakt import Trakt, TraktCredentials
 from trakt.core.components import DefaultHttpComponent
 from trakt.core.exceptions import ClientError

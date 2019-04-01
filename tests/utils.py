@@ -6,6 +6,7 @@ from copy import deepcopy
 from math import ceil
 from typing import Any, Dict, Generator, Iterable, List, Optional
 
+from trakt import Trakt, TraktCredentials
 from trakt.core.components.http_component import DefaultHttpComponent
 
 try:
@@ -114,3 +115,15 @@ def get_mock_http_component(
         )
 
     return wrapper
+
+
+USER = TraktCredentials("", "", "", 10e14)
+
+
+def mk_mock_client(endpoints, client_id="", client_secret="", user=False):
+    return Trakt(
+        client_id,
+        client_secret,
+        http_component=get_mock_http_component(endpoints),
+        user=USER if user is False else None,
+    )
