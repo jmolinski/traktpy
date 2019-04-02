@@ -17,4 +17,5 @@ LIST = {
     "user": USER,
 }
 
-TRENDING_LISTS = [{"like_count": 5, "comment_count": 5, "list": LIST}]
+TRENDING_LISTS = [{"like_count": 5, "comment_count": 5, "list": LIST, "user": USER}]
+TRENDING_LISTS_MISSING_DATA = [{"comment_count": 5, "list": LIST, "user": USER}]

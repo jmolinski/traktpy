@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Union
 
 import jsons  # type: ignore
@@ -15,7 +15,12 @@ def any_deserializer(obj: Any, *args, **kwargs) -> Any:
     return obj
 
 
+def date_deserializer(obj: str, *args, **kwargs) -> Any:
+    return date.fromisoformat(obj)
+
+
 jsons.set_deserializer(any_deserializer, Any)
+jsons.set_deserializer(date_deserializer, date)
 
 #
 

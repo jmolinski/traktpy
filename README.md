@@ -14,10 +14,10 @@ All methods have detailed type annotations. That allows for precise code complet
 ---
 Todo 0.1.0:
 - http component retries etc
-- define all paths & user friendly aliases
 - possibly get rid of abstracts
 - pagination extras (limit exact items, per endpoint default limit?, config)
 - docs
+- tests for interfaces
 - pypi release
 
 ---

@@ -1,8 +1,8 @@
 import json
 
 import pytest
-from tests.client import MockRequests, MockResponse, get_mock_http_component
 from tests.test_data.oauth import OAUTH_GET_TOKEN, OAUTH_VERIFICATION_CODE
+from tests.utils import MockRequests, MockResponse, get_mock_http_component
 from trakt import Trakt, TraktCredentials
 from trakt.core.components.http_component import DefaultHttpComponent
 from trakt.core.components.oauth import CodeResponse
