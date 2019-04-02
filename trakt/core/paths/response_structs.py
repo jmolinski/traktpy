@@ -325,19 +325,13 @@ class SeasoneEpisodeStats:
 
 
 @dataclass
-class RatingsSummary:
-    rating: float
-    votes: int
-    distribution: Dict[str, int]
-
-
-@dataclass
 class EpisodeTranslation:
     title: str
     overview: str
     language: str
 
-@dataclass 
+
+@dataclass
 class ShowWithStats:
     watcher_count: int
     player_count: int
