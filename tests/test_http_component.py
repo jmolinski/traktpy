@@ -62,8 +62,4 @@ def test_add_quargs():
 
     req = client.http._requests.req_map["a"][0]
 
-    url: str = req["path"]
-
-    print(url)
-
-    assert url.endswith(r"/a?arg=abc")
+    assert req["path"].endswith(r"/a?arg=abc")
