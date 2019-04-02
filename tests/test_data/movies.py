@@ -24,3 +24,5 @@ MOVIE_PREMIERES = [
     {"released": "2014-08-01", "movie": MOVIE1},
     {"released": "2014-08-01", "movie": MOVIE2},
 ]
+
+MOVIES = [MOVIE1, MOVIE2]

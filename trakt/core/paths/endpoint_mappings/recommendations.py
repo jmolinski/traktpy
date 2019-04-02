@@ -26,6 +26,7 @@ class RecommendationsI(SuiteInterface):
         "hide_movie": Path(
             "recommendations/movies/!id",
             {},
+            methods="DELETE",
             validators=[AuthRequiredValidator(), ID_VALIDATOR],
         ),
         "get_show_recommendations": Path(
@@ -38,6 +39,7 @@ class RecommendationsI(SuiteInterface):
         "hide_show": Path(
             "recommendations/shows/!id",
             {},
+            methods="DELETE",
             validators=[AuthRequiredValidator(), ID_VALIDATOR],
         ),
     }
