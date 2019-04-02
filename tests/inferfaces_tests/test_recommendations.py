@@ -1,10 +1,10 @@
 import pytest
 from tests.test_data.movies import MOVIE1, MOVIES
+from tests.test_data.shows import SHOW
 from tests.utils import USER, mk_mock_client
 from trakt.core.exceptions import ArgumentError, NotAuthenticated
 from trakt.core.json_parser import parse_tree
 from trakt.core.models import Movie, Show
-from tests.test_data.shows import SHOW
 
 
 def test_recommendations_movies():
