@@ -36,7 +36,7 @@ class TrendingShow:
 @dataclass
 class TrendingMovie:
     watchers: int
-    show: Movie
+    movie: Movie
 
 
 @dataclass
@@ -314,6 +314,30 @@ class EpisodeScrobble:
 
 
 @dataclass
+class SeasoneEpisodeStats:
+    watchers: int
+    plays: int
+    collectors: int
+    collected_episodes: int
+    comments: int
+    lists: int
+    votes: int
+
+
+@dataclass
+class RatingsSummary:
+    rating: float
+    votes: int
+    distribution: Dict[str, int]
+
+
+@dataclass
+class EpisodeTranslation:
+    title: str
+    overview: str
+    language: str
+
+@dataclass 
 class ShowWithStats:
     watcher_count: int
     player_count: int

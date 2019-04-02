@@ -44,12 +44,12 @@ class SuiteInterface:
     @staticmethod
     def _generic_get_id(
         item: Union[Movie, Episode, Show, Season, Comment, str, int]
-    ) -> str:
+    ) -> Union[int, str]:
         if isinstance(item, (int, str)):
-            return str(item)
+            return item
         if isinstance(item, Comment):
-            return str(item.id)
+            return item.id
         elif isinstance(item, (Movie, Episode, Show, Season, TraktList)):
-            return str(item.ids["trakt"])
+            return item.ids["trakt"]
         else:
             raise ArgumentError("item: invalid id")

@@ -139,6 +139,17 @@ class Season(AbstractBaseModel):
     number: int
     ids: Dict[str, MediaForeignIDType]
 
+    rating: Optional[int] = None
+    votes: Optional[int] = None
+    episode_count: Optional[int] = None
+    aired_episodes: Optional[int] = None
+    title: Optional[str] = None
+    overview: Optional[str] = None
+    first_aired: Optional[datetime] = None
+    network: Optional[str] = None
+
+    episodes: Optional[List[Episode]] = None
+
 
 @dataclass
 class Comment:
