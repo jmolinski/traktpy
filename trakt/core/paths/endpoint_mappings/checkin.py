@@ -12,9 +12,9 @@ from trakt.core.paths.response_structs import (
     Show,
 )
 from trakt.core.paths.suite_interface import SuiteInterface
-from trakt.core.paths.validators import AuthRequiredValidator, List, Validator
+from trakt.core.paths.validators import AuthRequiredValidator, PerArgValidator
 
-AUTH_VALIDATOR: List[Validator] = [AuthRequiredValidator()]
+MESSAGE_VALIDATOR = PerArgValidator("message", lambda m: isinstance(m, str))
 
 
 class CheckinI(SuiteInterface):
@@ -22,13 +22,19 @@ class CheckinI(SuiteInterface):
 
     paths = {
         "delete_active_checkins": Path(
-            "checkin", {}, methods="DELETE", validators=AUTH_VALIDATOR
+            "checkin", {}, methods="DELETE", validators=[AuthRequiredValidator()]
         ),
         "check_into_episode": Path(
-            "checkin", EpisodeCheckin, methods="POST", validators=AUTH_VALIDATOR
+            "checkin",
+            EpisodeCheckin,
+            methods="POST",
+            validators=[AuthRequiredValidator(), MESSAGE_VALIDATOR],
         ),
         "check_into_movie": Path(
-            "checkin", MovieCheckin, methods="POST", validators=AUTH_VALIDATOR
+            "checkin",
+            MovieCheckin,
+            methods="POST",
+            validators=[AuthRequiredValidator(), MESSAGE_VALIDATOR],
         ),
     }
 
@@ -38,22 +44,27 @@ class CheckinI(SuiteInterface):
         *,
         movie: Optional[Union[Movie, Dict[str, Any]]] = None,
         episode: Optional[Union[Episode, Dict[str, Any]]] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Union[EpisodeCheckin, MovieCheckin]:
         if movie and episode:
             raise ArgumentError("you must provide exactly one of: [episode, movie]")
 
         if movie:
-            return self.check_into_movie(movie, **kwargs)
+            return self.check_into_movie(movie=movie, **kwargs)
         elif episode:
-            return self.check_into_episode(episode, **kwargs)
+            return self.check_into_episode(episode=episode, **kwargs)
         else:
             raise ArgumentError("you must provide exactly one of: [episode, movie]")
 
     def check_into_episode(
-        self, episode: Union[Episode, Dict[str, Any]], **kwargs
+        self,
+        *,
+        episode: Union[Episode, Dict[str, Any]],
+        message: Optional[str] = None,
+        sharing: Optional[Union[Sharing, Dict[str, str]]] = None,
+        **kwargs,
     ) -> EpisodeCheckin:
-        data = self._prepare_common_data(**kwargs)
+        data = self._prepare_common_data(**kwargs, message=message, sharing=sharing)
 
         if isinstance(episode, Episode):
             episode = {"ids": {"trakt": episode.ids["trakt"]}}
@@ -63,36 +74,46 @@ class CheckinI(SuiteInterface):
             show = kwargs["show"]
             if isinstance(show, Show):
                 show = {"ids": {"trakt": show.ids["trakt"]}}
-            data["show"] = show
+            elif isinstance(show, dict):
+                data["show"] = show
+            else:
+                raise ArgumentError("show: invalid argument value")
 
-        return self.run("check_into_episode", **kwargs, body=data)
+        return self.run("check_into_episode", **data, body=data)
 
     def check_into_movie(
-        self, movie: Union[Movie, Dict[str, Any]], **kwargs
+        self,
+        *,
+        movie: Union[Movie, Dict[str, Any]],
+        message: Optional[str] = None,
+        sharing: Optional[Union[Sharing, Dict[str, str]]] = None,
+        **kwargs,
     ) -> MovieCheckin:
-        data = self._prepare_common_data(**kwargs)
+        data = self._prepare_common_data(**kwargs, message=message, sharing=sharing)
 
         if isinstance(movie, Movie):
             movie = {"ids": {"trakt": movie.ids["trakt"]}}
         data["movie"] = movie
 
-        return self.run("check_into_movie", **kwargs, body=data)
+        return self.run("check_into_movie", **data, body=data)
 
     def _prepare_common_data(
         self, **kwargs: Any
     ) -> Dict[str, Union[str, Dict[str, str]]]:
         d: Dict[str, Union[str, Dict[str, str]]] = {}
 
-        if "sharing" in kwargs:
+        if "sharing" in kwargs and kwargs["sharing"] is not None:
             if isinstance(kwargs["sharing"], Sharing):
                 d["sharing"] = asdict(kwargs["sharing"])
-            else:
+            elif isinstance(kwargs["sharing"], dict):
                 d["sharing"] = kwargs["sharing"]
+            else:
+                raise ArgumentError("sharing: invalid argument value")
 
         for f in ["message", "venue_id", "venue_name", "app_version", "app_date"]:
             if f in kwargs:
                 v = kwargs[f]
-                if v and isinstance(v, str):
+                if v is not None:
                     d[f] = v
 
         return d
