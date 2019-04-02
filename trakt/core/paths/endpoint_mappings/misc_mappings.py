@@ -8,10 +8,9 @@ from trakt.core.paths.response_structs import (
     Language,
     ListResponse,
     Network,
-    TrendingShow,
 )
 from trakt.core.paths.suite_interface import SuiteInterface
-from trakt.core.paths.validators import COMMON_FILTERS, SHOWS_FILTERS, PerArgValidator
+from trakt.core.paths.validators import PerArgValidator
 
 TYPE_MOVIES_SHOWS = PerArgValidator("type", lambda t: t in {"shows", "movies"})
 
@@ -70,23 +69,6 @@ class LanguagesI(SuiteInterface):
 
     def get_languages(self, *, type: str, **kwargs: Any) -> List[Language]:
         return self.run("get_languages", type=type, **kwargs)
-
-
-class ShowsI(SuiteInterface):
-    name = "shows"
-
-    paths = {
-        "get_trending": Path(
-            "shows/trending",
-            [TrendingShow],
-            filters=COMMON_FILTERS | SHOWS_FILTERS,
-            extended=["full"],
-            pagination=True,
-        )
-    }
-
-    def get_trending(self, **kwargs: Any) -> Iterable[TrendingShow]:
-        return self.run("get_trending", **kwargs)
 
 
 class ListsI(SuiteInterface):

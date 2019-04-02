@@ -70,6 +70,8 @@ class Executor:
         path: Path,
         extra_quargs: Optional[Dict[str, str]] = None,
         pagination: bool = False,
+        return_code: bool = False,
+        return_original: bool = False,
         **kwargs: Any,
     ):
         api_path, query_args = path.get_path_and_qargs()
@@ -81,13 +83,20 @@ class Executor:
             query_args=query_args,
             data=kwargs.get("data"),
             return_pagination=pagination,
+            return_code=return_code,
+            return_original=return_original,
+            **kwargs,
         )
 
-        if pagination:
-            (json_response, *r) = response
-            return (json_parser.parse_tree(json_response, path.response_structure), *r)
+        return_extras_enabled = pagination or return_code or return_original
 
-        return json_parser.parse_tree(response, path.response_structure)
+        if return_extras_enabled:
+            return [
+                json_parser.parse_tree(response[0], path.response_structure),
+                *response[1:],
+            ]
+        else:
+            return json_parser.parse_tree(response, path.response_structure)
 
     def make_generator(self, path: Path, **kwargs: Any):
         start_page = int(kwargs.get("page", 1))
