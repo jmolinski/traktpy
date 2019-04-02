@@ -116,7 +116,6 @@ class TraktApi(AbstractApi):
             self.comments,
             self.countries,
             self.genres,
-            self.shows,
             self.languages,
             self.lists,
             self.movies,
@@ -125,4 +124,5 @@ class TraktApi(AbstractApi):
             self.recommendations,
             self.scrobble,
             self.search,
+            self.shows,
         ]

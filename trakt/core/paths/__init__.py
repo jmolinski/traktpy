@@ -10,10 +10,10 @@ from trakt.core.paths.endpoint_mappings.misc_mappings import (
     ListsI,
     NetworksI,
     Path,
-    ShowsI,
 )
 from trakt.core.paths.endpoint_mappings.movies import MoviesI
 from trakt.core.paths.endpoint_mappings.people import PeopleI
 from trakt.core.paths.endpoint_mappings.recommendations import RecommendationsI
 from trakt.core.paths.endpoint_mappings.scrobble import ScrobbleI
 from trakt.core.paths.endpoint_mappings.search import SearchI
+from trakt.core.paths.endpoint_mappings.shows import ShowsI

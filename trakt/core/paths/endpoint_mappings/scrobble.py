@@ -46,14 +46,14 @@ class ScrobbleI(SuiteInterface):
         **kwargs: Any
     ) -> Union[MovieScrobble, EpisodeScrobble]:
         if movie and episode:
-            raise ArgumentError("you can either provide episode or movie, not both")
+            raise ArgumentError("you must provide exactly one of: [episode, movie]")
 
         if movie:
             return self.start_scrobble_movie(movie=movie, **kwargs)
         elif episode:
             return self.start_scrobble_episode(episode=episode, show=show, **kwargs)
         else:
-            raise ArgumentError("missing both episode and movie arguments")
+            raise ArgumentError("you must provide exactly one of: [episode, movie]")
 
     def start_scrobble_movie(
         self, *, movie: Union[Movie, Dict[str, Any]], progress: float, **kwargs
@@ -78,14 +78,14 @@ class ScrobbleI(SuiteInterface):
         **kwargs: Any
     ) -> Union[MovieScrobble, EpisodeScrobble]:
         if movie and episode:
-            raise ArgumentError("you can either provide episode or movie, not both")
+            raise ArgumentError("you must provide exactly one of: [episode, movie]")
 
         if movie:
             return self.pause_scrobble_movie(movie=movie, **kwargs)
         elif episode:
             return self.pause_scrobble_episode(episode=episode, show=show, **kwargs)
         else:
-            raise ArgumentError("missing both episode and movie arguments")
+            raise ArgumentError("you must provide exactly one of: [episode, movie]")
 
     def pause_scrobble_movie(
         self, *, movie: Union[Movie, Dict[str, Any]], progress: float, **kwargs

@@ -41,14 +41,14 @@ class CheckinI(SuiteInterface):
         **kwargs: Any
     ) -> Union[EpisodeCheckin, MovieCheckin]:
         if movie and episode:
-            raise ArgumentError("you can either provide episode or movie, not both")
+            raise ArgumentError("you must provide exactly one of: [episode, movie]")
 
         if movie:
             return self.check_into_movie(movie, **kwargs)
         elif episode:
             return self.check_into_episode(episode, **kwargs)
         else:
-            raise ArgumentError("missing both episode and movie arguments")
+            raise ArgumentError("you must provide exactly one of: [episode, movie]")
 
     def check_into_episode(
         self, episode: Union[Episode, Dict[str, Any]], **kwargs

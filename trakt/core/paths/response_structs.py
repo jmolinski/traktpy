@@ -133,7 +133,7 @@ class UpdatedMovie:
 
 
 @dataclass
-class MovieAlias:
+class Alias:
     title: str
     country: str
 
@@ -186,7 +186,7 @@ class CastCrewList:
 
 
 @dataclass
-class MovieRatings:
+class RatingsSummary:
     rating: float
     votes: int
     distribution: Dict[str, int]
@@ -286,7 +286,7 @@ class CommentAndItem:
 @dataclass
 class SearchResult:
     type: str
-    score: Optional[float]
+    score: Optional[float] = None
     movie: Optional[Movie] = None
     list: Optional[TraktList] = None
     person: Optional[Person] = None
@@ -311,3 +311,94 @@ class EpisodeScrobble:
     sharing: Sharing
     episode: Episode
     show: Show
+
+
+@dataclass
+class ShowWithStats:
+    watcher_count: int
+    player_count: int
+    collected_count: int
+    show: Show
+
+
+@dataclass
+class AnticipatedShow:
+    list_count: int
+    show: Show
+
+
+@dataclass
+class UpdatedShow:
+    updated_at: datetime
+    show: Show
+
+
+@dataclass
+class ShowTranslation:
+    title: str
+    overview: str
+    language: str
+
+
+@dataclass
+class EpisodeCollectionProgress:
+    number: int
+    completed: bool
+    collected_at: Optional[datetime] = None
+
+
+@dataclass
+class SeasonCollectionProgress:
+    number: int
+    aired: int
+    completed: int
+    episodes: EpisodeCollectionProgress
+
+
+@dataclass
+class ShowCollectionProgress:
+    aired: int
+    completed: int
+    last_collected_at: datetime
+    seasons: List[SeasonCollectionProgress]
+    hidden_seasons: List[Season]
+    last_episode: Episode
+    next_episode: Optional[Episode] = None
+
+
+@dataclass
+class EpisodeWatchedProgress:
+    number: int
+    completed: bool
+    last_watched_at: Optional[datetime] = None
+
+
+@dataclass
+class SeasonWatchedProgress:
+    number: int
+    aired: int
+    completed: int
+    episodes: EpisodeWatchedProgress
+
+
+@dataclass
+class ShowWatchedProgress:
+    aired: int
+    completed: int
+    last_watched_at: datetime
+    seasons: List[SeasonWatchedProgress]
+    hidden_seasons: List[Season]
+    last_episode: Episode
+    next_episode: Optional[Episode] = None
+    reset_at: Optional[datetime] = None
+
+
+@dataclass
+class ShowStats:
+    watchers: int
+    plays: int
+    collectors: int
+    collected_episodes: int
+    comments: int
+    lists: int
+    votes: int
