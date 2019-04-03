@@ -11,11 +11,13 @@ Python3.7+ is required to run this library.
 
 All methods have detailed type annotations. That allows for precise code completion both for API calls and accessing response structs.
 
-Library in development.
+Library in development. The docs are not available at the moment. You may use https://trakt.docs.apiary.io/ as a reference.
 
 ---
 
-Sample usage
+# Sample usage
+
+OAuth
 ```python
 from trakt import Trakt
 
@@ -29,6 +31,7 @@ user = client.oauth.get_token(code=code)
 
 ```
 
+Movies, recommendations
 ```python
 from trakt import Trakt
 
@@ -41,6 +44,7 @@ for movie in client.movies.get_trending():
     client.recommendations.hide_movie(movie=movie)
 ```
 
+Scrobble
 ```python
 from trakt import Trakt
 
@@ -55,6 +59,23 @@ print(scrobble_status.movie.title)
 ```
 
 ---
+
+# Exceptions
+The library performs basic argument validation before making the request. 
+You can expect a meaningful error message if there is an obvious problem - trying to access authorized-only endpoint without authorization, invalid argument format, missing required arguments, passing an invalid argument value.
+
+All custom exceptions inherit from `trakt.core.exceptions.TraktError`.
+
+All argument-related validations will raise exceptions inheriting from `trakt.core.exceptions.ArgumentError`.
+
+Authorization errors (user not authenticated) will raise `trakt.core.exceptions.NotAuthenticated`.
+
+Request related errors (4xx-5xx) will raise exceptions inheriting from `trakt.core.exceptions.RequestRelatedError`.
+The exception will have a `code` field: `e.code`.
+
+If the response is corrupt (can't be parsed) the parser will raise `trakt.core.exceptions.TraktResponseError`.
+
+---
 Todo 0.1.0:
 - http component retries
 - possibly get rid of abstracts
@@ -65,7 +86,6 @@ Todo 0.1.0:
 ---
 Todo 0.2.0:
 - sync
-
 - pagination: 
     - custom iter/generator: keep information about page count
     - pagination extras (limit exact items, per endpoint default limit, config)
