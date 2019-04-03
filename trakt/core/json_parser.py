@@ -50,7 +50,7 @@ def _parse_tree(data: Any, tree_structure: Any) -> Any:
         return jsons.load(data, tree_structure)
 
     if level_type == list:
-        return _parse_list(data, single_item_type=tree_structure[0])
+        return _parse_list(data, tree_structure)
 
     if level_type == dict:
         return _parse_dict(data, tree_structure)
@@ -60,16 +60,23 @@ def _is_arbitrary_value(x: Any) -> bool:
     return x.__class__ not in (ITERABLES | {type})
 
 
-def _parse_list(data: List[Any], single_item_type: Any) -> List[Any]:
+def _parse_list(data: List[Any], tree_structure: List[Any]) -> List[Any]:
+    if not tree_structure:
+        return tree_structure
+
+    single_item_type = tree_structure[0]
     if single_item_type is Any:
         return data
-    if data is None:
+    if data is None or not data:
         return []
 
     return [_parse_tree(e, single_item_type) for e in data]
 
 
 def _parse_dict(data: Dict[Any, Any], tree_structure: Dict[Any, Any]) -> Dict[Any, Any]:
+    if not tree_structure:
+        return tree_structure
+
     wildcards = {  # eg {str: str} / {str: Any}
         k: v for k, v in tree_structure.items() if isinstance(k, type)
     }

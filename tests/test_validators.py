@@ -8,6 +8,7 @@ from trakt.core.paths.validators import (
     OptionalArgsValidator,
     PerArgValidator,
     RequiredArgsValidator,
+    is_date,
 )
 
 
@@ -111,3 +112,8 @@ def test_filters_validator():
         for v in v_list:
             with pytest.raises(ArgumentError):
                 FiltersValidator().validate(path=p, **{k: v})
+
+
+def test_is_date():
+    assert is_date("2012-12-05")
+    assert not is_date("201x-12-05")

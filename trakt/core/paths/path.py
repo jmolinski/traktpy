@@ -124,7 +124,15 @@ class Path:
 
             qargs["extended"] = self.__bound_kwargs["extended"]
 
+        qargs = {k: self._stringify_param(v) for k, v in qargs.items()}
+
         return "/".join(parts), qargs
+
+    @staticmethod
+    def _stringify_param(v: Any) -> str:
+        if isinstance(v, bool):
+            return "true" if v else "false"
+        return str(v)
 
     def _get_parsed_filters(self) -> Dict[str, str]:
         m = {}

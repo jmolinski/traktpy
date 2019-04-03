@@ -138,3 +138,11 @@ def test_parser_default_none():
 def test_parser_invalid_structure():
     with pytest.raises(TraktResponseError):
         json_parser.parse_tree([{"a": "b"}], Show)
+
+
+def test_empty_resp():
+    data_list = json_parser.parse_tree([], [])
+    data_dict = json_parser.parse_tree({}, {})
+
+    assert data_dict == {}
+    assert data_list == []

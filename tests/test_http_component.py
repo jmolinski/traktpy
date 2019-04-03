@@ -1,10 +1,12 @@
 # flake8: noqa: F403, F405
 
 import pytest
-from tests.utils import MockRequests
+from tests.utils import MockRequests, mk_mock_client
 from trakt import Trakt
 from trakt.core.components import DefaultHttpComponent
 from trakt.core.exceptions import BadRequest
+from trakt.core.executors import Executor
+from trakt.core.paths.path import Path
 
 
 def test_get_url():
@@ -48,3 +50,16 @@ def test_extra_info_return():
     assert code == 200
     assert pagination["limit"] == 1
     assert pagination["page_count"] == 3
+
+
+def test_add_quargs():
+    client = mk_mock_client({".*": [[], 200]})
+    path = Path("a", [None], qargs=["arg"])
+
+    executor = Executor(client)
+
+    _ = executor.run(path=path, arg="abc")
+
+    req = client.http._requests.req_map["a"][0]
+
+    assert req["path"].endswith(r"/a?arg=abc")

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional
 
@@ -169,14 +169,14 @@ class CrewMember:
 
 @dataclass
 class CrewList:
-    production: List[CrewMember]
-    art: List[CrewMember]
-    crew: List[CrewMember]
-    costume_make_up: List[CrewMember]
-    directing: List[CrewMember]
-    writing: List[CrewMember]
-    sound: List[CrewMember]
-    camera: List[CrewMember]
+    production: List[CrewMember] = field(default_factory=list)
+    art: List[CrewMember] = field(default_factory=list)
+    crew: List[CrewMember] = field(default_factory=list)
+    costume_make_up: List[CrewMember] = field(default_factory=list)
+    directing: List[CrewMember] = field(default_factory=list)
+    writing: List[CrewMember] = field(default_factory=list)
+    sound: List[CrewMember] = field(default_factory=list)
+    camera: List[CrewMember] = field(default_factory=list)
 
 
 @dataclass
@@ -206,14 +206,14 @@ class MovieCrewCredit:
 
 @dataclass
 class MovieCrewCredits:
-    production: List[MovieCrewCredit]
-    art: List[MovieCrewCredit]
-    crew: List[MovieCrewCredit]
-    costume_make_up: List[MovieCrewCredit]
-    directing: List[MovieCrewCredit]
-    writing: List[MovieCrewCredit]
-    sound: List[MovieCrewCredit]
-    camera: List[MovieCrewCredit]
+    production: List[MovieCrewCredit] = field(default_factory=list)
+    art: List[MovieCrewCredit] = field(default_factory=list)
+    crew: List[MovieCrewCredit] = field(default_factory=list)
+    costume_make_up: List[MovieCrewCredit] = field(default_factory=list)
+    directing: List[MovieCrewCredit] = field(default_factory=list)
+    writing: List[MovieCrewCredit] = field(default_factory=list)
+    sound: List[MovieCrewCredit] = field(default_factory=list)
+    camera: List[MovieCrewCredit] = field(default_factory=list)
 
 
 @dataclass
@@ -236,14 +236,14 @@ class ShowCrewCredit:
 
 @dataclass
 class ShowCrewCredits:
-    production: List[ShowCrewCredit]
-    art: List[ShowCrewCredit]
-    crew: List[ShowCrewCredit]
-    costume_make_up: List[ShowCrewCredit]
-    directing: List[ShowCrewCredit]
-    writing: List[ShowCrewCredit]
-    sound: List[ShowCrewCredit]
-    camera: List[ShowCrewCredit]
+    production: List[ShowCrewCredit] = field(default_factory=list)
+    art: List[ShowCrewCredit] = field(default_factory=list)
+    crew: List[ShowCrewCredit] = field(default_factory=list)
+    costume_make_up: List[ShowCrewCredit] = field(default_factory=list)
+    directing: List[ShowCrewCredit] = field(default_factory=list)
+    writing: List[ShowCrewCredit] = field(default_factory=list)
+    sound: List[ShowCrewCredit] = field(default_factory=list)
+    camera: List[ShowCrewCredit] = field(default_factory=list)
 
 
 @dataclass

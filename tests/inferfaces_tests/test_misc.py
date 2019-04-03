@@ -39,7 +39,7 @@ def test_genres():
 
 def test_languages():
     client = mk_mock_client({r".*languages.*": [LANGUAGES, 200]})
-    languages = client.languages.get_languages(type="shows")
+    languages = client.languages.get_languages(type="movies")
     assert languages[0].name == LANGUAGES[0]["name"]
 
 

@@ -61,19 +61,22 @@ class MockRequests:
 
         return response_generator()
 
-    def request(self, method, path, *args, **kwargs):
+    def request(self, method, path, params, *args, **kwargs):
         p = path.split(".tv/" if ".tv" in path else ".com/")[1]
+
+        if params:
+            path += "?" + "&".join([f"{k}={v}" for k, v in params.items()])
 
         # log request
         self.req_map[p].append(
-            {**kwargs, "method": method, "path": path, "resource": p}
+            {**kwargs, "method": method, "path": path, "resource": p, "params": params}
         )
 
         endpoint_identifier = self.find_path(path)
         response = next(self.m[endpoint_identifier])
 
         if endpoint_identifier[2:-2] in self.paginated_endpoints:
-            return self.return_page(response, **kwargs)
+            return self.return_page(response, params=params, **kwargs)
 
         return response
 

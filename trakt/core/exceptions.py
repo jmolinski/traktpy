@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, List, Optional
 
 
-class ClientError(Exception):
+class TraktError(Exception):
     message: str = ""
 
     def __init__(
@@ -16,6 +16,9 @@ class ClientError(Exception):
         if not errors:
             errors = []
         self.errors = errors
+
+
+ClientError = TraktError
 
 
 class NotAuthenticated(ClientError):
