@@ -86,7 +86,7 @@ def test_dispatch():
 
 
 def test_delete_checkins():
-    client = mk_mock_client({r".*checkin.*": [{}, 201]}, user=None)
+    client = mk_mock_client({r".*checkin.*": [{}, 204]}, user=None)
 
     with pytest.raises(NotAuthenticated):
         client.checkin.delete_active_checkins()
