@@ -64,7 +64,9 @@ class CheckinI(SuiteInterface):
         sharing: Optional[Union[Sharing, Dict[str, str]]] = None,
         **kwargs,
     ) -> EpisodeCheckin:
-        data = self._prepare_common_data(**kwargs, message=message, sharing=sharing)
+        data: Dict[str, Any] = self._prepare_common_data(
+            **kwargs, message=message, sharing=sharing
+        )
 
         if isinstance(episode, Episode):
             episode = {"ids": {"trakt": episode.ids["trakt"]}}
@@ -73,7 +75,7 @@ class CheckinI(SuiteInterface):
         if "show" in kwargs:
             show = kwargs["show"]
             if isinstance(show, Show):
-                show = {"ids": {"trakt": show.ids["trakt"]}}
+                data["show"] = {"ids": {"trakt": show.ids["trakt"]}}
             elif isinstance(show, dict):
                 data["show"] = show
             else:

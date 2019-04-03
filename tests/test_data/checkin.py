@@ -13,6 +13,7 @@ CHECKIN_MOVIE = {
         },
     },
 }
+
 CHECKIN_EPISODE = {
     "id": 3373536620,
     "watched_at": "2014-08-06T06:54:36.859Z",
