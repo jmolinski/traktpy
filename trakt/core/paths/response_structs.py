@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from trakt.core.models import (
     Comment,
@@ -99,7 +99,7 @@ class MovieCheckin:
 @dataclass
 class MovieWithStats:
     watcher_count: int
-    player_count: int
+    play_count: int
     collected_count: int
     movie: Movie
 
@@ -142,9 +142,9 @@ class Alias:
 class MovieRelease:
     country: str
     certification: str
-    release_date: datetime
+    release_date: date
     release_type: str
-    note: Any
+    note: Optional[str] = None
 
 
 @dataclass
@@ -334,7 +334,7 @@ class EpisodeTranslation:
 @dataclass
 class ShowWithStats:
     watcher_count: int
-    player_count: int
+    play_count: int
     collected_count: int
     show: Show
 

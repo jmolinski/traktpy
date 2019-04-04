@@ -150,9 +150,7 @@ class MoviesI(SuiteInterface):
     ) -> Iterable[UpdatedMovie]:
         return self.run("get_recently_updated", **kwargs, start_date=start_date)
 
-    def get_summary(
-        self, *, movie: Union[Movie, str, int], **kwargs
-    ) -> Iterable[UpdatedMovie]:
+    def get_summary(self, *, movie: Union[Movie, str, int], **kwargs) -> Movie:
         movie_id = self._get_movie_id(movie)
         return self.run("get_summary", **kwargs, id=movie_id)
 
