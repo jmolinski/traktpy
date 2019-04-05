@@ -103,3 +103,40 @@ RELEASES = [
         "note": None,
     },
 ]
+
+TRANSLATIONS = [
+    {
+        "title": "Batman Begins",
+        "overview": "...",
+        "tagline": "Das Böse fürchtet den Ritter.",
+        "language": "de",
+    }
+]
+
+RATINGS = {
+    "rating": 7.33778,
+    "votes": 7866,
+    "distribution": {
+        "1": 298,
+        "2": 46,
+        "3": 87,
+        "4": 178,
+        "5": 446,
+        "6": 1167,
+        "7": 1855,
+        "8": 1543,
+        "9": 662,
+        "10": 1583,
+    },
+}
+
+RELATED_MOVIES = [MOVIE1, MOVIE2]
+
+MOVIE_STATS = {
+    "watchers": 39204,
+    "plays": 51033,
+    "collectors": 27379,
+    "comments": 36,
+    "lists": 4561,
+    "votes": 7866,
+}

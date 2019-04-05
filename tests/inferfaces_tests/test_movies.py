@@ -1,19 +1,25 @@
 import pytest
+from tests.test_data.comments import COMMENTS
+from tests.test_data.lists import LIST
 from tests.test_data.movies import (
     ALIASES,
     ANTICIPATED_MOVIES,
     BOX_OFFICE,
     EXTENDED_MOVIE,
+    MOVIE_STATS,
     MOVIES,
     PLAYED_MOVIES,
+    RATINGS,
+    RELATED_MOVIES,
     RELEASES,
+    TRANSLATIONS,
     TRENDING_MOVIES,
     UPDATED_MOVIES,
 )
+from tests.test_data.people import MOVIE_ALL_PEOPLE
+from tests.test_data.user import USER
 from tests.utils import mk_mock_client
 from trakt.core.exceptions import ArgumentError
-
-#  160-161, 166-170, 175-179, 184-185, 195-196, 199, 202, 207, 210, 215, 218-223
 
 
 @pytest.fixture
@@ -31,6 +37,14 @@ def movies_client():
             r".*movies/updates.*": [UPDATED_MOVIES, 200, PAG_H],
             r".*movies/.*/aliases.*": [ALIASES, 200],
             r".*movies/.*/releases.*": [RELEASES, 200],
+            r".*movies/.*/translations.*": [TRANSLATIONS, 200],
+            r".*movies/.*/comments.*": [COMMENTS, 200, PAG_H],
+            r".*movies/.*/lists.*": [[LIST], 200, PAG_H],
+            r".*movies/.*/people.*": [MOVIE_ALL_PEOPLE, 200, PAG_H],
+            r".*movies/.*/ratings.*": [RATINGS, 200],
+            r".*movies/.*/related.*": [RELATED_MOVIES, 200, PAG_H],
+            r".*movies/.*/stats.*": [MOVIE_STATS, 200],
+            r".*movies/.*/watching.*": [[USER], 200],
         }
     )
 
@@ -106,3 +120,46 @@ def test_aliases(movies_client):
 def test_releases(movies_client):
     releases = movies_client.movies.get_releases(movie=123, country="us")
     assert releases[0].release_type == RELEASES[0]["release_type"]
+
+
+def test_translations(movies_client):
+    translations = movies_client.movies.get_translations(movie=123, language="de")
+    assert translations[0].title == TRANSLATIONS[0]["title"]
+
+
+def test_comments(movies_client):
+    with pytest.raises(ArgumentError):
+        movies_client.movies.get_comments(movie=123, sort="xtz")
+
+    comments = list(movies_client.movies.get_comments(movie=123))
+    assert comments[0].comment == COMMENTS[0]["comment"]
+
+
+def test_lists(movies_client):
+    lists = list(movies_client.movies.get_lists(movie=123))
+    assert lists[0].comment_count == LIST["comment_count"]
+
+
+def test_get_people(movies_client):
+    people = movies_client.movies.get_people(movie=123)
+    assert people.cast[0].character == MOVIE_ALL_PEOPLE["cast"][0]["character"]
+
+
+def test_ratings(movies_client):
+    ratings = movies_client.movies.get_ratings(movie=123)
+    assert ratings.rating == RATINGS["rating"]
+
+
+def test_related(movies_client):
+    related = list(movies_client.movies.get_related(movie=123))
+    assert related[0].title == RELATED_MOVIES[0]["title"]
+
+
+def test_stats(movies_client):
+    stats = movies_client.movies.get_stats(movie=123)
+    assert stats.watchers == MOVIE_STATS["watchers"]
+
+
+def test_watching(movies_client):
+    watching = list(movies_client.movies.get_users_watching(movie=123))
+    assert watching[0].name == USER["name"]

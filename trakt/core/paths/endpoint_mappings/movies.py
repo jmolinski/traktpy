@@ -1,6 +1,5 @@
 from typing import Any, Iterable, List, Optional, Union
 
-from trakt.core.exceptions import ArgumentError
 from trakt.core.models import Comment
 from trakt.core.paths.path import Path
 from trakt.core.paths.response_structs import (
@@ -213,9 +212,4 @@ class MoviesI(SuiteInterface):
         return self.run("get_users_watching", **kwargs, id=self._get_movie_id(movie))
 
     def _get_movie_id(self, movie: Union[Movie, str, int]) -> str:
-        if isinstance(movie, Movie):
-            return str(movie.ids["trakt"])
-        elif isinstance(movie, (int, str)):
-            return str(movie)
-        else:
-            raise ArgumentError("movie: invalid id")
+        return str(self._generic_get_id(movie))

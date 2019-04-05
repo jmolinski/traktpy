@@ -11,6 +11,10 @@ PERSON = {
     "homepage": "http://www.bryancranston.com/",
 }
 
+MINI_PERSON = {
+    "name": "Bryan Cranston",
+    "ids": {"trakt": 1, "slug": "bryan-cranston", "imdb": "nm0186505", "tmdb": 17419},
+}
 
 MOVIE_CREDITS = {
     "cast": [{"character": "Joe Brody", "movie": MOVIE1}],
@@ -24,4 +28,18 @@ MOVIE_CREDITS = {
 SHOW_CREDITS = {
     "cast": [{"character": "Walter White", "show": SHOW}],
     "crew": {"production": [{"job": "Producer", "show": SHOW}]},
+}
+
+MOVIE_ALL_PEOPLE = {
+    "cast": [
+        {"character": "Sam Flynn", "person": MINI_PERSON},
+        {"character": "Kevin Flynn / Clu", "person": MINI_PERSON},
+    ],
+    "crew": {
+        "production": [{"job": "Casting", "person": MINI_PERSON}],
+        "crew": [{"job": "Supervising Art Director", "person": MINI_PERSON}],
+        "costume & make-up": [{"job": "Costume Design", "person": MINI_PERSON}],
+        "directing": [{"job": "Director", "person": MINI_PERSON}],
+        "writing": [{"job": "Screenplay", "person": MINI_PERSON}],
+    },
 }

@@ -121,5 +121,4 @@ class CheckinI(SuiteInterface):
         return d
 
     def delete_active_checkins(self, **kwargs: Any) -> None:
-        # TODO test delete method
         self.run("delete_active_checkins", **kwargs)
