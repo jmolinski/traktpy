@@ -74,3 +74,103 @@ EXTENDED_SHOW = {
     "genres": ["reality", "romance"],
     "aired_episodes": 20,
 }
+
+PLAYED_SHOWS = [
+    {
+        "watcher_count": 155291,
+        "play_count": 23542030,
+        "collected_count": 6635583,
+        "collector_count": 54953,
+        "show": SHOW,
+    }
+]
+
+ANTICIPATED_SHOWS = [{"list_count": 5383, "show": SHOW}]
+
+UPDATED_SHOWS = [{"updated_at": "2014-09-22T21:56:03.000Z", "show": SHOW}]
+
+TRANSLATIONS = [{"title": "Batman Begins", "overview": "...", "language": "de"}]
+
+SHOW_STATS = {
+    "watchers": 355422,
+    "plays": 18278737,
+    "collectors": 159266,
+    "collected_episodes": 7144637,
+    "comments": 257,
+    "lists": 149488,
+    "votes": 51065,
+}
+
+RELATED_SHOWS = [SHOW]
+
+COLLECTION_PROGRESS = {
+    "aired": 2,
+    "completed": 1,
+    "last_collected_at": "2015-03-21T19:03:58.000Z",
+    "seasons": [
+        {
+            "number": 1,
+            "aired": 1,
+            "completed": 1,
+            "episodes": [
+                {
+                    "number": 1,
+                    "completed": True,
+                    "collected_at": "2015-03-21T19:03:58.000Z",
+                }
+            ],
+        }
+    ],
+    "hidden_seasons": [
+        {"number": 2, "ids": {"trakt": 3051, "tvdb": 498968, "tmdb": 53334}}
+    ],
+    "next_episode": {
+        "season": 1,
+        "number": 7,
+        "title": "Water",
+        "ids": {"trakt": 62315, "tvdb": 4849873, "imdb": None, "tmdb": None},
+    },
+    "last_episode": {
+        "season": 1,
+        "number": 6,
+        "title": "Fire",
+        "ids": {"trakt": 62314, "tvdb": 4849872, "imdb": None, "tmdb": None},
+    },
+}
+
+WATCHED_PROGRESS = {
+    "aired": 8,
+    "completed": 6,
+    "last_watched_at": "2015-03-21T19:03:58.000Z",
+    "reset_at": None,
+    "seasons": [
+        {
+            "number": 1,
+            "aired": 8,
+            "completed": 6,
+            "episodes": [
+                {
+                    "number": 1,
+                    "completed": True,
+                    "last_watched_at": "2015-03-21T19:03:58.000Z",
+                },
+                {"number": 2, "completed": False, "last_watched_at": None},
+            ],
+        }
+    ],
+    "hidden_seasons": [
+        {"number": 2, "ids": {"trakt": 3051, "tvdb": 498968, "tmdb": 53334}}
+    ],
+    "next_episode": {
+        "season": 1,
+        "number": 7,
+        "title": "Water",
+        "ids": {"trakt": 62315, "tvdb": 4849873, "imdb": None, "tmdb": None},
+    },
+    "last_episode": {
+        "season": 1,
+        "number": 6,
+        "title": "Fire",
+        "ids": {"trakt": 62314, "tvdb": 4849872, "imdb": None, "tmdb": None},
+    },
+}

@@ -282,9 +282,7 @@ class ShowsI(SuiteInterface):
     def get_users_watching(
         self, *, show: Union[Show, str, int], **kwargs
     ) -> List[User]:
-        return self.run(
-            "get_users_watching", **kwargs, movie=self._generic_get_id(show)
-        )
+        return self.run("get_users_watching", **kwargs, id=self._generic_get_id(show))
 
     def get_next_episode(
         self, *, show: Union[Show, str, int], **kwargs

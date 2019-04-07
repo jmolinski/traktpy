@@ -371,7 +371,7 @@ class SeasonCollectionProgress:
     number: int
     aired: int
     completed: int
-    episodes: EpisodeCollectionProgress
+    episodes: List[EpisodeCollectionProgress]
 
 
 @dataclass
@@ -397,17 +397,17 @@ class SeasonWatchedProgress:
     number: int
     aired: int
     completed: int
-    episodes: EpisodeWatchedProgress
+    episodes: List[EpisodeWatchedProgress]
 
 
 @dataclass
 class ShowWatchedProgress:
     aired: int
     completed: int
-    last_watched_at: datetime
     seasons: List[SeasonWatchedProgress]
     hidden_seasons: List[Season]
-    last_episode: Episode
+    last_episode: Optional[Episode] = None
+    last_watched_at: Optional[datetime] = None
     next_episode: Optional[Episode] = None
     reset_at: Optional[datetime] = None
 
