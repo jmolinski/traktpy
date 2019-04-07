@@ -34,6 +34,7 @@ class MockRequests:
     def __init__(self, map_of_responses, paginated=None):
         self.m: Dict[str, Generator[MockResponse, None, None]] = {}
         self.req_map = defaultdict(list)
+        self.req_stack = []
         self.paginated_endpoints = paginated or set()
 
         for path, v in map_of_responses.items():
@@ -68,9 +69,15 @@ class MockRequests:
             path += "?" + "&".join([f"{k}={v}" for k, v in params.items()])
 
         # log request
-        self.req_map[p].append(
-            {**kwargs, "method": method, "path": path, "resource": p, "params": params}
-        )
+        req = {
+            **kwargs,
+            "method": method,
+            "path": path,
+            "resource": p,
+            "params": params,
+        }
+        self.req_map[p].append(req)
+        self.req_stack.append(req)
 
         endpoint_identifier = self.find_path(path)
         response = next(self.m[endpoint_identifier])
@@ -130,3 +137,7 @@ def mk_mock_client(endpoints, client_id="", client_secret="", user=False):
         http_component=get_mock_http_component(endpoints),
         user=USER if user is False else None,
     )
+
+
+def get_last_req(http):
+    return http._requests.req_stack[-1]

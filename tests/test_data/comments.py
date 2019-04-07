@@ -1,3 +1,7 @@
+from tests.test_data.movies import MOVIE1
+from tests.test_data.shows import SHOW
+from tests.test_data.user import USER
+
 COMMENT = {
     "id": 8,
     "parent_id": 0,
@@ -20,3 +24,9 @@ COMMENT = {
 }
 
 COMMENTS = [COMMENT]
+
+ATTACHED_SHOW = {"type": "show", "show": SHOW}
+
+LIKED_USER = {"liked_at": "2014-09-01T09:10:11.000Z", "user": USER}
+
+TRENDING_COMMENTS = [{"type": "movie", "movie": MOVIE1, "comment": COMMENT}]

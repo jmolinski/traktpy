@@ -7,6 +7,7 @@ from trakt.core.paths.response_structs import (
     Comment,
     CommentAndItem,
     CommentItemOnly,
+    CommentLiker,
     CommentResponse,
     Sharing,
 )
@@ -60,19 +61,24 @@ class CommentsI(SuiteInterface):
         ),
         "post_reply": Path(
             "comments/!id/replies",
-            [Comment],
+            Comment,
             validators=[
                 AuthRequiredValidator(),
                 COMMENT_ID_VALIDATOR,
                 COMMENT_TEXT_VALIDATOR,
             ],
-            pagination=True,
         ),
         "get_item": Path(
             "comments/!id/item",
             CommentItemOnly,
             validators=[COMMENT_ID_VALIDATOR],
             extended=["full"],
+        ),
+        "get_likes": Path(
+            "comments/!id/likes",
+            [CommentLiker],
+            validators=[COMMENT_ID_VALIDATOR],
+            pagination=True,
         ),
         "like_comment": Path(
             "comments/!id/like",
@@ -172,6 +178,12 @@ class CommentsI(SuiteInterface):
     def get_item(self, *, id: Union[Comment, str, int], **kwargs) -> CommentItemOnly:
         id = int(self._generic_get_id(id))
         return self.run("get_item", **kwargs, id=id)
+
+    def get_likes(
+        self, *, id: Union[Comment, str, int], **kwargs
+    ) -> List[CommentLiker]:
+        id = int(self._generic_get_id(id))
+        return self.run("get_likes", **kwargs, id=id)
 
     def like_comment(self, *, id: Union[Comment, str, int], **kwargs) -> None:
         id = int(self._generic_get_id(id))
