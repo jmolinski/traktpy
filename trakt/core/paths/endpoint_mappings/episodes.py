@@ -34,7 +34,7 @@ class EpisodesI(SuiteInterface):
             validators=[ID_VALIDATOR, SEASON_ID_VALIDATOR, EPISODE_ID_VALIDATOR],
         ),
         "get_translations": Path(
-            "shows/!id/seasons/!season/comments/episodes/!episode/translations/?language",
+            "shows/!id/seasons/!season/episodes/!episode/translations/?language",
             [EpisodeTranslation],
             validators=[
                 ID_VALIDATOR,
@@ -42,10 +42,9 @@ class EpisodesI(SuiteInterface):
                 EPISODE_ID_VALIDATOR,
                 PerArgValidator("language", lambda s: isinstance(s, str)),
             ],
-            pagination=True,
         ),
         "get_comments": Path(
-            "shows/!id/seasons/!season/comments/episodes/!episode/?sort",
+            "shows/!id/seasons/!season/episodes/!episode/comments/?sort",
             [Comment],
             validators=[
                 ID_VALIDATOR,
@@ -85,7 +84,7 @@ class EpisodesI(SuiteInterface):
         ),
     }
 
-    def get_season(
+    def get_episode(
         self,
         *,
         show: Union[Show, str, int],
@@ -96,7 +95,7 @@ class EpisodesI(SuiteInterface):
         id = self._generic_get_id(show)
         season = self._generic_get_id(season)
         episode = self._generic_get_id(episode)
-        return self.run("get_season", **kwargs, id=id, season=season, episode=episode)
+        return self.run("get_episode", **kwargs, id=id, season=season, episode=episode)
 
     def get_comments(
         self,
@@ -122,12 +121,17 @@ class EpisodesI(SuiteInterface):
         episode: Union[Episode, int, str],
         sort: str = "newest",
         **kwargs
-    ) -> Iterable[Comment]:
+    ) -> List[Comment]:
         id = self._generic_get_id(show)
         season = self._generic_get_id(season)
         episode = self._generic_get_id(episode)
         return self.run(
-            "get_comments", **kwargs, sort=sort, id=id, season=season, episode=episode
+            "get_translations",
+            **kwargs,
+            sort=sort,
+            id=id,
+            season=season,
+            episode=episode
         )
 
     def get_lists(
