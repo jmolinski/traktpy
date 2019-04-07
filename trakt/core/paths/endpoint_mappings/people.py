@@ -1,6 +1,5 @@
 from typing import List, Union
 
-from trakt.core.exceptions import ArgumentError
 from trakt.core.models import Person, TraktList
 from trakt.core.paths.endpoint_mappings.movies import LIST_SORT_VALUES, LIST_TYPE_VALUES
 from trakt.core.paths.path import Path
@@ -62,11 +61,5 @@ class PeopleI(SuiteInterface):
         id = self._get_person_id(person)
         return self.run("get_lists", **kwargs, id=id)
 
-    @staticmethod
-    def _get_person_id(p: Union[Person, int, str]) -> str:
-        if isinstance(p, (str, int)):
-            return str(p)
-        elif isinstance(p, Person):
-            return str(p.ids["trakt"])
-        else:
-            raise ArgumentError("person: invalid id")
+    def _get_person_id(self, p: Union[Person, int, str]) -> str:
+        return str(self._generic_get_id(item=p))

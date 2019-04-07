@@ -37,7 +37,7 @@ def test_hide_movie():
     client.set_user(USER)
 
     client.recommendations.hide_movie(movie=movie)
-    client.recommendations.hide_movie(movie=movie.ids["trakt"])
+    client.recommendations.hide_movie(movie=movie.ids.trakt)
 
     reqs = list(client.http._requests.req_map.items())[0]
     req = reqs[1][1]  # [(path, data)] -> data

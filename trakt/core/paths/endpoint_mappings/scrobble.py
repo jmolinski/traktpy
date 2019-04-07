@@ -131,8 +131,8 @@ class ScrobbleI(SuiteInterface):
         data = self._prepare_episode_data(episode, progress, show=kwargs.get("show"))
         return self.run("stop_scrobble_episode", **kwargs, body=data, progress=progress)
 
-    @staticmethod
     def _prepare_episode_data(
+        self,
         episode: Union[Episode, Dict[str, Any]],
         progress: float,
         show: Optional[Union[Show, int, str]] = None,
@@ -140,25 +140,24 @@ class ScrobbleI(SuiteInterface):
         data: Dict[str, Any] = {"progress": progress}
 
         if isinstance(episode, Episode):
-            episode = {"ids": {"trakt": episode.ids["trakt"]}}
+            episode = {"ids": {"trakt": self._generic_get_id(episode)}}
         data["episode"] = episode
 
         if show:
             if isinstance(show, Show):
-                data["show"] = {"ids": {"trakt": show.ids["trakt"]}}
+                data["show"] = {"ids": {"trakt": self._generic_get_id(show)}}
             else:
                 data["show"] = show
 
         return data
 
-    @staticmethod
     def _prepare_movie_data(
-        progress: float, movie: Union[Movie, Dict[str, Any]]
+        self, progress: float, movie: Union[Movie, Dict[str, Any]]
     ) -> Dict[str, Any]:
         data: Dict[str, Any] = {"progress": progress}
 
         if isinstance(movie, Movie):
-            data["movie"] = {"ids": {"trakt": movie.ids["trakt"]}}
+            data["movie"] = {"ids": {"trakt": self._generic_get_id(movie)}}
         else:
             data["movie"] = movie
 

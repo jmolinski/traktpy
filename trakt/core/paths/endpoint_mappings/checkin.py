@@ -69,13 +69,13 @@ class CheckinI(SuiteInterface):
         )
 
         if isinstance(episode, Episode):
-            episode = {"ids": {"trakt": episode.ids["trakt"]}}
+            episode = {"ids": {"trakt": self._generic_get_id(episode)}}
         data["episode"] = episode
 
         if "show" in kwargs:
             show = kwargs["show"]
             if isinstance(show, Show):
-                data["show"] = {"ids": {"trakt": show.ids["trakt"]}}
+                data["show"] = {"ids": {"trakt": self._generic_get_id(show)}}
             elif isinstance(show, dict):
                 data["show"] = show
             else:
@@ -94,7 +94,7 @@ class CheckinI(SuiteInterface):
         data = self._prepare_common_data(**kwargs, message=message, sharing=sharing)
 
         if isinstance(movie, Movie):
-            movie = {"ids": {"trakt": movie.ids["trakt"]}}
+            movie = {"ids": {"trakt": self._generic_get_id(movie)}}
         data["movie"] = movie
 
         return self.run("check_into_movie", **data, body=data)

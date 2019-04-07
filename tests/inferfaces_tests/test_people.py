@@ -14,7 +14,7 @@ def test_get_person():
     with pytest.raises(ArgumentError):
         client.people.get_person(person=0.5)
 
-    assert client.people.get_person(person=person.ids["trakt"]).name == PERSON["name"]
+    assert client.people.get_person(person=person.ids.trakt).name == PERSON["name"]
     assert client.people.get_person(person=person).name == PERSON["name"]
 
 

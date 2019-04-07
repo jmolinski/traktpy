@@ -1,14 +1,9 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import jsons  # type: ignore
 from trakt.core.abstract import AbstractBaseModel
-
-MediaForeignIDType = Union[int, str]
-
-
-# TODO is there a way to do it better? currently not in use
 
 
 def any_deserializer(obj: Any, *args, **kwargs) -> Any:
@@ -22,14 +17,27 @@ def date_deserializer(obj: str, *args, **kwargs) -> Any:
 jsons.set_deserializer(any_deserializer, Any)
 jsons.set_deserializer(date_deserializer, date)
 
-#
+
+@dataclass
+class IDs:
+    trakt: int
+    slug: Optional[str] = None
+    imdb: Optional[str] = None
+    tmdb: Optional[int] = None
+    tvdb: Optional[int] = None
+    tvrage: Optional[int] = None
+
+
+@dataclass
+class SlugId:
+    slug: str
 
 
 @dataclass
 class Show(AbstractBaseModel):
     title: str
     year: int
-    ids: Dict[str, MediaForeignIDType]
+    ids: IDs
 
     overview: Optional[str] = None
     first_aired: Optional[datetime] = None
@@ -58,7 +66,7 @@ class User(AbstractBaseModel):
     name: str
     vip: bool
     vip_ep: bool
-    ids: Dict[str, MediaForeignIDType]
+    ids: SlugId
 
     joined_at: Optional[datetime] = None
     location: Optional[str] = None
@@ -82,7 +90,7 @@ class TraktList(AbstractBaseModel):
     item_count: int
     comment_count: int
     likes: int
-    ids: Dict[str, MediaForeignIDType]
+    ids: IDs
     user: Optional[User] = None
 
 
@@ -91,7 +99,7 @@ class Episode(AbstractBaseModel):
     season: int
     number: int
     title: str
-    ids: Dict[str, MediaForeignIDType] = field(default_factory=dict)
+    ids: IDs
 
     number_abs: Optional[int] = None
     overview: Optional[str] = None
@@ -108,7 +116,7 @@ class Episode(AbstractBaseModel):
 class Movie(AbstractBaseModel):
     title: int
     year: int
-    ids: Dict[str, MediaForeignIDType]
+    ids: IDs
 
     tagline: Optional[str] = None
     overview: Optional[str] = None
@@ -130,7 +138,7 @@ class Movie(AbstractBaseModel):
 @dataclass
 class Person(AbstractBaseModel):
     name: str
-    ids: Dict[str, MediaForeignIDType]
+    ids: IDs
 
     biography: Optional[str] = None
     birthday: Optional[datetime] = None
@@ -142,7 +150,7 @@ class Person(AbstractBaseModel):
 @dataclass
 class Season(AbstractBaseModel):
     number: int
-    ids: Dict[str, MediaForeignIDType]
+    ids: IDs
 
     rating: Optional[int] = None
     votes: Optional[int] = None

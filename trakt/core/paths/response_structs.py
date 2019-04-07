@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from trakt.core.models import (
     Comment,
@@ -187,9 +187,10 @@ class CastCrewList:
 
 @dataclass
 class RatingsSummary:
+
     rating: float
     votes: int
-    distribution: Dict[str, int]
+    distribution: Dict[Any, Any]
 
 
 @dataclass
