@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Type, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Tuple, Type, Union
 
 from trakt.core.exceptions import ArgumentError
 from trakt.core.models import Episode, Movie, Person, Season, Show, TraktList
@@ -22,15 +22,15 @@ class SuiteInterface:
         self.client = client
         self.executor_class = executor
 
-    def find_matching(self, name: Union[List[str], str]) -> List[Path]:
-        poss_paths = self.paths.values()
+    def find_matching(self, name: Union[List[str], str]) -> List[Tuple[Path, Callable]]:
+        poss_paths = self.paths.items()
 
         params = name.split(".") if isinstance(name, str) else name
         if params[0] == self.name:
             params = params[1:]
 
         alias = ".".join(params)
-        return [p for p in poss_paths if p.does_match(alias)]
+        return [(p, getattr(self, k)) for k, p in poss_paths if p.does_match(alias)]
 
     def run(self, command: str, **kwargs: Any) -> Any:
         return self.run_path(path=self._get_path(command), **kwargs)

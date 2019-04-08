@@ -103,12 +103,6 @@ class TraktApi:
     def set_user(self, user: TraktCredentials) -> None:
         self.user = user
 
-    def __getattr__(self, item: str) -> Executor:
-        e = Executor(self, item)
-        e.install(self._get_executor_paths())
-
-        return e
-
     def _get_executor_paths(self) -> List[SuiteInterface]:
         return [
             self.calendars,
