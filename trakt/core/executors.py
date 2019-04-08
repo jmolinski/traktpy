@@ -7,19 +7,19 @@ from trakt.core import json_parser
 from trakt.core.exceptions import ClientError
 
 if TYPE_CHECKING:  # pragma: no cover
-    from trakt.core.abstract import AbstractApi
+    from trakt.api import TraktApi
     from trakt.core.paths.suite_interface import SuiteInterface
     from trakt.core.paths.path import Path
 
 
 class Executor:
     params: List[str]
-    client: AbstractApi
+    client: TraktApi
     paths: List[Path]
     path_suites: List[SuiteInterface]
 
     def __init__(
-        self, client: AbstractApi, params: Union[List[str], str, None] = None
+        self, client: TraktApi, params: Union[List[str], str, None] = None
     ) -> None:
         if isinstance(params, str):
             params = [params]

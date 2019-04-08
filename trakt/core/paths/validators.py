@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import datetime
 import re
-from typing import Any, Callable, Dict, List
+from typing import TYPE_CHECKING, Any, Callable, Dict, List
 
-from trakt.core.abstract import AbstractApi
 from trakt.core.exceptions import ArgumentError, NotAuthenticated
+
+if TYPE_CHECKING:  # pragma: no cover
+    from trakt.api import TraktApi
 
 SINGLE_FILTERS = {"query", "years", "runtimes", "ratings"}
 MULTI_FILTERS = {
@@ -35,13 +37,13 @@ STATUS_FILTER_VALUES = {
 
 class Validator:
     def validate(
-        self, *args: Any, client: AbstractApi, path: Any, **kwargs: Any
+        self, *args: Any, client: TraktApi, path: Any, **kwargs: Any
     ) -> None:  # pragma: no cover
         return None
 
 
 class AuthRequiredValidator(Validator):
-    def validate(self, *args: Any, client: AbstractApi, **kwargs: Any) -> None:
+    def validate(self, *args: Any, client: TraktApi, **kwargs: Any) -> None:
         if not client.user:
             raise NotAuthenticated
 

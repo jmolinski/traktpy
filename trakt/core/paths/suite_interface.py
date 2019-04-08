@@ -7,18 +7,18 @@ from trakt.core.models import Episode, Movie, Person, Season, Show, TraktList
 from trakt.core.paths.response_structs import Comment
 
 if TYPE_CHECKING:  # pragma: no cover
-    from trakt.core.abstract import AbstractApi
+    from trakt.api import TraktApi
     from trakt.core.executors import Executor
     from trakt.core.paths.path import Path
 
 
 class SuiteInterface:
     paths: Dict[str, Path] = {}
-    client: AbstractApi
+    client: TraktApi
     executor_class: Type[Executor]
     name: str
 
-    def __init__(self, client: AbstractApi, executor: Type[Executor]) -> None:
+    def __init__(self, client: TraktApi, executor: Type[Executor]) -> None:
         self.client = client
         self.executor_class = executor
 

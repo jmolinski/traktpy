@@ -1,7 +1,6 @@
 # traktpy
 [![Build Status](https://travis-ci.org/jmolinski/traktpy.svg?branch=master)](https://travis-ci.org/jmolinski/traktpy)
 [![Coverage Status](https://coveralls.io/repos/github/jmolinski/traktpy/badge.svg?branch=master)](https://coveralls.io/github/jmolinski/traktpy?branch=master)
-[![Maintainability](https://api.codeclimate.com/v1/badges/56fa3c9b591a4bf96dfe/maintainability)](https://codeclimate.com/github/jmolinski/traktpy/maintainability)
 
 Python library for accessing the Trakt.tv REST api.
 ---
@@ -78,8 +77,6 @@ If the response is corrupt (can't be parsed) the parser will raise `trakt.core.e
 ---
 Todo 0.1.0:
 - http component retries
-- possibly get rid of abstracts
-- add missing interfaces tests
 - docs
 - pypi release
 

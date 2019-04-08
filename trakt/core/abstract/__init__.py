@@ -1,40 +1,21 @@
 from __future__ import annotations
 
 from dataclasses import asdict
-from typing import TYPE_CHECKING, Optional
-
-from trakt.core.config import Config, TraktCredentials
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
-
-
-class AbstractApi:
-    client_id: str
-    client_secret: str
-    config: Config
-    http: DefaultHttpComponent
-    oauth: DefaultOauthComponent
-    user: Optional[TraktCredentials]
-
-
-class AbstractComponent:
-    name: str = "base_component"
-    client: AbstractApi
-
-    def __init__(self, client: AbstractApi) -> None:
-        self.client = client
+    from trakt.api import TraktApi
 
 
 class AbstractBaseModel:
-    _client = AbstractApi()
+    _client: TraktApi
 
     @classmethod
-    def set_client(cls, client: AbstractApi) -> None:
+    def set_client(cls, client: TraktApi) -> None:
         cls._client = client
 
     @property
-    def client(self) -> AbstractApi:
+    def client(self) -> TraktApi:
         return self._client
 
     def to_dict(self):

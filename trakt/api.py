@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
 
-from trakt.core.abstract import AbstractApi, AbstractBaseModel
+from trakt.core.abstract import AbstractBaseModel
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
-from trakt.core.config import DefaultConfig, TraktCredentials
+from trakt.core.config import Config, DefaultConfig, TraktCredentials
 from trakt.core.executors import Executor
 from trakt.core.paths import (
     CalendarsI,
@@ -30,7 +30,14 @@ if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.paths.suite_interface import SuiteInterface
 
 
-class TraktApi(AbstractApi):
+class TraktApi:
+    client_id: str
+    client_secret: str
+    config: Config
+    http: DefaultHttpComponent
+    oauth: DefaultOauthComponent
+    user: Optional[TraktCredentials]
+
     def __init__(
         self,
         client_id: str,
