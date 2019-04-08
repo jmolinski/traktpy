@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
 
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 from trakt.core.config import Config, DefaultConfig, TraktCredentials
 from trakt.core.executors import Executor
 from trakt.core.models import AbstractBaseModel
 from trakt.core.paths import (
+    DEFAULT_INTERFACES,
     CalendarsI,
     CertificationsI,
     CheckinI,
@@ -38,6 +39,24 @@ class TraktApi:
     oauth: DefaultOauthComponent
     user: Optional[TraktCredentials]
 
+    countries: CountriesI
+    calendars: CalendarsI
+    shows: ShowsI
+    genres: GenresI
+    certifications: CertificationsI
+    languages: LanguagesI
+    lists: ListsI
+    movies: MoviesI
+    checkin: CheckinI
+    people: PeopleI
+    networks: NetworksI
+    comments: CommentsI
+    search: SearchI
+    recommendations: RecommendationsI
+    scrobble: ScrobbleI
+    seasons: SeasonsI
+    episodes: EpisodesI
+
     def __init__(
         self,
         client_id: str,
@@ -45,23 +64,7 @@ class TraktApi:
         *,
         http_component: Optional[Type[DefaultHttpComponent]] = None,
         oauth_component: Optional[Type[DefaultOauthComponent]] = None,
-        countries_interface: Optional[Type[CountriesI]] = None,
-        calendars_interface: Optional[Type[CalendarsI]] = None,
-        shows_interface: Optional[Type[ShowsI]] = None,
-        genres_interface: Optional[Type[GenresI]] = None,
-        certifications_interface: Optional[Type[CertificationsI]] = None,
-        languages_interface: Optional[Type[LanguagesI]] = None,
-        lists_interface: Optional[Type[ListsI]] = None,
-        movies_interface: Optional[Type[MoviesI]] = None,
-        checkin_interface: Optional[Type[CheckinI]] = None,
-        people_interface: Optional[Type[PeopleI]] = None,
-        networks_interface: Optional[Type[NetworksI]] = None,
-        comments_interface: Optional[Type[CommentsI]] = None,
-        search_interface: Optional[Type[SearchI]] = None,
-        recommendations_interface: Optional[Type[RecommendationsI]] = None,
-        scrobble_interface: Optional[Type[ScrobbleI]] = None,
-        seasons_interface: Optional[Type[SeasonsI]] = None,
-        episodes_interface: Optional[Type[EpisodesI]] = None,
+        interfaces: Dict[str, Type[SuiteInterface]] = None,
         user: Optional[TraktCredentials] = None,
         auto_refresh_token: bool = False,
         **config: str
@@ -82,27 +85,11 @@ class TraktApi:
 
         self.http = (http_component or DefaultHttpComponent)(self)
         self.oauth = (oauth_component or DefaultOauthComponent)(self)
-        self.countries = (countries_interface or CountriesI)(self, Executor)
-        self.calendars = (calendars_interface or CalendarsI)(self, Executor)
-        self.shows = (shows_interface or ShowsI)(self, Executor)
-        self.genres = (genres_interface or GenresI)(self, Executor)
-        self.certifications = (certifications_interface or CertificationsI)(
-            self, Executor
-        )
-        self.languages = (languages_interface or LanguagesI)(self, Executor)
-        self.lists = (lists_interface or ListsI)(self, Executor)
-        self.movies = (movies_interface or MoviesI)(self, Executor)
-        self.checkin = (checkin_interface or CheckinI)(self, Executor)
-        self.people = (people_interface or PeopleI)(self, Executor)
-        self.networks = (networks_interface or NetworksI)(self, Executor)
-        self.comments = (comments_interface or CommentsI)(self, Executor)
-        self.search = (search_interface or SearchI)(self, Executor)
-        self.recommendations = (recommendations_interface or RecommendationsI)(
-            self, Executor
-        )
-        self.scrobble = (scrobble_interface or ScrobbleI)(self, Executor)
-        self.seasons = (seasons_interface or SeasonsI)(self, Executor)
-        self.episodes = (episodes_interface or EpisodesI)(self, Executor)
+
+        interfaces = interfaces or {}
+        for i_name, default in DEFAULT_INTERFACES.items():
+            i_obj = interfaces.get(i_name, default)(self, Executor)
+            setattr(self, i_name, i_obj)
 
     def request(self, params: Union[str, List[str]], **kwargs: Any) -> Any:
         if isinstance(params, str):

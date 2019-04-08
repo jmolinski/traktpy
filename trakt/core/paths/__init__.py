@@ -19,3 +19,23 @@ from trakt.core.paths.endpoint_mappings.scrobble import ScrobbleI
 from trakt.core.paths.endpoint_mappings.search import SearchI
 from trakt.core.paths.endpoint_mappings.seasons import SeasonsI
 from trakt.core.paths.endpoint_mappings.shows import ShowsI
+
+DEFAULT_INTERFACES = {
+    "countries": CountriesI,
+    "calendars": CalendarsI,
+    "shows": ShowsI,
+    "genres": GenresI,
+    "certifications": CertificationsI,
+    "languages": LanguagesI,
+    "lists": ListsI,
+    "movies": MoviesI,
+    "checkin": CheckinI,
+    "people": PeopleI,
+    "networks": NetworksI,
+    "comments": CommentsI,
+    "search": SearchI,
+    "recommendations": RecommendationsI,
+    "scrobble": ScrobbleI,
+    "seasons": SeasonsI,
+    "episodes": EpisodesI,
+}
