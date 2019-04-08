@@ -1,9 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import jsons  # type: ignore
-from trakt.core.abstract import AbstractBaseModel
+
+if TYPE_CHECKING:  # pragma: no cover
+    from trakt.api import TraktApi
 
 
 def any_deserializer(obj: Any, *args, **kwargs) -> Any:
@@ -16,6 +18,21 @@ def date_deserializer(obj: str, *args, **kwargs) -> Any:
 
 jsons.set_deserializer(any_deserializer, Any)
 jsons.set_deserializer(date_deserializer, date)
+
+
+class AbstractBaseModel:
+    _client: "TraktApi"
+
+    @classmethod
+    def set_client(cls, client: "TraktApi") -> None:
+        cls._client = client
+
+    @property
+    def client(self) -> "TraktApi":
+        return self._client
+
+    def to_dict(self):
+        return asdict(self)
 
 
 @dataclass

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
 
-from trakt.core.abstract import AbstractBaseModel
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 from trakt.core.config import Config, DefaultConfig, TraktCredentials
 from trakt.core.executors import Executor
+from trakt.core.models import AbstractBaseModel
 from trakt.core.paths import (
     CalendarsI,
     CertificationsI,
