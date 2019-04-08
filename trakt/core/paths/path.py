@@ -13,7 +13,7 @@ from trakt.core.paths.validators import (
 )
 
 if TYPE_CHECKING:  # pragma: no cover
-    from trakt.core.abstract import AbstractApi
+    from trakt.api import TraktApi
 
 DEFAULT_VALIDATORS = [
     RequiredArgsValidator(),
@@ -37,7 +37,7 @@ class Path:
 
     _output_structure: Any
 
-    __bound_client: Optional[AbstractApi]
+    __bound_client: Optional[TraktApi]
     __bound_kwargs: Dict[str, Any]
 
     def __init__(
@@ -82,7 +82,7 @@ class Path:
     def does_match(self, name: str) -> bool:
         return name in self.aliases
 
-    def is_valid(self, client: "AbstractApi", **kwargs: Any) -> bool:
+    def is_valid(self, client: TraktApi, **kwargs: Any) -> bool:
         for v in self.validators:
             v.validate(self, client=client, path=self, **kwargs)  # may raise
 

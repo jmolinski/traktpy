@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import json
 import urllib.parse
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import requests
-from trakt.core.abstract import AbstractApi, AbstractComponent
 from trakt.core.exceptions import (
     BadRequest,
     Conflict,
@@ -21,14 +20,17 @@ from trakt.core.exceptions import (
     UnprocessableEntity,
 )
 
+if TYPE_CHECKING:  # pragma: no cover
+    from trakt.api import TraktApi
 
-class DefaultHttpComponent(AbstractComponent):
+
+class DefaultHttpComponent:
     name = "http"
+    client: TraktApi
     _requests = requests
 
-    def __init__(self, client: AbstractApi, requests_dependency: Any = None) -> None:
-        super().__init__(client)
-
+    def __init__(self, client: TraktApi, requests_dependency: Any = None) -> None:
+        self.client = client
         self._requests = requests_dependency if requests_dependency else requests
 
     def request(

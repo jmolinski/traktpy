@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import time
-from typing import NamedTuple, cast
+from typing import TYPE_CHECKING, NamedTuple, cast
 
-from trakt.core.abstract import AbstractComponent
 from trakt.core.config import TraktCredentials
 from trakt.core.decorators import auth_required
 from trakt.core.exceptions import TraktTimeoutError
+
+if TYPE_CHECKING:  # pragma: no cover
+    from trakt.api import TraktApi
 
 
 class CodeResponse(NamedTuple):
@@ -17,8 +19,12 @@ class CodeResponse(NamedTuple):
     interval: int
 
 
-class DefaultOauthComponent(AbstractComponent):
+class DefaultOauthComponent:
     name = "oauth"
+    client: TraktApi
+
+    def __init__(self, client: TraktApi) -> None:
+        self.client = client
 
     def get_redirect_url(self, *, redirect_uri: str = "", state: str = "") -> str:
         if not redirect_uri:
