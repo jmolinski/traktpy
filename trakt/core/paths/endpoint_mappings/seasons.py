@@ -9,7 +9,7 @@ from trakt.core.paths.endpoint_mappings.movies import (
 from trakt.core.paths.path import Path
 from trakt.core.paths.response_structs import (
     RatingsSummary,
-    SeasoneEpisodeStats,
+    SeasonEpisodeStats,
     Show,
     TraktList,
     User,
@@ -73,7 +73,7 @@ class SeasonsI(SuiteInterface):
         ),
         "get_stats": Path(
             "shows/!id/seasons/!season/stats",
-            SeasoneEpisodeStats,
+            SeasonEpisodeStats,
             validators=[ID_VALIDATOR, SEASON_ID_VALIDATOR],
         ),
         "get_users_watching": Path(
@@ -134,7 +134,7 @@ class SeasonsI(SuiteInterface):
 
     def get_stats(
         self, *, show: Union[Show, str, int], season: Union[Season, str, int], **kwargs
-    ) -> SeasoneEpisodeStats:
+    ) -> SeasonEpisodeStats:
         id = self._generic_get_id(show)
         season = self._generic_get_id(season)
         return self.run("get_stats", **kwargs, id=id, season=season)
