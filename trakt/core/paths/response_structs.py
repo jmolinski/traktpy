@@ -259,8 +259,19 @@ class Network:
 
 
 @dataclass
-class CommentResponse(Comment):
-    sharing: Sharing
+class CommentResponse:
+    id: int
+    created_at: datetime
+    comment: str
+    spoiler: bool
+    review: bool
+    replies: int
+    likes: int
+    user: User
+    parent_id: Optional[int] = None
+    user_rating: Optional[int] = None
+    updated_at: Optional[datetime] = None
+    sharing: Optional[Sharing] = None
 
 
 @dataclass
@@ -371,7 +382,7 @@ class SeasonCollectionProgress:
     number: int
     aired: int
     completed: int
-    episodes: EpisodeCollectionProgress
+    episodes: List[EpisodeCollectionProgress]
 
 
 @dataclass
@@ -397,17 +408,17 @@ class SeasonWatchedProgress:
     number: int
     aired: int
     completed: int
-    episodes: EpisodeWatchedProgress
+    episodes: List[EpisodeWatchedProgress]
 
 
 @dataclass
 class ShowWatchedProgress:
     aired: int
     completed: int
-    last_watched_at: datetime
     seasons: List[SeasonWatchedProgress]
     hidden_seasons: List[Season]
-    last_episode: Episode
+    last_episode: Optional[Episode] = None
+    last_watched_at: Optional[datetime] = None
     next_episode: Optional[Episode] = None
     reset_at: Optional[datetime] = None
 
@@ -421,3 +432,9 @@ class ShowStats:
     comments: int
     lists: int
     votes: int
+
+
+@dataclass
+class CommentLiker:
+    liked_at: datetime
+    user: User

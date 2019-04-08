@@ -43,15 +43,18 @@ class ScrobbleI(SuiteInterface):
         movie: Optional[Union[Movie, Dict[str, Any]]] = None,
         episode: Optional[Union[Episode, Dict[str, Any]]] = None,
         show: Optional[Union[Show, Dict[str, Any]]] = None,
-        **kwargs: Any
+        progress: float,
+        **kwargs: Any,
     ) -> Union[MovieScrobble, EpisodeScrobble]:
         if movie and episode:
             raise ArgumentError("you must provide exactly one of: [episode, movie]")
 
         if movie:
-            return self.start_scrobble_movie(movie=movie, **kwargs)
+            return self.start_scrobble_movie(movie=movie, progress=progress, **kwargs)
         elif episode:
-            return self.start_scrobble_episode(episode=episode, show=show, **kwargs)
+            return self.start_scrobble_episode(
+                episode=episode, show=show, progress=progress, **kwargs
+            )
         else:
             raise ArgumentError("you must provide exactly one of: [episode, movie]")
 
@@ -75,7 +78,7 @@ class ScrobbleI(SuiteInterface):
         movie: Optional[Union[Movie, Dict[str, Any]]] = None,
         episode: Optional[Union[Episode, Dict[str, Any]]] = None,
         show: Optional[Union[Show, Dict[str, Any]]] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Union[MovieScrobble, EpisodeScrobble]:
         if movie and episode:
             raise ArgumentError("you must provide exactly one of: [episode, movie]")
@@ -107,15 +110,15 @@ class ScrobbleI(SuiteInterface):
         movie: Optional[Union[Movie, Dict[str, Any]]] = None,
         episode: Optional[Union[Episode, Dict[str, Any]]] = None,
         show: Optional[Union[Show, Dict[str, Any]]] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Union[MovieScrobble, EpisodeScrobble]:
         if movie and episode:
             raise ArgumentError("you can either provide episode or movie, not both")
 
         if movie:
-            return self.pause_scrobble_movie(movie=movie, **kwargs)
+            return self.stop_scrobble_movie(movie=movie, **kwargs)
         elif episode:
-            return self.pause_scrobble_episode(episode=episode, show=show, **kwargs)
+            return self.stop_scrobble_episode(episode=episode, show=show, **kwargs)
         else:
             raise ArgumentError("missing both episode and movie arguments")
 
