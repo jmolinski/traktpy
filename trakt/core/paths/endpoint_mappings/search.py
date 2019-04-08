@@ -31,10 +31,12 @@ class SearchI(SuiteInterface):
             filters=ALL_FILTERS,
             pagination=True,
             validators=[
-                PerArgValidator("type", lambda t: t in MEDIA_TYPES),
+                PerArgValidator(
+                    "type", lambda t: all(x in MEDIA_TYPES for x in t.split(","))
+                ),
                 PerArgValidator("query", lambda q: isinstance(q, str) and q),
                 PerArgValidator(
-                    "fields", lambda f: [x in POSSIBLE_FIELDS for x in f.split(",")]
+                    "fields", lambda f: all(x in POSSIBLE_FIELDS for x in f.split(","))
                 ),
             ],
             qargs=["fields"],
@@ -49,7 +51,7 @@ class SearchI(SuiteInterface):
                 PerArgValidator("id", lambda t: isinstance(t, (int, str))),
                 PerArgValidator("id_type", lambda it: it in ID_TYPES),
                 PerArgValidator(
-                    "type", lambda f: [x in MEDIA_TYPES for x in f.split(",")]
+                    "type", lambda f: all(x in MEDIA_TYPES for x in f.split(","))
                 ),
             ],
             qargs=["type"],
@@ -80,7 +82,7 @@ class SearchI(SuiteInterface):
         type: Optional[Union[str, List[str]]] = None,
         **kwargs
     ) -> Iterable[SearchResult]:
-        req = {"id_type": type, "id": id}
+        req = {"id_type": id_type, "id": id}
 
         if type:
             type = [type] if isinstance(type, str) else type
