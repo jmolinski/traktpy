@@ -117,6 +117,7 @@ class Executor:
 
 
 T = TypeVar("T")
+PER_PAGE_LIMIT = 100
 
 
 class PaginationIterator(Iterable[T]):
@@ -138,6 +139,7 @@ class PaginationIterator(Iterable[T]):
 
         self._exhausted = False
         self._queue: List[T] = []
+        self._yielded_items = 0
 
     def __iter__(self) -> PaginationIterator[T]:
         if self._exhausted:
@@ -148,6 +150,7 @@ class PaginationIterator(Iterable[T]):
         self._stop_at_page = self._max_pages
 
         self._queue = []
+        self._yielded_items = 0
 
         return self
 
@@ -158,16 +161,17 @@ class PaginationIterator(Iterable[T]):
 
             self._fetch_next_page()
 
+        self._yielded_items += 1
         return self._queue.pop(0)
 
-    def _fetch_next_page(self) -> None:
+    def _fetch_next_page(self, skip_first: int = 0) -> None:
         response, pagination = self._executor.exec_path_call(
             self._path,
             pagination=True,
             extra_quargs={"page": str(self._page), "limit": str(self._per_page)},
         )
 
-        for r in response:
+        for r in response[skip_first:]:
             self._queue.append(r)
 
         self._page += 1
@@ -175,15 +179,25 @@ class PaginationIterator(Iterable[T]):
         self.pages_total = self._stop_at_page
 
     def prefetch_all(self) -> PaginationIterator[T]:
-        """Prefetch all results. Faster than normal iteration."""
+        """Prefetch all results. Optimized."""
         iterator = cast(PaginationIterator[T], iter(self))
 
-        # TODO assert changing per_page doesn't break iteration
-        # old_per_page = self._per_page
-        # self._per_page = 100
+        if not self._has_next_page():
+            return iterator
+
+        # tweak per_page setting to make fetching as fast as possible
+        old_per_page = self._per_page
+        self._per_page = PER_PAGE_LIMIT
+
+        self._page = (self._yielded_items // PER_PAGE_LIMIT) + 1
+        to_skip = (self._yielded_items % PER_PAGE_LIMIT) + len(self._queue)
+
+        self._fetch_next_page(skip_first=to_skip)
+
         while self._has_next_page():
             self._fetch_next_page()
-        # self._per_page = old_per_page
+
+        self._per_page = old_per_page
 
         return iterator
 

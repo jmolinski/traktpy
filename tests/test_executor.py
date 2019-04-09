@@ -1,7 +1,6 @@
 # flake8: noqa: F403, F405
 
 import time
-import types
 from dataclasses import asdict
 
 import pytest
@@ -108,7 +107,7 @@ def test_prefetch_off():
 
 
 def test_prefetch_on():
-    data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    data = list(range(10 ** 4))
     client = mk_mock_client({"pag_on": [data, 200]}, paginated=["pag_on"])
     executor = Executor(client)
     p_pag = Path("pag_on", [int], pagination=True)
@@ -158,3 +157,13 @@ def test_take():
         next(it)
 
     assert it.take(2) == it.take_all() == []
+
+
+def test_chaining():
+    data = list(range(300))
+    client = mk_mock_client({"pag_on": [data, 200]}, paginated=["pag_on"])
+    executor = Executor(client)
+    p_pag = Path("pag_on", [int], pagination=True)
+
+    assert executor.run(path=p_pag, per_page=2).take_all() == data
+    assert executor.run(path=p_pag, per_page=2).prefetch_all().take_all() == data
