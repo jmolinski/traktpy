@@ -1,10 +1,22 @@
 from __future__ import annotations
 
+import itertools
 import time
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from trakt.core import json_parser
-from trakt.core.exceptions import ClientError
+from trakt.core.exceptions import ArgumentError, ClientError
+from trakt.core.models import AbstractBaseModel
 
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.api import TraktApi
@@ -105,7 +117,10 @@ class Executor:
         return [p for s in self.path_suites for p in s.find_matching(self.params)]
 
 
-class PaginationIterator:
+T = TypeVar("T", bound=AbstractBaseModel)
+
+
+class PaginationIterator(Iterable[T]):
     pages_total: Optional[int] = None
 
     def __init__(
@@ -124,7 +139,7 @@ class PaginationIterator:
 
         self._exhausted = False
 
-    def __iter__(self) -> PaginationIterator:
+    def __iter__(self) -> PaginationIterator[T]:
         if self._exhausted:
             return self
 
@@ -132,11 +147,11 @@ class PaginationIterator:
         self._page = self._start_page
         self._stop_at_page = self._max_pages
 
-        self._queue: Any = []  # TODO generic type specification
+        self._queue: List[T] = []
 
         return self
 
-    def __next__(self):
+    def __next__(self) -> T:
         if not self._queue:
             if not self._has_next_page():
                 raise StopIteration()
@@ -159,8 +174,8 @@ class PaginationIterator:
         self._stop_at_page = int(pagination["page_count"])
         self.pages_total = self._stop_at_page
 
-    def prefetch_all(self) -> PaginationIterator:
-        iterator = cast(PaginationIterator, iter(self))
+    def prefetch_all(self) -> PaginationIterator[T]:
+        iterator = cast(PaginationIterator[T], iter(self))
         while self._has_next_page():
             self._fetch_next_page()
 
@@ -168,3 +183,19 @@ class PaginationIterator:
 
     def _has_next_page(self) -> bool:
         return self._page <= self._stop_at_page
+
+    def take(self, n: int) -> List[T]:
+        if not isinstance(n, int) or n < 1:
+            raise ArgumentError(
+                f"argument n={n} is invalid; n must be an int and n >= 1"
+            )
+
+        it = iter(self)
+        return list(itertools.islice(it, n))
+
+    def take_all(self) -> List[T]:
+        self.prefetch_all()
+        return self.take(len(self._queue))
+
+    def has_next(self) -> bool:
+        return bool(self._queue or self._has_next_page())
