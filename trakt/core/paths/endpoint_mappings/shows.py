@@ -1,4 +1,6 @@
-from typing import Any, Dict, Iterable, List, Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from trakt.core.models import Comment
 from trakt.core.paths.endpoint_mappings.movies import (
@@ -45,6 +47,9 @@ PROGRESS_VALIDATORS: List[Validator] = [
     PerArgValidator("count_specials", lambda t: isinstance(t, bool)),
     PerArgValidator("last_activity", lambda t: t in {"collected", "watched"}),
 ]
+
+if TYPE_CHECKING:  # pragma: no cover
+    from trakt.core.executors import PaginationIterator
 
 
 class ShowsI(SuiteInterface):
@@ -168,36 +173,38 @@ class ShowsI(SuiteInterface):
             validators=extra_validators,
         )
 
-    def get_trending(self, **kwargs) -> Iterable[TrendingShow]:
+    def get_trending(self, **kwargs) -> PaginationIterator[TrendingShow]:
         return self.run("get_trending", **kwargs)
 
-    def get_popular(self, **kwargs) -> Iterable[Show]:
+    def get_popular(self, **kwargs) -> PaginationIterator[Show]:
         return self.run("get_popular", **kwargs)
 
     def get_most_played(
         self, *, period: str = "weekly", **kwargs
-    ) -> Iterable[ShowWithStats]:
+    ) -> PaginationIterator[ShowWithStats]:
         return self.run("get_most_played", **kwargs, period=period)
 
     def get_most_watched(
         self, *, period: str = "weekly", **kwargs
-    ) -> Iterable[ShowWithStats]:
+    ) -> PaginationIterator[ShowWithStats]:
         return self.run("get_most_watched", **kwargs, period=period)
 
     def get_most_collected(
         self, *, period: str = "weekly", **kwargs
-    ) -> Iterable[ShowWithStats]:
+    ) -> PaginationIterator[ShowWithStats]:
         return self.run("get_most_collected", **kwargs, period=period)
 
-    def get_most_anticipated(self, **kwargs) -> Iterable[AnticipatedShow]:
+    def get_most_anticipated(self, **kwargs) -> PaginationIterator[AnticipatedShow]:
         return self.run("get_most_anticipated", **kwargs)
 
     def get_recently_updated(
         self, *, start_date: Optional[str] = None, **kwargs
-    ) -> Iterable[UpdatedShow]:
+    ) -> PaginationIterator[UpdatedShow]:
         return self.run("get_recently_updated", **kwargs, start_date=start_date)
 
-    def get_summary(self, *, show: Union[Show, str, int], **kwargs) -> Iterable[Show]:
+    def get_summary(
+        self, *, show: Union[Show, str, int], **kwargs
+    ) -> PaginationIterator[Show]:
         id = self._generic_get_id(show)
         return self.run("get_summary", **kwargs, id=id)
 
@@ -216,7 +223,7 @@ class ShowsI(SuiteInterface):
 
     def get_comments(
         self, *, show: Union[Show, str, int], sort: str = "newest", **kwargs
-    ) -> Iterable[Comment]:
+    ) -> PaginationIterator[Comment]:
         id = self._generic_get_id(show)
         return self.run("get_comments", **kwargs, sort=sort, id=id)
 
@@ -227,7 +234,7 @@ class ShowsI(SuiteInterface):
         type: str = "personal",
         sort: str = "popular",
         **kwargs
-    ) -> Iterable[TraktList]:
+    ) -> PaginationIterator[TraktList]:
         id = self._generic_get_id(show)
         return self.run("get_lists", **kwargs, type=type, sort=sort, id=id)
 
@@ -273,7 +280,9 @@ class ShowsI(SuiteInterface):
     def get_ratings(self, *, show: Union[Show, str, int], **kwargs) -> RatingsSummary:
         return self.run("get_ratings", **kwargs, id=self._generic_get_id(show))
 
-    def get_related(self, *, show: Union[Show, str, int], **kwargs) -> Iterable[Show]:
+    def get_related(
+        self, *, show: Union[Show, str, int], **kwargs
+    ) -> PaginationIterator[Show]:
         return self.run("get_related", **kwargs, id=self._generic_get_id(show))
 
     def get_stats(self, *, show: Union[Show, str, int], **kwargs) -> ShowStats:

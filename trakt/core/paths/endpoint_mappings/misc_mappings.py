@@ -1,4 +1,6 @@
-from typing import Any, Iterable, List
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, List
 
 from trakt.core.paths.path import Path
 from trakt.core.paths.response_structs import (
@@ -13,6 +15,9 @@ from trakt.core.paths.suite_interface import SuiteInterface
 from trakt.core.paths.validators import PerArgValidator
 
 TYPE_MOVIES_SHOWS = PerArgValidator("type", lambda t: t in {"shows", "movies"})
+
+if TYPE_CHECKING:  # pragma: no cover
+    from trakt.core.executors import PaginationIterator
 
 
 class CountriesI(SuiteInterface):
@@ -83,10 +88,10 @@ class ListsI(SuiteInterface):
         ),
     }
 
-    def get_trending(self, **kwargs: Any) -> Iterable[ListResponse]:
+    def get_trending(self, **kwargs: Any) -> PaginationIterator[ListResponse]:
         return self.run("get_trending", **kwargs)
 
-    def get_popular(self, **kwargs: Any) -> Iterable[ListResponse]:
+    def get_popular(self, **kwargs: Any) -> PaginationIterator[ListResponse]:
         return self.run("get_popular", **kwargs)
 
 

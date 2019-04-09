@@ -16,7 +16,6 @@ from typing import (
 
 from trakt.core import json_parser
 from trakt.core.exceptions import ArgumentError, ClientError
-from trakt.core.models import AbstractBaseModel
 
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.api import TraktApi
@@ -117,7 +116,7 @@ class Executor:
         return [p for s in self.path_suites for p in s.find_matching(self.params)]
 
 
-T = TypeVar("T", bound=AbstractBaseModel)
+T = TypeVar("T")
 
 
 class PaginationIterator(Iterable[T]):

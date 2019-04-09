@@ -1,4 +1,6 @@
-from typing import Iterable, List, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List, Union
 
 from trakt.core.models import Comment, Episode, Season
 from trakt.core.paths.endpoint_mappings.movies import (
@@ -21,6 +23,9 @@ from trakt.core.paths.validators import PerArgValidator
 ID_VALIDATOR = PerArgValidator("id", lambda i: isinstance(i, (int, str)))
 SEASON_ID_VALIDATOR = PerArgValidator("season", lambda i: isinstance(i, int))
 EPISODE_ID_VALIDATOR = PerArgValidator("season", lambda i: isinstance(i, int))
+
+if TYPE_CHECKING:  # pragma: no cover
+    from trakt.core.executors import PaginationIterator
 
 
 class EpisodesI(SuiteInterface):
@@ -105,7 +110,7 @@ class EpisodesI(SuiteInterface):
         episode: Union[Episode, int, str],
         sort: str = "newest",
         **kwargs
-    ) -> Iterable[Comment]:
+    ) -> PaginationIterator[Comment]:
         id = self._generic_get_id(show)
         season = self._generic_get_id(season)
         episode = self._generic_get_id(episode)
@@ -143,7 +148,7 @@ class EpisodesI(SuiteInterface):
         type: str = "personal",
         sort: str = "popular",
         **kwargs
-    ) -> Iterable[TraktList]:
+    ) -> PaginationIterator[TraktList]:
         id = self._generic_get_id(show)
         season = self._generic_get_id(season)
         episode = self._generic_get_id(episode)
