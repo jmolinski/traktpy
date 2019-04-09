@@ -10,7 +10,7 @@ from tests.test_data.oauth import OAUTH_GET_TOKEN
 from tests.utils import MockRequests, get_last_req, mk_mock_client
 from trakt import Trakt, TraktCredentials
 from trakt.core.components import DefaultHttpComponent
-from trakt.core.exceptions import ClientError
+from trakt.core.exceptions import ArgumentError, ClientError
 from trakt.core.executors import Executor, PaginationIterator
 from trakt.core.paths import Path
 
@@ -127,3 +127,34 @@ def test_prefetch_on():
     # execute prefetched -> assert no new requests
     list(req)
     assert get_last_req(client.http) is None
+
+
+def test_take():
+    data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    client = mk_mock_client({"pag_on": [data, 200]}, paginated=["pag_on"])
+    executor = Executor(client)
+    p_pag = Path("pag_on", [int], pagination=True)
+
+    it = executor.run(path=p_pag, per_page=2)
+    assert it.has_next()
+    assert isinstance(next(it), int)
+    assert next(it) == 2
+    assert it.has_next()
+
+    assert it.take(3) == [3, 4, 5]
+    assert it.has_next()
+
+    with pytest.raises(ArgumentError):
+        it.take(-5)
+
+    assert it.take(0) == []
+    assert it.take() == [6, 7]  # per_page setting
+    assert it.has_next()
+
+    assert it.take_all() == [8, 9, 10]
+    assert not it.has_next()
+
+    with pytest.raises(StopIteration):
+        next(it)
+
+    assert it.take(2) == it.take_all() == []

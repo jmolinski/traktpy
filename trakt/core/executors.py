@@ -137,6 +137,7 @@ class PaginationIterator(Iterable[T]):
         self._max_pages = max_pages
 
         self._exhausted = False
+        self._queue: List[T] = []
 
     def __iter__(self) -> PaginationIterator[T]:
         if self._exhausted:
@@ -146,7 +147,7 @@ class PaginationIterator(Iterable[T]):
         self._page = self._start_page
         self._stop_at_page = self._max_pages
 
-        self._queue: List[T] = []
+        self._queue = []
 
         return self
 
@@ -174,17 +175,27 @@ class PaginationIterator(Iterable[T]):
         self.pages_total = self._stop_at_page
 
     def prefetch_all(self) -> PaginationIterator[T]:
+        """Prefetch all results. Faster than normal iteration."""
         iterator = cast(PaginationIterator[T], iter(self))
+
+        # TODO assert changing per_page doesn't break iteration
+        # old_per_page = self._per_page
+        # self._per_page = 100
         while self._has_next_page():
             self._fetch_next_page()
+        # self._per_page = old_per_page
 
         return iterator
 
     def _has_next_page(self) -> bool:
         return self._page <= self._stop_at_page
 
-    def take(self, n: int) -> List[T]:
-        if not isinstance(n, int) or n < 1:
+    def take(self, n: int = -1) -> List[T]:
+        """Take n next results. By default returns per_page results."""
+        if n == -1:
+            n = self._per_page
+
+        if not isinstance(n, int) or n < 0:
             raise ArgumentError(
                 f"argument n={n} is invalid; n must be an int and n >= 1"
             )
@@ -193,8 +204,13 @@ class PaginationIterator(Iterable[T]):
         return list(itertools.islice(it, n))
 
     def take_all(self) -> List[T]:
+        """Take all available results."""
         self.prefetch_all()
         return self.take(len(self._queue))
 
     def has_next(self) -> bool:
+        """Check if there are any results left."""
+        if not self._exhausted:
+            iter(self)
+
         return bool(self._queue or self._has_next_page())
