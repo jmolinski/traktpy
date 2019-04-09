@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union
 
 from trakt.core import json_parser
 from trakt.core.exceptions import ClientError
@@ -15,18 +15,11 @@ if TYPE_CHECKING:  # pragma: no cover
 class Executor:
     params: List[str]
     client: TraktApi
-    paths: List[Path]
     path_suites: List[SuiteInterface]
 
-    def __init__(
-        self, client: TraktApi, params: Union[List[str], str, None] = None
-    ) -> None:
-        if isinstance(params, str):
-            params = [params]
-
+    def __init__(self, client: TraktApi, params: Union[List[str], None] = None) -> None:
         self.params = params or []
         self.client = client
-        self.paths = []
         self.path_suites = []
 
         if self.client.config["auto_refresh_token"] and self.client.user:
@@ -35,35 +28,32 @@ class Executor:
             if expires_in < self.client.config["oauth"]["refresh_token_s"]:
                 self.client.oauth.refresh_token()
 
-    def __getattr__(self, param: str) -> Executor:
-        self.params.append(param)
-        return self
-
     def __repr__(self) -> str:  # pragma: no cover
         return f'Executor(params={".".join(self.params)})'
-
-    def __call__(self, **kwargs: Any) -> Any:
-        return self.run(**kwargs)
 
     def install(self, suites: List[SuiteInterface]) -> None:
         self.path_suites.extend(suites)
 
     def run(self, *, path: Optional[Path] = None, **kwargs: Any) -> Any:
         if not path:
-            matching_paths = self.find_matching_path()
+            return self._delegate_to_interface(**kwargs)
 
-            if len(matching_paths) != 1:
-                raise ClientError("Ambiguous call: matching paths # has to be 1")
-
-            path = matching_paths[0]
-
-        if not path.is_valid(self.client, **kwargs):
-            raise ClientError("Invalid call!")
+        path.is_valid(self.client, **kwargs)  # raises
 
         if path.pagination:
             return self.make_generator(path, **kwargs)
 
         return self.exec_path_call(path, **kwargs)
+
+    def _delegate_to_interface(self, **kwargs):
+        matching_paths = self.find_matching_path()
+
+        if len(matching_paths) != 1:
+            raise ClientError("Ambiguous call: matching paths # has to be 1")
+
+        path, interface_handler = matching_paths[0]
+
+        return interface_handler(**kwargs)
 
     def exec_path_call(
         self,
@@ -121,5 +111,5 @@ class Executor:
 
         return generator()
 
-    def find_matching_path(self) -> List[Path]:
+    def find_matching_path(self) -> List[Tuple[Path, Callable]]:
         return [p for s in self.path_suites for p in s.find_matching(self.params)]

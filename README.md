@@ -76,7 +76,6 @@ If the response is corrupt (can't be parsed) the parser will raise `trakt.core.e
 
 ---
 Todo 0.1.0:
-- http component retries
 - docs
 - pypi release
 
@@ -89,3 +88,4 @@ Todo 0.2.0:
 - methods on models (episode.rate() etc)
 - user profile
 - caching (networks, countries etc)
+- http component retries

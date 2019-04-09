@@ -5,9 +5,8 @@ import types
 from dataclasses import asdict
 
 import pytest
-from tests.test_data.countries import COUNTRIES
 from tests.test_data.oauth import OAUTH_GET_TOKEN
-from tests.utils import MockRequests
+from tests.utils import MockRequests, mk_mock_client
 from trakt import Trakt, TraktCredentials
 from trakt.core.components import DefaultHttpComponent
 from trakt.core.exceptions import ClientError
@@ -17,23 +16,16 @@ from trakt.core.paths import Path
 
 def test_executor():
     response = [{"name": "Australia", "code": "au"}]
-    http = lambda client: DefaultHttpComponent(
-        client, requests_dependency=MockRequests({".*": [response, 200]})
-    )
+    client = mk_mock_client({".*": [response, 200]})
 
-    client = Trakt("", "", http_component=http)
+    assert len(client.request("countries", type="shows")) == len(response)
+    assert len(client.request("countries.get_countries", type="shows")) == len(response)
 
-    assert client.request("countries", type="shows") == client.request(
-        "get_countries", type="shows"
-    )
-    assert client.request(
-        "countries.get_countries", type="shows"
-    ) == client.get_countries(type="shows")
-    assert len(client.get_countries(type="shows")) == len(response)
-    assert [asdict(s) for s in client.get_countries(type="shows")] == response
+    countries = client.request("get_countries", type="shows")
+    assert [asdict(s) for s in countries] == response
 
     with pytest.raises(ClientError):
-        client.count(type="shows")
+        client.request("count", type="shows")
 
 
 TOKEN_REFRESH_HTTP = lambda client: DefaultHttpComponent(
@@ -48,7 +40,7 @@ def test_refresh_token_off():
     credentials = TraktCredentials("access", "refresh", "scope", 100)
 
     client = Trakt("", "", http_component=TOKEN_REFRESH_HTTP, user=credentials)
-    client.get_countries(type="shows")
+    client.countries.get_countries(type="shows")
 
     assert client.user.refresh_token == "refresh"
     assert client.user.access_token == "access"
@@ -60,7 +52,7 @@ def test_refresh_token_on():
     # token is not going to expire soon (should not refresh)
     expire_at = int(time.time()) + 2 * 30 * 24 * 60 * 60  # 60 days
     client.set_user(TraktCredentials("access", "refresh", "scope", expire_at))
-    client.get_countries(type="shows")
+    client.countries.get_countries(type="shows")
 
     assert client.user.refresh_token == "refresh"
     assert client.user.access_token == "access"
@@ -68,7 +60,7 @@ def test_refresh_token_on():
     # token is going to expire soon
     expire_at = int(time.time()) + 15 * 24 * 60 * 60  # 15 days
     client.set_user(TraktCredentials("access", "refresh", "scope", expire_at))
-    client.get_countries(type="shows")
+    client.countries.get_countries(type="shows")
 
     assert client.user.refresh_token == OAUTH_GET_TOKEN["refresh_token"]
     assert client.user.access_token == OAUTH_GET_TOKEN["access_token"]

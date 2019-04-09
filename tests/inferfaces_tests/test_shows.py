@@ -154,12 +154,13 @@ def test_watching(shows_client):
     assert watching[0].name == USER["name"]
 
 
-def test_next_episode():
-    def next_ep_responses():
-        yield MockResponse({}, 204)
-        yield MockResponse(EXTENDED_EPISODE, 200)
+def next_last_ep_responses():
+    yield MockResponse({}, 204)
+    yield MockResponse(EXTENDED_EPISODE, 200)
 
-    client = mk_mock_client({".*shows.*": next_ep_responses()})
+
+def test_next_episode():
+    client = mk_mock_client({".*shows.*": next_last_ep_responses()})
 
     no_ep = client.shows.get_next_episode(show=123, extended=True)
     ep = client.shows.get_next_episode(show=123, extended=True)
@@ -169,11 +170,7 @@ def test_next_episode():
 
 
 def test_last_episode():
-    def next_ep_responses():
-        yield MockResponse({}, 204)
-        yield MockResponse(EXTENDED_EPISODE, 200)
-
-    client = mk_mock_client({".*shows.*": next_ep_responses()})
+    client = mk_mock_client({".*shows.*": next_last_ep_responses()})
 
     no_ep = client.shows.get_last_episode(show=123, extended=True)
     ep = client.shows.get_last_episode(show=123, extended=True)

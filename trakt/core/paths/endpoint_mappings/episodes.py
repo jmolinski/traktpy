@@ -10,7 +10,7 @@ from trakt.core.paths.path import Path
 from trakt.core.paths.response_structs import (
     EpisodeTranslation,
     RatingsSummary,
-    SeasoneEpisodeStats,
+    SeasonEpisodeStats,
     Show,
     TraktList,
     User,
@@ -73,7 +73,7 @@ class EpisodesI(SuiteInterface):
         ),
         "get_stats": Path(
             "shows/!id/seasons/!season/episodes/!episode/stats",
-            SeasoneEpisodeStats,
+            SeasonEpisodeStats,
             validators=[ID_VALIDATOR, SEASON_ID_VALIDATOR, EPISODE_ID_VALIDATOR],
         ),
         "get_users_watching": Path(
@@ -177,7 +177,7 @@ class EpisodesI(SuiteInterface):
         season: Union[Season, str, int],
         episode: Union[Episode, int, str],
         **kwargs
-    ) -> SeasoneEpisodeStats:
+    ) -> SeasonEpisodeStats:
         id = self._generic_get_id(show)
         season = self._generic_get_id(season)
         episode = self._generic_get_id(episode)

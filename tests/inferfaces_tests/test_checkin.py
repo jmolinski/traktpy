@@ -3,7 +3,7 @@ from tests.test_data.checkin import CHECKIN_EPISODE, CHECKIN_MOVIE
 from tests.test_data.episodes import EPISODE
 from tests.test_data.movies import MOVIE1
 from tests.test_data.shows import SHOW
-from tests.utils import USER, mk_mock_client
+from tests.utils import USER, get_last_req, mk_mock_client
 from trakt.core.exceptions import ArgumentError, NotAuthenticated
 from trakt.core.json_parser import parse_tree
 from trakt.core.models import Episode, Movie, Show
@@ -94,3 +94,4 @@ def test_delete_checkins():
     client.set_user(USER)
 
     client.checkin.delete_active_checkins()
+    assert get_last_req(client.http)["method"] == "DELETE"

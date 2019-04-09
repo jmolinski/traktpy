@@ -1,7 +1,7 @@
 import pytest
 from tests.test_data.movies import MOVIE1, MOVIES
 from tests.test_data.shows import SHOW
-from tests.utils import USER, mk_mock_client
+from tests.utils import USER, get_last_req, mk_mock_client
 from trakt.core.exceptions import ArgumentError, NotAuthenticated
 from trakt.core.json_parser import parse_tree
 from trakt.core.models import Movie, Show
@@ -39,10 +39,7 @@ def test_hide_movie():
     client.recommendations.hide_movie(movie=movie)
     client.recommendations.hide_movie(movie=movie.ids.trakt)
 
-    reqs = list(client.http._requests.req_map.items())[0]
-    req = reqs[1][1]  # [(path, data)] -> data
-
-    assert req["method"] == "DELETE"
+    assert get_last_req(client.http)["method"] == "DELETE"
 
 
 def test_recommendations_shows():
@@ -72,7 +69,4 @@ def test_hide_show():
 
     client.recommendations.hide_show(show=show)
 
-    reqs = list(client.http._requests.req_map.items())[0]
-    req = reqs[1][0]  # [(path, data)] -> data
-
-    assert req["method"] == "DELETE"
+    assert get_last_req(client.http)["method"] == "DELETE"
