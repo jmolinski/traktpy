@@ -87,7 +87,20 @@ def _parse_dict(data: Dict[Any, Any], tree_structure: Dict[Any, Any]) -> Dict[An
         if (k not in wildcards) and _is_arbitrary_value(v)
     }
 
-    result = dict()
+    result = __parse_dict_items(data, tree_structure, wildcards)
+
+    # set defaults if any keys are missing
+    for k, v in defaults.items():
+        if k not in result:
+            result[k] = v
+
+    return result
+
+
+def __parse_dict_items(
+    data: Dict[Any, Any], tree_structure: Dict[Any, Any], wildcards: Dict[type, Any]
+):
+    result = {}
     for k, v in data.items():
         if k in tree_structure:
             # v may be a default value -> use its type as subtree type
@@ -98,10 +111,5 @@ def _parse_dict(data: Dict[Any, Any], tree_structure: Dict[Any, Any]) -> Dict[An
         elif k.__class__ in wildcards:
             wildcard = wildcards[k.__class__]
             result[k] = v if wildcard is Any else _parse_tree(v, wildcard)
-
-    # set defaults if any keys are missing
-    for k, v in defaults.items():
-        if k not in result:
-            result[k] = v
 
     return result
