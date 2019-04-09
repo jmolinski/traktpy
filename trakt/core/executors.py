@@ -5,13 +5,13 @@ import time
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable
+    Callable,
     Dict,
     Iterable,
     List,
     Optional,
+    Tuple,
     TypeVar,
-    Tuple
     Union,
     cast,
 )
@@ -111,7 +111,7 @@ class Executor:
     def find_matching_path(self) -> List[Tuple[Path, Callable]]:
         return [p for s in self.path_suites for p in s.find_matching(self.params)]
 
-      
+
 T = TypeVar("T")
 PER_PAGE_LIMIT = 100
 
