@@ -83,9 +83,6 @@ Todo 0.1.0:
 ---
 Todo 0.2.0:
 - sync
-- pagination: 
-    - custom iter/generator: keep information about page count
-    - pagination extras (limit exact items, per endpoint default limit, config)
 - methods on models (episode.rate() etc)
 - user profile
 - caching (networks, countries etc)
