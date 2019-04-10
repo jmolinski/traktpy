@@ -8,6 +8,7 @@ from tests.test_data.oauth import OAUTH_GET_TOKEN
 from tests.utils import MockRequests, get_last_req, mk_mock_client
 from trakt import Trakt, TraktCredentials
 from trakt.core.components import DefaultHttpComponent
+from trakt.core.components.cache import FrozenRequest
 from trakt.core.exceptions import ArgumentError, ClientError
 from trakt.core.executors import Executor, PaginationIterator
 from trakt.core.paths import Path
@@ -99,7 +100,7 @@ def test_prefetch_off():
 
 
 def test_prefetch_on():
-    data = list(range(10 ** 4))
+    data = list(range(10 ** 3))
     client = mk_mock_client({"pag_on": [data, 200]}, paginated=["pag_on"])
     executor = Executor(client)
     p_pag = Path("pag_on", [int], pagination=True)
@@ -159,3 +160,28 @@ def test_chaining():
 
     assert executor.run(path=p_pag, per_page=2).take_all() == data
     assert executor.run(path=p_pag, per_page=2).prefetch_all().take_all() == data
+
+
+def test_use_cached():
+    client = mk_mock_client({".*": [[], 200]})
+
+    client.networks.get_networks()
+    client.networks.get_networks()
+
+    assert len(client.http._requests.req_stack) == 1
+
+
+def test_cache_timeout():
+    client = mk_mock_client({".*": [[], 200]}, cache={"timeout": -1})
+
+    client.networks.get_networks()
+    client.networks.get_networks()
+
+    assert len(client.http._requests.req_stack) == 2
+
+
+def test_cache_get():
+    client = mk_mock_client({})
+
+    with pytest.raises(LookupError):
+        client.cache.get(FrozenRequest("", {}, {}, None))

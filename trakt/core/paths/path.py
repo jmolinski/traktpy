@@ -108,7 +108,7 @@ class Path:
             return self.__bound_kwargs.get(arg_name)
 
     def get_path_and_qargs(self) -> Tuple[str, Dict[str, Any]]:
-        if not self.is_bound():
+        if not self.is_bound():  # pragma: no cover
             raise ClientError("call .is_valid first!")
 
         parts = [self._get_param_value(p) for p in self.params]

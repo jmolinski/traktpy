@@ -131,13 +131,14 @@ USER = TraktCredentials("", "", "", 10e14)
 
 
 def mk_mock_client(
-    endpoints, client_id="", client_secret="", user=False, paginated=None
+    endpoints, client_id="", client_secret="", user=False, paginated=None, **config
 ):
     return Trakt(
         client_id,
         client_secret,
         http_component=get_mock_http_component(endpoints, paginated=paginated),
         user=USER if user is False else None,
+        **config,
     )
 
 

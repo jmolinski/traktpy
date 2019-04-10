@@ -3,8 +3,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any, Dict
 
-from trakt.core.exceptions import ClientError
-
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.api import TraktApi
 
@@ -26,10 +24,8 @@ class CacheManager:
             return False
         elif level == "basic":
             return max_allowed in {"basic", "full"}
-        elif level == "full":
+        else:  # "full"
             return max_allowed == "full"
-        else:
-            raise ClientError("invalid cache level")
 
     def get(self, wanted: FrozenRequest) -> FrozenRequest:
         if not self.has(wanted):
@@ -79,4 +75,4 @@ class FrozenRequest:
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, FrozenRequest):
             return self._unique_id == other._unique_id
-        return False
+        return False  # pragma: no cover
