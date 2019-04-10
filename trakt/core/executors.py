@@ -82,7 +82,7 @@ class Executor:
         self, path: Path, extra_quargs: Optional[Dict[str, str]] = None, **kwargs: Any
     ) -> ApiResponse:
         caching_enabled = self._should_use_cache(path, kwargs.get("no_cache", False))
-        print(caching_enabled)
+
         api_path, query_args = path.get_path_and_qargs()
         query_args.update(extra_quargs or {})
 
