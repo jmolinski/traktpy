@@ -34,6 +34,7 @@ class Path:
     extended: List[str]
     filters: Set[str]
     pagination: bool
+    cache_level: str
 
     _output_structure: Any
 
@@ -52,6 +53,7 @@ class Path:
         extended: List[str] = None,
         filters: Set[str] = None,
         pagination: bool = False,
+        cache_level: Optional[str] = None
     ) -> None:
         self.path = path
         self._output_structure = output_structure
@@ -78,6 +80,8 @@ class Path:
         self.pagination = pagination
 
         self.__bound_client = None
+
+        self.cache_level = self._determine_cache_level(cache_level)
 
     def does_match(self, name: str) -> bool:
         return name in self.aliases
@@ -158,3 +162,12 @@ class Path:
     @property
     def method(self) -> str:
         return self.methods[0]
+
+    def _determine_cache_level(self, cache_level: Optional[str]) -> str:
+        if set(self.methods) & {"POST", "PUT", "DELETE"}:
+            return "no"
+
+        if cache_level:  # 'basic'/forced 'no' have to be explicitly set
+            return cache_level
+
+        return "full"  # default for GET endpoints

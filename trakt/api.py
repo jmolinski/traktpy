@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
 
 from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
 from trakt.core.config import Config, DefaultConfig, TraktCredentials
-from trakt.core.executors import Executor
+from trakt.core.executors import CacheManager, Executor
 from trakt.core.models import AbstractBaseModel
 from trakt.core.paths import (
     DEFAULT_INTERFACES,
@@ -40,6 +40,7 @@ class TraktApi:
     config: Config
     http: DefaultHttpComponent
     oauth: DefaultOauthComponent
+    cache: CacheManager
     user: Optional[TraktCredentials]
 
     countries: CountriesI
@@ -67,6 +68,7 @@ class TraktApi:
         *,
         http_component: Optional[Type[DefaultHttpComponent]] = None,
         oauth_component: Optional[Type[DefaultOauthComponent]] = None,
+        cache_manager: Optional[Type[CacheManager]] = None,
         interfaces: Dict[str, Type[SuiteInterface]] = None,
         user: Optional[TraktCredentials] = None,
         auto_refresh_token: bool = False,
@@ -88,6 +90,7 @@ class TraktApi:
 
         self.http = (http_component or DefaultHttpComponent)(self)
         self.oauth = (oauth_component or DefaultOauthComponent)(self)
+        self.cache = (cache_manager or CacheManager)(self)
 
         interfaces = interfaces or {}
         for i_name, default in DEFAULT_INTERFACES.items():

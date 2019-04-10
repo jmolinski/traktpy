@@ -49,7 +49,7 @@ class Executor:
         matching_paths = self.find_matching_path()
 
         if len(matching_paths) != 1:
-            raise ClientError("Ambiguous call: matching paths # has to be 1")
+            raise ClientError("Invalid call: matching paths # has to be 1")
 
         path, interface_handler = matching_paths[0]
 
@@ -64,6 +64,8 @@ class Executor:
         return_original: bool = False,
         **kwargs: Any,
     ):
+        caching_enabled = self._should_use_cache(path, kwargs.get("no_cache", False))
+
         api_path, query_args = path.get_path_and_qargs()
         query_args.update(extra_quargs or {})
 
@@ -75,18 +77,28 @@ class Executor:
             return_pagination=pagination,
             return_code=return_code,
             return_original=return_original,
+            use_cached=caching_enabled,
             **kwargs,
         )
 
         return_extras_enabled = pagination or return_code or return_original
 
         if return_extras_enabled:
-            return [
+            result = [
                 json_parser.parse_tree(response[0], path.response_structure),
                 *response[1:],
             ]
         else:
-            return json_parser.parse_tree(response, path.response_structure)
+            result = json_parser.parse_tree(response, path.response_structure)
+
+        if caching_enabled:
+            # only runs if there were no errors
+            self.client.http.cache_last_request()
+
+        return result
+
+    def _should_use_cache(self, path: Path, no_cache: bool):
+        return no_cache is False and self.client.cache.accepted_level(path.cache_level)
 
     def make_generator(self, path: Path, **kwargs: Any):
         start_page = int(kwargs.get("page", 1))
@@ -113,3 +125,22 @@ class Executor:
 
     def find_matching_path(self) -> List[Tuple[Path, Callable]]:
         return [p for s in self.path_suites for p in s.find_matching(self.params)]
+
+
+class CacheManager:
+    client: TraktApi
+
+    def __init__(self, client: TraktApi) -> None:
+        self.client = client
+
+    def accepted_level(self, level: str) -> bool:
+        max_allowed = self.client.config["cache"]["cache_level"]
+
+        if level == "no":
+            return False
+        elif level == "basic":
+            return max_allowed in {"basic", "full"}
+        elif level == "full":
+            return max_allowed == "full"
+        else:
+            raise ClientError("invalid cache level")
