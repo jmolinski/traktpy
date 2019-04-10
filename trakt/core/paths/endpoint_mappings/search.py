@@ -45,6 +45,7 @@ class SearchI(SuiteInterface):
                 ),
             ],
             qargs=["fields"],
+            cache_level="basic",
         ),
         "id_lookup": Path(  # type: ignore
             "search/!id_type/!id",
@@ -60,6 +61,7 @@ class SearchI(SuiteInterface):
                 ),
             ],
             qargs=["type"],
+            cache_level="basic",
         ),
     }
 

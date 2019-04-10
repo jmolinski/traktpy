@@ -39,7 +39,7 @@ DEFAULT_CONFIG: InternalConfigType = {
         "default_redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
         "refresh_token_s": 30 * 24 * 60 * 60,
     },
-    "cache": {"cache_level": "basic", "cache_timeout": 60 * 60},
+    "cache": {"cache_level": "basic", "timeout": 60 * 60},
 }
 
 

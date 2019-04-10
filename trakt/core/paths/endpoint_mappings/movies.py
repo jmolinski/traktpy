@@ -50,7 +50,9 @@ class MoviesI(SuiteInterface):
     }
 
     paths = {
-        "get_box_office": Path("movies/boxoffice", [BoxOffice], extended=["full"]),
+        "get_box_office": Path(
+            "movies/boxoffice", [BoxOffice], extended=["full"], cache_level="basic"
+        ),
         "get_recently_updated": Path(
             "movies/updates/?start_date",
             [UpdatedMovie],
@@ -58,14 +60,17 @@ class MoviesI(SuiteInterface):
             pagination=True,
             validators=[PerArgValidator("start_date", is_date)],
         ),
-        "get_summary": Path("movies/!id", Movie, extended=["full"]),
-        "get_aliases": Path("movies/!id/aliases", [Alias]),
+        "get_summary": Path(
+            "movies/!id", Movie, extended=["full"], cache_level="basic"
+        ),
+        "get_aliases": Path("movies/!id/aliases", [Alias], cache_level="basic"),
         "get_releases": Path(
             "movies/!id/releases/?country",
             [MovieRelease],
             validators=[
                 PerArgValidator("country", lambda c: isinstance(c, str) and len(c) == 2)
             ],
+            cache_level="basic",
         ),
         "get_translations": Path(
             "movies/!id/translations/?language",
@@ -75,6 +80,7 @@ class MoviesI(SuiteInterface):
                     "language", lambda c: isinstance(c, str) and len(c) == 2
                 )
             ],
+            cache_level="basic",
         ),
         "get_comments": Path(
             "movies/!id/comments/?sort",
@@ -91,10 +97,16 @@ class MoviesI(SuiteInterface):
             ],
             pagination=True,
         ),
-        "get_people": Path("movies/!id/people", CastCrewList, extended=["full"]),
+        "get_people": Path(
+            "movies/!id/people", CastCrewList, extended=["full"], cache_level="basic"
+        ),
         "get_ratings": Path("movies/!id/ratings", RatingsSummary),
         "get_related": Path(
-            "movies/!id/related", [Movie], extended=["full"], pagination=True
+            "movies/!id/related",
+            [Movie],
+            extended=["full"],
+            pagination=True,
+            cache_level="basic",
         ),
         "get_stats": Path("movies/!id/stats", MovieStats),
         "get_users_watching": Path("movies/!id/watching", [User], extended=["full"]),

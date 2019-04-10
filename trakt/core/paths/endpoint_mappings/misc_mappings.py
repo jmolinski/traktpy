@@ -29,6 +29,7 @@ class CountriesI(SuiteInterface):
             [Country],
             aliases=["get_countries", ""],
             validators=[TYPE_MOVIES_SHOWS],
+            cache_level="basic",
         )
     }
 
@@ -44,6 +45,7 @@ class CertificationsI(SuiteInterface):
             "certifications/!type",
             {"us": [Certification]},
             validators=[TYPE_MOVIES_SHOWS],
+            cache_level="basic",
         )
     }
 
@@ -56,7 +58,9 @@ class GenresI(SuiteInterface):
     name = "genres"
 
     paths = {
-        "get_genres": Path("genres/!type", [Genre], validators=[TYPE_MOVIES_SHOWS])
+        "get_genres": Path(
+            "genres/!type", [Genre], validators=[TYPE_MOVIES_SHOWS], cache_level="basic"
+        )
     }
 
     def get_genres(self, *, type: str, **kwargs: Any) -> List[Genre]:
@@ -68,7 +72,10 @@ class LanguagesI(SuiteInterface):
 
     paths = {
         "get_languages": Path(
-            "languages/!type", [Language], validators=[TYPE_MOVIES_SHOWS]
+            "languages/!type",
+            [Language],
+            validators=[TYPE_MOVIES_SHOWS],
+            cache_level="basic",
         )
     }
 
@@ -98,7 +105,7 @@ class ListsI(SuiteInterface):
 class NetworksI(SuiteInterface):
     name = "networks"
 
-    paths = {"get_networks": Path("networks", [Network])}
+    paths = {"get_networks": Path("networks", [Network], cache_level="basic")}
 
     def get_networks(self, **kwargs: Any) -> List[Network]:
         return self.run("get_networks", **kwargs)
