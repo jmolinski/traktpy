@@ -130,14 +130,17 @@ def get_mock_http_component(
 USER = TraktCredentials("", "", "", 10e14)
 
 
-def mk_mock_client(endpoints, client_id="", client_secret="", user=False):
+def mk_mock_client(
+    endpoints, client_id="", client_secret="", user=False, paginated=None
+):
     return Trakt(
         client_id,
         client_secret,
-        http_component=get_mock_http_component(endpoints),
+        http_component=get_mock_http_component(endpoints, paginated=paginated),
         user=USER if user is False else None,
     )
 
 
 def get_last_req(http):
-    return http._requests.req_stack[-1]
+    if http._requests.req_stack:
+        return http._requests.req_stack[-1]

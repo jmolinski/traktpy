@@ -1,4 +1,6 @@
-from typing import Any, Iterable, List, Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 
 from trakt.core.models import Comment
 from trakt.core.paths.path import Path
@@ -25,6 +27,9 @@ from trakt.core.paths.validators import (
     Validator,
     is_date,
 )
+
+if TYPE_CHECKING:  # pragma: no cover
+    from trakt.core.executors import PaginationIterator
 
 PERIOD_VALUES = {"weekly", "monthly", "yearly", "all"}
 COMMENT_SORT_VALUES = {"newest", "oldest", "likes", "replies"}
@@ -117,28 +122,28 @@ class MoviesI(SuiteInterface):
             validators=extra_validators,
         )
 
-    def get_trending(self, **kwargs) -> Iterable[TrendingMovie]:
+    def get_trending(self, **kwargs) -> PaginationIterator[TrendingMovie]:
         return self.run("get_trending", **kwargs)
 
-    def get_popular(self, **kwargs) -> Iterable[Movie]:
+    def get_popular(self, **kwargs) -> PaginationIterator[Movie]:
         return self.run("get_popular", **kwargs)
 
     def get_most_played(
         self, *, period: str = "weekly", **kwargs
-    ) -> Iterable[MovieWithStats]:
+    ) -> PaginationIterator[MovieWithStats]:
         return self.run("get_most_played", **kwargs, period=period)
 
     def get_most_watched(
         self, *, period: str = "weekly", **kwargs
-    ) -> Iterable[MovieWithStats]:
+    ) -> PaginationIterator[MovieWithStats]:
         return self.run("get_most_watched", **kwargs, period=period)
 
     def get_most_collected(
         self, *, period: str = "weekly", **kwargs
-    ) -> Iterable[MovieWithStats]:
+    ) -> PaginationIterator[MovieWithStats]:
         return self.run("get_most_collected", **kwargs, period=period)
 
-    def get_most_anticipated(self, **kwargs) -> Iterable[AnticipatedMovie]:
+    def get_most_anticipated(self, **kwargs) -> PaginationIterator[AnticipatedMovie]:
         return self.run("get_most_anticipated", **kwargs)
 
     def get_box_office(self, **kwargs) -> List[BoxOffice]:
@@ -146,7 +151,7 @@ class MoviesI(SuiteInterface):
 
     def get_recently_updated(
         self, *, start_date: Optional[str] = None, **kwargs
-    ) -> Iterable[UpdatedMovie]:
+    ) -> PaginationIterator[UpdatedMovie]:
         return self.run("get_recently_updated", **kwargs, start_date=start_date)
 
     def get_summary(self, *, movie: Union[Movie, str, int], **kwargs) -> Movie:
@@ -177,7 +182,7 @@ class MoviesI(SuiteInterface):
 
     def get_comments(
         self, *, movie: Union[Movie, str, int], sort: str = "newest", **kwargs
-    ) -> Iterable[Comment]:
+    ) -> PaginationIterator[Comment]:
         movie_id = self._get_movie_id(movie)
         return self.run("get_comments", **kwargs, sort=sort, id=movie_id)
 
@@ -188,7 +193,7 @@ class MoviesI(SuiteInterface):
         type: str = "personal",
         sort: str = "popular",
         **kwargs
-    ) -> Iterable[TraktList]:
+    ) -> PaginationIterator[TraktList]:
         movie_id = self._get_movie_id(movie)
         return self.run("get_lists", **kwargs, type=type, sort=sort, id=movie_id)
 
@@ -200,7 +205,7 @@ class MoviesI(SuiteInterface):
 
     def get_related(
         self, *, movie: Union[Movie, str, int], **kwargs
-    ) -> Iterable[Movie]:
+    ) -> PaginationIterator[Movie]:
         return self.run("get_related", **kwargs, id=self._get_movie_id(movie))
 
     def get_stats(self, *, movie: Union[Movie, str, int], **kwargs) -> MovieStats:
