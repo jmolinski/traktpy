@@ -7,9 +7,6 @@ from typing import (
     Any,
     Callable,
     Dict,
-    List,
-    Optional,
-    Tuple,
     Iterable,
     List,
     Optional,
@@ -22,7 +19,6 @@ from typing import (
 from trakt.core import json_parser
 from trakt.core.components.cache import FrozenRequest
 from trakt.core.exceptions import ArgumentError, ClientError
-
 
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.api import TraktApi
@@ -59,7 +55,7 @@ class Executor:
         path.is_valid(self.client, **kwargs)  # raises
 
         if path.pagination:
-            return self.make_generator(path, **kwargs)
+            return self._make_generator(path, **kwargs)
 
         return self.exec_path_call(path, **kwargs)
 
@@ -108,25 +104,13 @@ class Executor:
     def _should_use_cache(self, path: Path, no_cache: bool):
         return no_cache is False and self.client.cache.accepted_level(path.cache_level)
 
-    def make_generator(self, path: Path, **kwargs: Any):
+    def _make_generator(self, path: Path, **kwargs: Any):
         start_page = int(kwargs.get("page", 1))
         per_page = int(kwargs.get("per_page", 10))
         max_pages = 1 << 16
 
         return PaginationIterator(self, path, start_page, per_page, max_pages)
 
-            while page < stop_at_page:
-                resp = self.exec_path_call(
-                    path,
-                    return_extras=True,
-                    extra_quargs={"page": str(page), "limit": str(per_page)},
-                )
-
-                yield from resp.parsed
-
-                page += 1
-                stop_at_page = int(resp.pagination["page_count"]) + 1
-                
     def find_matching_path(self) -> List[Tuple[Path, Callable]]:
         return [p for s in self.path_suites for p in s.find_matching(self.params)]
 
@@ -180,17 +164,17 @@ class PaginationIterator(Iterable[T]):
         return self._queue.pop(0)
 
     def _fetch_next_page(self, skip_first: int = 0) -> None:
-        response, pagination = self._executor.exec_path_call(
+        response = self._executor.exec_path_call(
             self._path,
-            pagination=True,
+            return_extras=True,
             extra_quargs={"page": str(self._page), "limit": str(self._per_page)},
         )
 
-        for r in response[skip_first:]:
+        for r in response.parsed[skip_first:]:
             self._queue.append(r)
 
         self._page += 1
-        self._stop_at_page = int(pagination["page_count"])
+        self._stop_at_page = int(response.pagination["page_count"])
         self.pages_total = self._stop_at_page
 
     def prefetch_all(self) -> PaginationIterator[T]:
