@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import requests
+from trakt.core.components.cache import FrozenRequest
 from trakt.core.exceptions import (
     BadRequest,
     Conflict,
@@ -20,7 +21,6 @@ from trakt.core.exceptions import (
     Unauthorized,
     UnprocessableEntity,
 )
-from trakt.core.executors import FrozenRequest
 
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.api import TraktApi
