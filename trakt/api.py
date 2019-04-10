@@ -31,6 +31,9 @@ if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.paths.suite_interface import SuiteInterface
 
 
+CACHE_LEVELS = ("no", "basic", "full")
+
+
 class TraktApi:
     client_id: str
     client_secret: str
