@@ -144,3 +144,12 @@ class CacheManager:
             return max_allowed == "full"
         else:
             raise ClientError("invalid cache level")
+
+    def get(self, *args, **kwargs) -> Any:
+        pass
+
+    def set(self, x) -> None:
+        pass
+
+    def has(self, *args, **kwargs) -> bool:
+        return False
