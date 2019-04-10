@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from dataclasses import asdict
-from typing import Dict, Iterable, List, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 from trakt.core.models import Episode, Movie, Season, Show
 from trakt.core.paths.path import Path
@@ -17,6 +19,9 @@ from trakt.core.paths.validators import (
     PerArgValidator,
     Validator,
 )
+
+if TYPE_CHECKING:  # pragma: no cover
+    from trakt.core.executors import PaginationIterator
 
 COMMENT_TEXT_VALIDATOR = PerArgValidator(
     "comment", lambda c: isinstance(c, str) and len(c.split(" ")) > 4
@@ -157,7 +162,7 @@ class CommentsI(SuiteInterface):
 
     def get_replies(
         self, *, id: Union[Comment, str, int], **kwargs
-    ) -> Iterable[Comment]:
+    ) -> PaginationIterator[Comment]:
         id = int(self._generic_get_id(id))
         return self.run("get_replies", **kwargs, id=id)
 
@@ -168,7 +173,7 @@ class CommentsI(SuiteInterface):
         comment: str,
         spoiler: bool = False,
         **kwargs
-    ) -> Iterable[Comment]:
+    ) -> PaginationIterator[Comment]:
         id = int(self._generic_get_id(id))
 
         body = {"comment": comment, "spoiler": spoiler}

@@ -1,4 +1,6 @@
-from typing import Iterable, List, Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List, Optional, Union
 
 from trakt.core.paths.path import Path
 from trakt.core.paths.response_structs import SearchResult
@@ -18,6 +20,9 @@ POSSIBLE_FIELDS = {
     "biography",
     "description",
 }
+
+if TYPE_CHECKING:  # pragma: no cover
+    from trakt.core.executors import PaginationIterator
 
 
 class SearchI(SuiteInterface):
@@ -64,7 +69,7 @@ class SearchI(SuiteInterface):
         query: str,
         fields: Optional[Union[str, List[str]]] = None,
         **kwargs
-    ) -> Iterable[SearchResult]:
+    ) -> PaginationIterator[SearchResult]:
         type = [type] if isinstance(type, str) else type
         type = ",".join(type)
         req = {"type": type, "query": query}
@@ -81,7 +86,7 @@ class SearchI(SuiteInterface):
         id: Union[str, int],
         type: Optional[Union[str, List[str]]] = None,
         **kwargs
-    ) -> Iterable[SearchResult]:
+    ) -> PaginationIterator[SearchResult]:
         req = {"id_type": id_type, "id": id}
 
         if type:
