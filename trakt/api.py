@@ -31,7 +31,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.paths.suite_interface import SuiteInterface
 
 
-CACHE_LEVELS = ("no", "basic", "full")
+CACHE_LEVELS = CacheManager.CACHE_LEVELS
 
 
 class TraktApi:

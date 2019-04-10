@@ -20,6 +20,7 @@ from trakt.core.exceptions import (
     Unauthorized,
     UnprocessableEntity,
 )
+from trakt.core.executors import FrozenRequest
 
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.api import TraktApi
@@ -47,11 +48,12 @@ class DefaultHttpComponent:
     name = "http"
     client: TraktApi
     _requests = requests
-    _last_response: Any
+    _last_response: Optional[FrozenRequest]
 
     def __init__(self, client: TraktApi, requests_dependency: Any = None) -> None:
         self.client = client
         self._requests = requests_dependency if requests_dependency else requests
+        self._last_response = None
 
     def request(
         self,
@@ -73,22 +75,24 @@ class DefaultHttpComponent:
 
         headers = {
             "Content-type": "application/json",
-            **(headers if headers is not None else self.get_headers()),
+            **(headers if headers is not None else self._get_headers()),
         }  # {} disables get_headers call
 
-        if use_cache and self.client.cache.has(url, query_args, headers):
-            response = self.client.cache.get(url, query_args, headers)
+        poss_cached_req = FrozenRequest(path, query_args, headers, response=None)
+        if use_cache and self.client.cache.has(poss_cached_req):
+            response = self.client.cache.get(poss_cached_req)
         else:
             response = self._requests.request(
                 method, url, params=query_args, data=data, headers=headers
             )
 
-        self._last_response = response
-
         if not no_raise:
             self._handle_code(response)
 
         json_response = self._get_json(response, no_raise=no_raise)
+
+        self._last_response = FrozenRequest(path, query_args, headers, response)
+
         return ApiResponse(
             json_response, response, self._get_pagination_headers(response)
         )
@@ -103,7 +107,7 @@ class DefaultHttpComponent:
             else:
                 raise
 
-    def get_headers(self) -> Dict[str, str]:
+    def _get_headers(self) -> Dict[str, str]:
         headers = {
             "Content-Type": "application/json",
             "trakt-api-key": self.client.client_id,
@@ -147,12 +151,13 @@ class DefaultHttpComponent:
             "page_count": headers.get("X-Pagination-Page-Count"),
         }
 
-    def cache_last_request(self) -> None:
-        pass
+    @property
+    def last_request(self) -> Optional[FrozenRequest]:
+        return self._last_response
 
 
 @dataclass
 class ApiResponse:
     json: Any
     original: Any
-    pagination: Any = None
+    pagination: Any
