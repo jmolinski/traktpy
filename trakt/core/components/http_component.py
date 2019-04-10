@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import urllib.parse
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import requests
@@ -59,15 +60,11 @@ class DefaultHttpComponent:
         method: str = "GET",
         query_args: Dict[str, str] = None,
         data: Any = None,
-        return_code: bool = False,
         headers: Optional[Dict[str, str]] = None,
         no_raise: bool = False,
-        return_pagination: bool = False,
-        return_original_response: bool = False,
-        only_json: bool = True,
         use_cache: bool = False,
         **kwargs: Any,
-    ) -> Any:
+    ) -> ApiResponse:
 
         url = urllib.parse.urljoin(self.client.config["http"]["base_url"], path)
 
@@ -91,44 +88,10 @@ class DefaultHttpComponent:
         if not no_raise:
             self._handle_code(response)
 
-        return self._format_result(
-            only_json,
-            response,
-            no_raise,
-            return_code,
-            return_pagination,
-            return_original_response,
-        )
-
-    def _format_result(
-        self,
-        only_json: bool,
-        response: Any,
-        no_raise: bool,
-        return_code: bool,
-        return_pagination: bool,
-        return_original_response: bool,
-    ) -> Any:
-        only_json = only_json and not any(
-            [return_code, return_pagination, return_original_response]
-        )
-
         json_response = self._get_json(response, no_raise=no_raise)
-
-        if only_json:
-            return json_response
-
-        res = [json_response]
-        if return_code:
-            res += [response.status_code]
-
-        if return_pagination:
-            res += [self._get_pagination_headers(response)]
-
-        if return_original_response:
-            res += [response]
-
-        return res
+        return ApiResponse(
+            json_response, response, self._get_pagination_headers(response)
+        )
 
     @staticmethod
     def _get_json(response: Any, no_raise: bool) -> Any:
@@ -186,3 +149,10 @@ class DefaultHttpComponent:
 
     def cache_last_request(self) -> None:
         pass
+
+
+@dataclass
+class ApiResponse:
+    json: Any
+    original: Any
+    pagination: Any = None

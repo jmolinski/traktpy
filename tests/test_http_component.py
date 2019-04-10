@@ -42,14 +42,12 @@ def test_extra_info_return():
         requests_dependency=MockRequests({".*": [{"a": "v"}, 200, resp_headers]}),
     )
 
-    res, code, pagination = http.request(
-        "abc", return_code=True, return_pagination=True
-    )
+    res = http.request("abc")
 
-    assert res == {"a": "v"}
-    assert code == 200
-    assert pagination["limit"] == 1
-    assert pagination["page_count"] == 3
+    assert res.json == {"a": "v"}
+    assert res.original.status_code == 200
+    assert res.pagination["limit"] == 1
+    assert res.pagination["page_count"] == 3
 
 
 def test_add_quargs():

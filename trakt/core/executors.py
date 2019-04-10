@@ -69,14 +69,11 @@ class Executor:
         api_path, query_args = path.get_path_and_qargs()
         query_args.update(extra_quargs or {})
 
-        response = self.client.http.request(
+        api_response = self.client.http.request(
             api_path,
             method=path.method,
             query_args=query_args,
             data=kwargs.get("data"),
-            return_pagination=pagination,
-            return_code=return_code,
-            return_original=return_original,
             use_cached=caching_enabled,
             **kwargs,
         )
@@ -84,12 +81,19 @@ class Executor:
         return_extras_enabled = pagination or return_code or return_original
 
         if return_extras_enabled:
+            # TODO refactor
             result = [
-                json_parser.parse_tree(response[0], path.response_structure),
-                *response[1:],
+                json_parser.parse_tree(api_response.json, path.response_structure)
             ]
+            if return_code:
+                result.append(api_response.original.status_code)
+            if pagination:
+                result.append(api_response.pagination)
+            if return_original:
+                result.append(api_response.original)
+
         else:
-            result = json_parser.parse_tree(response, path.response_structure)
+            result = json_parser.parse_tree(api_response.json, path.response_structure)
 
         if caching_enabled:
             # only runs if there were no errors
