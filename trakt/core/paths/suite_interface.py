@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Tuple, Type, Union
 
+from trakt.core.components.http_component import ApiResponse
 from trakt.core.exceptions import ArgumentError
 from trakt.core.models import Episode, Movie, Person, Season, Show, TraktList
 from trakt.core.paths.response_structs import Comment
@@ -35,8 +36,15 @@ class SuiteInterface:
     def run(self, command: str, **kwargs: Any) -> Any:
         return self.run_path(path=self._get_path(command), **kwargs)
 
-    def run_path(self, path: Path, **kwargs: Any) -> Any:
-        return self.executor_class(self.client).run(path=path, **kwargs)
+    def run_path(self, path: Path, return_extras: bool = False, **kwargs: Any) -> Any:
+        r = self.executor_class(self.client).run(path=path, **kwargs)
+
+        if isinstance(r, ApiResponse):
+            if return_extras:
+                return r
+            return r.parsed
+
+        return r
 
     def _get_path(self, command: str) -> Path:
         return self.paths[command]

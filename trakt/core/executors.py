@@ -18,12 +18,17 @@ from typing import (
 
 from trakt.core import json_parser
 from trakt.core.components.cache import FrozenRequest
+from trakt.core.components.http_component import ApiResponse
 from trakt.core.exceptions import ArgumentError, ClientError
 
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.api import TraktApi
     from trakt.core.paths.suite_interface import SuiteInterface
     from trakt.core.paths.path import Path
+
+
+T = TypeVar("T")
+PER_PAGE_LIMIT = 100
 
 
 class Executor:
@@ -48,7 +53,9 @@ class Executor:
     def install(self, suites: List[SuiteInterface]) -> None:
         self.path_suites.extend(suites)
 
-    def run(self, *, path: Optional[Path] = None, **kwargs: Any) -> Any:
+    def run(
+        self, *, path: Optional[Path] = None, **kwargs: Any
+    ) -> Union[ApiResponse, PaginationIterator[T]]:
         if not path:
             return self._delegate_to_interface(**kwargs)
 
@@ -59,7 +66,9 @@ class Executor:
 
         return self.exec_path_call(path, **kwargs)
 
-    def _delegate_to_interface(self, **kwargs):
+    def _delegate_to_interface(
+        self, **kwargs
+    ) -> Union[ApiResponse, PaginationIterator[T]]:
         matching_paths = self.find_matching_path()
 
         if len(matching_paths) != 1:
@@ -70,12 +79,8 @@ class Executor:
         return interface_handler(**kwargs)
 
     def exec_path_call(
-        self,
-        path: Path,
-        extra_quargs: Optional[Dict[str, str]] = None,
-        return_extras: bool = False,
-        **kwargs: Any,
-    ):
+        self, path: Path, extra_quargs: Optional[Dict[str, str]] = None, **kwargs: Any
+    ) -> ApiResponse:
         caching_enabled = self._should_use_cache(path, kwargs.get("no_cache", False))
 
         api_path, query_args = path.get_path_and_qargs()
@@ -99,7 +104,7 @@ class Executor:
             last_request = cast(FrozenRequest, self.client.http.last_request)
             self.client.cache.set(last_request)
 
-        return api_response if return_extras else api_response.parsed
+        return api_response
 
     def _should_use_cache(self, path: Path, no_cache: bool):
         return no_cache is False and self.client.cache.accepted_level(path.cache_level)
@@ -113,10 +118,6 @@ class Executor:
 
     def find_matching_path(self) -> List[Tuple[Path, Callable]]:
         return [p for s in self.path_suites for p in s.find_matching(self.params)]
-
-
-T = TypeVar("T")
-PER_PAGE_LIMIT = 100
 
 
 class PaginationIterator(Iterable[T]):

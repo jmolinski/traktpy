@@ -75,7 +75,7 @@ def test_pagination():
     p_nopag = Path("pag_off", [int])
     p_pag = Path("pag_on", [int], pagination=True)
 
-    res_nopag = executor.run(path=p_nopag)
+    res_nopag = executor.run(path=p_nopag).parsed
     res_pag = executor.run(path=p_pag, page=2, per_page=3)
 
     assert isinstance(res_nopag, list)
