@@ -70,9 +70,7 @@ class Executor:
         self,
         path: Path,
         extra_quargs: Optional[Dict[str, str]] = None,
-        pagination: bool = False,
-        return_code: bool = False,
-        return_original: bool = False,
+        return_extras: bool = False,
         **kwargs: Any,
     ):
         caching_enabled = self._should_use_cache(path, kwargs.get("no_cache", False))
@@ -89,29 +87,16 @@ class Executor:
             **kwargs,
         )
 
-        return_extras_enabled = pagination or return_code or return_original
-
-        if return_extras_enabled:
-            # TODO refactor
-            result = [
-                json_parser.parse_tree(api_response.json, path.response_structure)
-            ]
-            if return_code:
-                result.append(api_response.original.status_code)
-            if pagination:
-                result.append(api_response.pagination)
-            if return_original:
-                result.append(api_response.original)
-
-        else:
-            result = json_parser.parse_tree(api_response.json, path.response_structure)
+        api_response.parsed = json_parser.parse_tree(
+            api_response.json, path.response_structure
+        )
 
         if caching_enabled:
             # only runs if there were no errors
             last_request = cast(FrozenRequest, self.client.http.last_request)
             self.client.cache.set(last_request)
 
-        return result
+        return api_response if return_extras else api_response.parsed
 
     def _should_use_cache(self, path: Path, no_cache: bool):
         return no_cache is False and self.client.cache.accepted_level(path.cache_level)
@@ -126,16 +111,16 @@ class Executor:
             stop_at_page = max_pages
 
             while page < stop_at_page:
-                response, pagination = self.exec_path_call(
+                resp = self.exec_path_call(
                     path,
-                    pagination=True,
+                    return_extras=True,
                     extra_quargs={"page": str(page), "limit": str(per_page)},
                 )
 
-                yield from response
+                yield from resp.parsed
 
                 page += 1
-                stop_at_page = int(pagination["page_count"]) + 1
+                stop_at_page = int(resp.pagination["page_count"]) + 1
 
         return generator()
 

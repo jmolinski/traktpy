@@ -31,7 +31,7 @@ class CacheManager:
         else:
             raise ClientError("invalid cache level")
 
-    def get(self, wanted: FrozenRequest) -> Any:
+    def get(self, wanted: FrozenRequest) -> FrozenRequest:
         if not self.has(wanted):
             raise LookupError("Request not in cache")
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import urllib.parse
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import requests
@@ -78,13 +78,9 @@ class DefaultHttpComponent:
             **(headers if headers is not None else self._get_headers()),
         }  # {} disables get_headers call
 
-        poss_cached_req = FrozenRequest(path, query_args, headers, response=None)
-        if use_cache and self.client.cache.has(poss_cached_req):
-            response = self.client.cache.get(poss_cached_req)
-        else:
-            response = self._requests.request(
-                method, url, params=query_args, data=data, headers=headers
-            )
+        response = self._get_raw_response(
+            url, path, query_args, headers, method, data, use_cache
+        )
 
         if not no_raise:
             self._handle_code(response)
@@ -95,6 +91,25 @@ class DefaultHttpComponent:
 
         return ApiResponse(
             json_response, response, self._get_pagination_headers(response)
+        )
+
+    def _get_raw_response(
+        self,
+        url: str,
+        path: str,
+        query_args: Dict[str, str],
+        headers: Dict[str, str],
+        method: str,
+        data: Any,
+        use_cache: bool,
+    ) -> Any:
+        if use_cache:
+            poss_cached_req = FrozenRequest(path, query_args, headers, response=None)
+            if self.client.cache.has(poss_cached_req):
+                return self.client.cache.get(poss_cached_req).response
+
+        return self._requests.request(
+            method, url, params=query_args, data=data, headers=headers
         )
 
     @staticmethod
@@ -161,3 +176,8 @@ class ApiResponse:
     json: Any
     original: Any
     pagination: Any
+    code: int = field(init=False)
+    parsed: Any = field(init=False, default=None)
+
+    def __post_init__(self) -> None:
+        self.code = self.original.status_code

@@ -287,23 +287,23 @@ class ShowsI(SuiteInterface):
     def get_next_episode(
         self, *, show: Union[Show, str, int], **kwargs
     ) -> Optional[Episode]:
-        resp, code = self.run(
+        resp = self.run(
             "get_next_episode",
             **kwargs,
             id=self._generic_get_id(show),
-            return_code=True
+            return_extras=True
         )
 
-        return None if code == 204 else resp
+        return None if resp.code == 204 else resp.parsed
 
     def get_last_episode(
         self, *, show: Union[Show, str, int], **kwargs
     ) -> Optional[Episode]:
-        resp, code = self.run(
+        resp = self.run(
             "get_last_episode",
             **kwargs,
             id=self._generic_get_id(show),
-            return_code=True
+            return_extras=True
         )
 
-        return None if code == 204 else resp
+        return None if resp.code == 204 else resp.parsed
