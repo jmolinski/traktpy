@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Union
 
+from trakt.core.components.cache import CacheLevel
 from trakt.core.exceptions import ClientError
 from trakt.core.paths.validators import (
     MULTI_FILTERS,
@@ -34,7 +35,7 @@ class Path:
     extended: List[str]
     filters: Set[str]
     pagination: bool
-    cache_level: str
+    cache_level: CacheLevel
 
     _output_structure: Any
 
@@ -53,7 +54,7 @@ class Path:
         extended: List[str] = None,
         filters: Set[str] = None,
         pagination: bool = False,
-        cache_level: Optional[str] = None
+        cache_level: Optional[Union[str, CacheLevel]] = None
     ) -> None:
         self.path = path
         self._output_structure = output_structure
@@ -163,11 +164,16 @@ class Path:
     def method(self) -> str:
         return self.methods[0]
 
-    def _determine_cache_level(self, cache_level: Optional[str]) -> str:
+    def _determine_cache_level(
+        self, cache_level: Union[str, CacheLevel, None]
+    ) -> CacheLevel:
         if set(self.methods) & {"POST", "PUT", "DELETE"}:
-            return "no"
+            return CacheLevel.NO
 
         if cache_level:  # 'basic'/forced 'no' have to be explicitly set
+            if isinstance(cache_level, str):
+                cache_level = CacheLevel(cache_level.lower())
+
             return cache_level
 
-        return "full"  # default for GET endpoints
+        return CacheLevel.FULL  # default for GET endpoints

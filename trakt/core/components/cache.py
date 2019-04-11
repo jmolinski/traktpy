@@ -1,31 +1,38 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from enum import Enum
 from typing import TYPE_CHECKING, Any, Dict
 
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.api import TraktApi
 
 
+class CacheLevel(Enum):
+    NO = "no"
+    BASIC = "basic"
+    FULL = "full"
+
+
 class CacheManager:
     client: TraktApi
     _cache: Dict[FrozenRequest, datetime]
 
-    CACHE_LEVELS = ("no", "basic", "full")
+    CACHE_LEVELS = (CacheLevel.NO, CacheLevel.BASIC, CacheLevel.FULL)
 
     def __init__(self, client: TraktApi) -> None:
         self.client = client
         self._cache = {}
 
-    def accepted_level(self, level: str) -> bool:
-        max_allowed = self.client.config["cache"]["cache_level"]
+    def accepted_level(self, level: CacheLevel) -> bool:
+        max_allowed = CacheLevel(self.client.config["cache"]["cache_level"])
 
-        if level == "no":
+        if level == CacheLevel.NO:
             return False
-        elif level == "basic":
-            return max_allowed in {"basic", "full"}
+        elif level == CacheLevel.BASIC:
+            return max_allowed in {CacheLevel.BASIC, CacheLevel.FULL}
         else:  # "full"
-            return max_allowed == "full"
+            return max_allowed == CacheLevel.FULL
 
     def get(self, wanted: FrozenRequest) -> FrozenRequest:
         if not self.has(wanted):
