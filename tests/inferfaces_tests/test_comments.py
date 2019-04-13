@@ -9,7 +9,8 @@ from tests.test_data.movies import MOVIE1
 from tests.test_data.shows import SHOW
 from tests.utils import get_last_req, mk_mock_client
 from trakt.core.exceptions import ArgumentError
-from trakt.core.paths.response_structs import Sharing
+from trakt.core.json_parser import parse_tree
+from trakt.core.paths.response_structs import Comment, Sharing
 
 PAG_H = {"X-Pagination-Page-Count": 1}
 
@@ -40,7 +41,8 @@ def test_post_comment():
 
 def test_get_comment():
     client = mk_mock_client({".*comments.*": [COMMENT, 200]})
-    comment = client.comments.get_comment(id=123)
+    comment = parse_tree(COMMENT, Comment)
+    comment = client.comments.get_comment(id=comment)
 
     assert comment.user.name == COMMENT["user"]["name"]
 

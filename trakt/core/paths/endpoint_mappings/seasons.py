@@ -34,6 +34,7 @@ class SeasonsI(SuiteInterface):
             [Season],
             extended=["full", "episodes"],
             validators=[ID_VALIDATOR],
+            cache_level="basic",
         ),
         "get_season": Path(
             "shows/!id/seasons/!season",
@@ -48,6 +49,7 @@ class SeasonsI(SuiteInterface):
                 ),
             ],
             qargs=["translations"],
+            cache_level="basic",
         ),
         "get_comments": Path(
             "shows/!id/seasons/!season/comments/?sort",

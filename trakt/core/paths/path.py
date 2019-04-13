@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Union
 
+from trakt.core.components.cache import CacheLevel
 from trakt.core.exceptions import ClientError
 from trakt.core.paths.validators import (
     MULTI_FILTERS,
@@ -34,6 +35,7 @@ class Path:
     extended: List[str]
     filters: Set[str]
     pagination: bool
+    cache_level: CacheLevel
 
     _output_structure: Any
 
@@ -52,6 +54,7 @@ class Path:
         extended: List[str] = None,
         filters: Set[str] = None,
         pagination: bool = False,
+        cache_level: Optional[Union[str, CacheLevel]] = None
     ) -> None:
         self.path = path
         self._output_structure = output_structure
@@ -79,6 +82,8 @@ class Path:
 
         self.__bound_client = None
 
+        self.cache_level = self._determine_cache_level(cache_level)
+
     def does_match(self, name: str) -> bool:
         return name in self.aliases
 
@@ -104,7 +109,7 @@ class Path:
             return self.__bound_kwargs.get(arg_name)
 
     def get_path_and_qargs(self) -> Tuple[str, Dict[str, Any]]:
-        if not self.is_bound():
+        if not self.is_bound():  # pragma: no cover
             raise ClientError("call .is_valid first!")
 
         parts = [self._get_param_value(p) for p in self.params]
@@ -158,3 +163,17 @@ class Path:
     @property
     def method(self) -> str:
         return self.methods[0]
+
+    def _determine_cache_level(
+        self, cache_level: Union[str, CacheLevel, None]
+    ) -> CacheLevel:
+        if set(self.methods) & {"POST", "PUT", "DELETE"}:
+            return CacheLevel.NO
+
+        if cache_level:  # 'basic'/forced 'no' have to be explicitly set
+            if isinstance(cache_level, str):
+                cache_level = CacheLevel(cache_level.lower())
+
+            return cache_level
+
+        return CacheLevel.FULL  # default for GET endpoints

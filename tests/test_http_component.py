@@ -4,7 +4,7 @@ import pytest
 from tests.utils import MockRequests, mk_mock_client
 from trakt import Trakt
 from trakt.core.components import DefaultHttpComponent
-from trakt.core.exceptions import BadRequest
+from trakt.core.exceptions import BadRequest, RequestRelatedError
 from trakt.core.executors import Executor
 from trakt.core.paths.path import Path
 
@@ -42,14 +42,12 @@ def test_extra_info_return():
         requests_dependency=MockRequests({".*": [{"a": "v"}, 200, resp_headers]}),
     )
 
-    res, code, pagination = http.request(
-        "abc", return_code=True, return_pagination=True
-    )
+    res = http.request("abc")
 
-    assert res == {"a": "v"}
-    assert code == 200
-    assert pagination["limit"] == 1
-    assert pagination["page_count"] == 3
+    assert res.json == {"a": "v"}
+    assert res.original.status_code == 200
+    assert res.pagination["limit"] == 1
+    assert res.pagination["page_count"] == 3
 
 
 def test_add_quargs():
@@ -63,3 +61,10 @@ def test_add_quargs():
     req = client.http._requests.req_map["a"][0]
 
     assert req["path"].endswith(r"/a?arg=abc")
+
+
+def test_unexpected_code():
+    client = mk_mock_client({".*": [[], 455]})
+
+    with pytest.raises(RequestRelatedError):
+        client.networks.get_networks()

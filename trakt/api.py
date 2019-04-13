@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
 
-from trakt.core.components import DefaultHttpComponent, DefaultOauthComponent
+from trakt.core.components import (
+    CacheManager,
+    DefaultHttpComponent,
+    DefaultOauthComponent,
+)
 from trakt.core.config import Config, DefaultConfig, TraktCredentials
 from trakt.core.executors import Executor
 from trakt.core.models import AbstractBaseModel
@@ -31,12 +35,16 @@ if TYPE_CHECKING:  # pragma: no cover
     from trakt.core.paths.suite_interface import SuiteInterface
 
 
+CACHE_LEVELS = CacheManager.CACHE_LEVELS
+
+
 class TraktApi:
     client_id: str
     client_secret: str
     config: Config
     http: DefaultHttpComponent
     oauth: DefaultOauthComponent
+    cache: CacheManager
     user: Optional[TraktCredentials]
 
     countries: CountriesI
@@ -64,6 +72,7 @@ class TraktApi:
         *,
         http_component: Optional[Type[DefaultHttpComponent]] = None,
         oauth_component: Optional[Type[DefaultOauthComponent]] = None,
+        cache_manager: Optional[Type[CacheManager]] = None,
         interfaces: Dict[str, Type[SuiteInterface]] = None,
         user: Optional[TraktCredentials] = None,
         auto_refresh_token: bool = False,
@@ -85,6 +94,7 @@ class TraktApi:
 
         self.http = (http_component or DefaultHttpComponent)(self)
         self.oauth = (oauth_component or DefaultOauthComponent)(self)
+        self.cache = (cache_manager or CacheManager)(self)
 
         interfaces = interfaces or {}
         for i_name, default in DEFAULT_INTERFACES.items():

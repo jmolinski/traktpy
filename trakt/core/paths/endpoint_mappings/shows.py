@@ -73,9 +73,15 @@ class ShowsI(SuiteInterface):
             validators=[PerArgValidator("start_date", is_date)],
         ),
         "get_summary": Path(
-            "shows/!id", Show, extended=["full"], validators=[ID_VALIDATOR]
+            "shows/!id",
+            Show,
+            extended=["full"],
+            validators=[ID_VALIDATOR],
+            cache_level="basic",
         ),
-        "get_aliases": Path("shows/!id/aliases", [Alias], validators=[ID_VALIDATOR]),
+        "get_aliases": Path(
+            "shows/!id/aliases", [Alias], validators=[ID_VALIDATOR], cache_level="basic"
+        ),
         "get_translations": Path(
             "shows/!id/translations/?language",
             [ShowTranslation],
@@ -85,6 +91,7 @@ class ShowsI(SuiteInterface):
                     "language", lambda c: isinstance(c, str) and len(c) == 2
                 ),
             ],
+            cache_level="basic",
         ),
         "get_comments": Path(
             "shows/!id/comments/?sort",
@@ -122,6 +129,7 @@ class ShowsI(SuiteInterface):
             CastCrewList,
             extended=["full"],
             validators=[ID_VALIDATOR],
+            cache_level="basic",
         ),
         "get_ratings": Path(
             "shows/!id/ratings", RatingsSummary, validators=[ID_VALIDATOR]
@@ -132,6 +140,7 @@ class ShowsI(SuiteInterface):
             extended=["full"],
             pagination=True,
             validators=[ID_VALIDATOR],
+            cache_level="basic",
         ),
         "get_stats": Path("shows/!id/stats", ShowStats, validators=[ID_VALIDATOR]),
         "get_users_watching": Path(
@@ -296,23 +305,23 @@ class ShowsI(SuiteInterface):
     def get_next_episode(
         self, *, show: Union[Show, str, int], **kwargs
     ) -> Optional[Episode]:
-        resp, code = self.run(
+        resp = self.run(
             "get_next_episode",
             **kwargs,
             id=self._generic_get_id(show),
-            return_code=True
+            return_extras=True
         )
 
-        return None if code == 204 else resp
+        return None if resp.code == 204 else resp.parsed
 
     def get_last_episode(
         self, *, show: Union[Show, str, int], **kwargs
     ) -> Optional[Episode]:
-        resp, code = self.run(
+        resp = self.run(
             "get_last_episode",
             **kwargs,
             id=self._generic_get_id(show),
-            return_code=True
+            return_extras=True
         )
 
-        return None if code == 204 else resp
+        return None if resp.code == 204 else resp.parsed

@@ -84,5 +84,4 @@ Todo 0.2.0:
 - sync
 - methods on models (episode.rate() etc)
 - user profile
-- caching (networks, countries etc)
 - http component retries

@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import json
 import urllib.parse
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import requests
+from trakt.core.components.cache import FrozenRequest
 from trakt.core.exceptions import (
     BadRequest,
     Conflict,
@@ -23,15 +25,35 @@ from trakt.core.exceptions import (
 if TYPE_CHECKING:  # pragma: no cover
     from trakt.api import TraktApi
 
+STATUS_CODE_MAPPING = {
+    400: BadRequest,
+    401: Unauthorized,
+    403: Forbidden,
+    404: NotFound,
+    405: MethodNotFound,
+    409: Conflict,
+    412: PreconditionFailed,
+    422: UnprocessableEntity,
+    429: RateLimitExceeded,
+    500: ServerError,
+    503: ServiceUnavailable,
+    504: ServiceUnavailable,
+    520: ServiceUnavailable,
+    521: ServiceUnavailable,
+    522: ServiceUnavailable,
+}
+
 
 class DefaultHttpComponent:
     name = "http"
     client: TraktApi
     _requests = requests
+    _last_response: Optional[FrozenRequest]
 
     def __init__(self, client: TraktApi, requests_dependency: Any = None) -> None:
         self.client = client
         self._requests = requests_dependency if requests_dependency else requests
+        self._last_response = None
 
     def request(
         self,
@@ -40,14 +62,11 @@ class DefaultHttpComponent:
         method: str = "GET",
         query_args: Dict[str, str] = None,
         data: Any = None,
-        return_code: bool = False,
         headers: Optional[Dict[str, str]] = None,
         no_raise: bool = False,
-        return_pagination: bool = False,
-        return_original_response: bool = False,
-        only_json: bool = True,
+        use_cache: bool = False,
         **kwargs: Any,
-    ) -> Any:
+    ) -> ApiResponse:
 
         url = urllib.parse.urljoin(self.client.config["http"]["base_url"], path)
 
@@ -56,38 +75,45 @@ class DefaultHttpComponent:
 
         headers = {
             "Content-type": "application/json",
-            **(headers if headers is not None else self.get_headers()),
+            **(headers if headers is not None else self._get_headers()),
         }  # {} disables get_headers call
 
-        response = self._requests.request(
-            method, url, params=query_args, data=data, headers=headers
+        response = self._get_raw_response(
+            url, path, query_args, headers, method, data, use_cache
         )
 
         if not no_raise:
-            self.handle_code(response)
+            self._handle_code(response)
 
         json_response = self._get_json(response, no_raise=no_raise)
 
-        only_json = only_json and not any(
-            [return_code, return_pagination, return_original_response]
+        self._last_response = FrozenRequest(path, query_args, headers, response)
+
+        return ApiResponse(
+            json_response, response, self._get_pagination_headers(response)
         )
 
-        if only_json:
-            return json_response
+    def _get_raw_response(
+        self,
+        url: str,
+        path: str,
+        query_args: Dict[str, str],
+        headers: Dict[str, str],
+        method: str,
+        data: Any,
+        use_cache: bool,
+    ) -> Any:
+        if use_cache:
+            poss_cached_req = FrozenRequest(path, query_args, headers, response=None)
+            if self.client.cache.has(poss_cached_req):
+                return self.client.cache.get(poss_cached_req).response
 
-        res = [json_response]
-        if return_code:
-            res += [response.status_code]
+        return self._requests.request(
+            method, url, params=query_args, data=data, headers=headers
+        )
 
-        if return_pagination:
-            res += [self.get_pagination_headers(response)]
-
-        if return_original_response:
-            res += [response]
-
-        return res
-
-    def _get_json(self, response: Any, no_raise: bool) -> Any:
+    @staticmethod
+    def _get_json(response: Any, no_raise: bool) -> Any:
         try:
             return response.json()
         except BaseException:  # pragma: no cover
@@ -96,7 +122,7 @@ class DefaultHttpComponent:
             else:
                 raise
 
-    def get_headers(self) -> Dict[str, str]:
+    def _get_headers(self) -> Dict[str, str]:
         headers = {
             "Content-Type": "application/json",
             "trakt-api-key": self.client.client_id,
@@ -110,29 +136,12 @@ class DefaultHttpComponent:
 
         return str_headers
 
-    def handle_code(self, response: Any) -> None:
-        m = {
-            400: BadRequest,
-            401: Unauthorized,
-            403: Forbidden,
-            404: NotFound,
-            405: MethodNotFound,
-            409: Conflict,
-            412: PreconditionFailed,
-            422: UnprocessableEntity,
-            429: RateLimitExceeded,
-            500: ServerError,
-            503: ServiceUnavailable,
-            504: ServiceUnavailable,
-            520: ServiceUnavailable,
-            521: ServiceUnavailable,
-            522: ServiceUnavailable,
-        }
-
+    @staticmethod
+    def _handle_code(response: Any) -> None:
         code = response.status_code
 
-        if code in m:
-            raise m[code](code, response=response)
+        if code in STATUS_CODE_MAPPING:
+            raise STATUS_CODE_MAPPING[code](code, response=response)
 
         if code // 100 in {4, 5}:
             raise RequestRelatedError(code=code, response=response)
@@ -146,7 +155,8 @@ class DefaultHttpComponent:
 
         return urllib.parse.urlunparse(url_parts)
 
-    def get_pagination_headers(self, response: Any) -> Dict[str, str]:
+    @staticmethod
+    def _get_pagination_headers(response: Any) -> Dict[str, str]:
         headers = response.headers
 
         return {
@@ -155,3 +165,19 @@ class DefaultHttpComponent:
             "page": headers.get("X-Pagination-Page"),
             "page_count": headers.get("X-Pagination-Page-Count"),
         }
+
+    @property
+    def last_request(self) -> Optional[FrozenRequest]:
+        return self._last_response
+
+
+@dataclass
+class ApiResponse:
+    json: Any
+    original: Any
+    pagination: Any
+    code: int = field(init=False)
+    parsed: Any = field(init=False, default=None)
+
+    def __post_init__(self) -> None:
+        self.code = self.original.status_code

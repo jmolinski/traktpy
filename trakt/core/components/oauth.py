@@ -53,7 +53,7 @@ class DefaultOauthComponent:
             "grant_type": "authorization_code",
         }
 
-        ret = self.client.http.request("oauth/token", method="POST", data=data)
+        ret = self.client.http.request("oauth/token", method="POST", data=data).json
 
         self.client.user = TraktCredentials(
             access_token=ret["access_token"],
@@ -77,7 +77,7 @@ class DefaultOauthComponent:
             "grant_type": "refresh_token",
         }
 
-        ret = self.client.http.request("oauth/token", method="POST", data=data)
+        ret = self.client.http.request("oauth/token", method="POST", data=data).json
 
         self.client.user = TraktCredentials(
             access_token=ret["access_token"],
@@ -97,7 +97,6 @@ class DefaultOauthComponent:
         }
 
         self.client.http.request("oauth/revoke", method="POST", data=data, headers={})
-
         self.client.user = None
 
     def get_verification_code(self) -> CodeResponse:
@@ -107,7 +106,7 @@ class DefaultOauthComponent:
             "oauth/device/code", method="POST", data=data, headers={}
         )
 
-        return CodeResponse(**ret)
+        return CodeResponse(**ret.json)
 
     def wait_for_verification(self, *, code: CodeResponse) -> TraktCredentials:
         data = {
@@ -118,7 +117,7 @@ class DefaultOauthComponent:
 
         elapsed_time: float = 0
         while True:
-            ret, status_code = self.client.http.request(
+            ret = self.client.http.request(
                 "oauth/device/token",
                 method="POST",
                 data=data,
@@ -126,7 +125,7 @@ class DefaultOauthComponent:
                 headers={},
                 no_raise=True,
             )
-            if status_code == 200:
+            if ret.original.status_code == 200:
                 break
 
             elapsed_time += code.interval + 0.3
@@ -138,10 +137,10 @@ class DefaultOauthComponent:
             self.sleep(code.interval + 0.3)
 
         self.client.user = TraktCredentials(
-            access_token=ret["access_token"],
-            refresh_token=ret["refresh_token"],
-            scope=ret["scope"],
-            expires_at=(int(ret["created_at"]) + int(ret["expires_in"])),
+            access_token=ret.json["access_token"],
+            refresh_token=ret.json["refresh_token"],
+            scope=ret.json["scope"],
+            expires_at=(int(ret.json["created_at"]) + int(ret.json["expires_in"])),
         )
 
         return self.client.user

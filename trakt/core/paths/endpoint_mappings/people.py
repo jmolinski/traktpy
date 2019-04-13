@@ -15,19 +15,25 @@ class PeopleI(SuiteInterface):
 
     paths = {
         "get_person": Path(
-            "people/!id", Person, validators=[PERSON_ID_VALIDATOR], extended=["full"]
+            "people/!id",
+            Person,
+            validators=[PERSON_ID_VALIDATOR],
+            extended=["full"],
+            cache_level="basic",
         ),
         "get_movie_credits": Path(
             "people/!id/movies",
             MovieCredits,
             validators=[PERSON_ID_VALIDATOR],
             extended=["full"],
+            cache_level="basic",
         ),
         "get_show_credits": Path(
             "people/!id/shows",
             ShowCredits,
             validators=[PERSON_ID_VALIDATOR],
             extended=["full"],
+            cache_level="basic",
         ),
         "get_lists": Path(
             "people/!id/lists/?type/?sort",
@@ -38,6 +44,7 @@ class PeopleI(SuiteInterface):
                 PerArgValidator("sort", lambda s: s in LIST_SORT_VALUES),
             ],
             extended=["full"],
+            cache_level="basic",
         ),
     }
 
