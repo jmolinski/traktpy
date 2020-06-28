@@ -1,5 +1,4 @@
 # traktpy
-[![Build Status](https://travis-ci.org/jmolinski/traktpy.svg?branch=master)](https://travis-ci.org/jmolinski/traktpy)
 [![Coverage Status](https://coveralls.io/repos/github/jmolinski/traktpy/badge.svg?branch=master)](https://coveralls.io/github/jmolinski/traktpy?branch=master)
 
 Python library for accessing the Trakt.tv REST api.
@@ -10,7 +9,7 @@ Python3.7+ is required to run this library.
 
 All methods have detailed type annotations. That allows for precise code completion both for API calls and accessing response structs.
 
-Library in development. The docs are not available at the moment. You may use https://trakt.docs.apiary.io/ as a reference.
+Library development is stalled. You may use https://trakt.docs.apiary.io/ as a reference.
 
 ---
 
@@ -76,12 +75,7 @@ If the response is corrupt (can't be parsed) the parser will raise `trakt.core.e
 
 ---
 Todo 0.1.0:
-- docs
-- pypi release
-
----
-Todo 0.2.0:
-- sync
-- methods on models (episode.rate() etc)
+- sync module
 - user profile
 - http component retries
+- pypi release
